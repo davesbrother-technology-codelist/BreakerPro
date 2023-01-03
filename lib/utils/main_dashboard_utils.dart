@@ -114,7 +114,7 @@ class MainDashboardUtils {
         });
   }
 
-  static void addPartDialog(BuildContext context) {
+  static void addPartDialog(BuildContext context,PartsList partsList) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -182,7 +182,13 @@ class MainDashboardUtils {
                       onPressed: () => {
                             Navigator.of(context).pop(),
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => VehicleDetailsScreen()))
+                                builder: (context) => MultiProvider(
+                                  providers: [
+                                    ChangeNotifierProvider<PartsList>(
+                                        create: (context) => partsList),
+                                  ],
+                                  child: const VehicleDetailsScreen(),
+                                ),))
                           },
                       child: const Text(
                         "MANUAL ENTRY",
