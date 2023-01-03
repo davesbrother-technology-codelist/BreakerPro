@@ -5,7 +5,7 @@ import 'package:breaker_pro/screens/main_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-
+import 'package:breaker_pro/screens/customise_parts_screen2.dart';
 import '../dataclass/part.dart';
 import '../my_theme.dart';
 import 'dart:convert';
@@ -114,7 +114,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                 child: ListTile(
                   onTap: () => {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CustomisePart()))
+                        builder: (context) => Customise()))
                   },
                   trailing: Text(partsList[index].id.toString()),
                   title: Text(partsList[index].partName),
@@ -172,16 +172,5 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   }
 }
 
-class CustomisePart extends StatefulWidget {
-  const CustomisePart({Key? key}) : super(key: key);
 
-  @override
-  State<CustomisePart> createState() => _CustomisePartState();
-}
 
-class _CustomisePartState extends State<CustomisePart> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
