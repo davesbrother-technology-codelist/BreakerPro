@@ -2,6 +2,7 @@ import 'package:breaker_pro/screens/quickScan.dart';
 import 'package:breaker_pro/screens/scanImaging.dart';
 import 'package:breaker_pro/screens/scanStockReconcile.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
+import 'package:breaker_pro/screens/vehicle_details_screen2.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -187,7 +188,7 @@ class MainDashboardUtils {
                                     ChangeNotifierProvider<PartsList>(
                                         create: (context) => partsList),
                                   ],
-                                  child: const VehicleDetailsScreen(),
+                                  child: const VehicleDetailsScreen2(),
                                 ),))
                           },
                       child: const Text(

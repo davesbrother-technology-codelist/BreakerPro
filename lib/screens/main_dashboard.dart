@@ -152,10 +152,14 @@ class _MainDashboardState extends State<MainDashboard> {
                 child: GestureDetector(
                     onTap: () {
                       print(index);
-                      if (index == 0 || index==1) {
+                      if (index == 0) {
                         MainDashboardUtils.functionList[index]!(
                             context, partsList);
-                      } else {
+                      }else if(index==1){
+                        MainDashboardUtils.functionList[index]!(
+                            context, partsList);
+                      }
+                      else {
                         MainDashboardUtils.functionList[index]!(context);
                       }
                     },

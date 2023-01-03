@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
 import 'capture_screen.dart';
-
+import 'package:breaker_pro/screens/main_dashboard.dart';
 
 // class Constants{
 //   String selectedItem='';
@@ -117,8 +117,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             padding: const EdgeInsets.all(10),
             child: IconButton(
               onPressed: () {
-                Navigator.of(context).pop();
-              },
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (ctx) => MainDashboard()));              },
               icon: const Icon(Icons.arrow_back),
             ),
           ),
