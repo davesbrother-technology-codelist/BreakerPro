@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../dataclass/part.dart';
 import '../my_theme.dart';
+import 'main_dashboard.dart';
 
 class AllocatePartsScreen extends StatefulWidget {
   const AllocatePartsScreen({Key? key}) : super(key: key);
@@ -64,8 +65,8 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: MyTheme.white),
           onPressed: () {
-            Navigator.of(context).pop();
-          },
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (ctx) => MainDashboard()));          },
         ),
         actions: [
           IconButton(
