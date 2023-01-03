@@ -1,3 +1,4 @@
+import 'package:breaker_pro/screens/customise_parts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../my_theme.dart';
@@ -75,7 +76,7 @@ class _CustomiseState extends State<Customise> {
           width: MediaQuery.of(context).size.width,
           child: TextButton(
             onPressed: () {
-            },
+              Navigator.pop(context);           },
             child: Text(
               "Save",
               style: TextStyle(color: MyTheme.white),
