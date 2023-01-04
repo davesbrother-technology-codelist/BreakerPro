@@ -363,11 +363,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               style: TextStyle(
                                   color: MyTheme.black, fontSize: 20)),
                           onPressed:() async {
-                            List<XFile> pickedGallery= (await _picker.pickMultiImage());
+                            // List<XFile> pickedGallery= (await _picker.pickMultiImage());
+                            var image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
                             setState(() {
                               // images.add(image);
-                              images= pickedGallery.map((e) => File(e.path)).toList();
+                              // images= pickedGallery.map((e) => File(e.path)).toList();
+                              ImageList.imgList.add(image!.path);
 
                             });
                           },

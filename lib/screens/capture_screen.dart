@@ -62,21 +62,21 @@ class _CaptureScreenState extends State<CaptureScreen> {
     }
   }
 
-  void toggleCamera() {
-    // If the current camera is the first camera (front), set the current camera index to the second camera (back).
-    // Otherwise, set the current camera index to the first camera (front).
-    currentCameraIndex = currentCameraIndex == 0 ? 1 : 0;
-
-    // Dispose of the current camera controller and initialize a new one with the selected camera.
-    _controller.dispose();
-    _controller = CameraController(camera, ResolutionPreset.medium);
-    _controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
-  }
+  // void toggleCamera() {
+  //   // If the current camera is the first camera (front), set the current camera index to the second camera (back).
+  //   // Otherwise, set the current camera index to the first camera (front).
+  //   currentCameraIndex = currentCameraIndex == 0 ? 1 : 0;
+  //
+  //   // Dispose of the current camera controller and initialize a new one with the selected camera.
+  //   _controller.dispose();
+  //   _controller = CameraController(camera, ResolutionPreset.medium);
+  //   _controller.initialize().then((_) {
+  //     if (!mounted) {
+  //       return;
+  //     }
+  //     setState(() {});
+  //   });
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,6 +237,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
     );
   }
   void _toggleCameraLens(){
+
     final lensDirection =  _controller.description.lensDirection;
     CameraDescription newDescription;
     if(lensDirection == CameraLensDirection.front){
