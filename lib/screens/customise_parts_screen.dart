@@ -11,6 +11,8 @@ import '../my_theme.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'addPart.dart';
+
 class CustomisePartsScreen extends StatefulWidget {
   const CustomisePartsScreen({Key? key}) : super(key: key);
 
@@ -68,7 +70,10 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () => {},
+              onPressed: () => {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>AddPart()))
+
+              },
               icon: Icon(
                 Icons.add_circle,
                 color: MyTheme.white,

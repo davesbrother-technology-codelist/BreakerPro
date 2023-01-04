@@ -165,7 +165,9 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: _toggleCameraLens,
+                                  onPressed:
+                                      // (){},
+                                  _toggleCameraLens,
                                   icon: const Icon(
                                     Icons.flip_camera_android,
                                     size: 40,
