@@ -17,6 +17,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late CameraDescription camera;
+  List<CameraDescription> _availableCameras=[];
 
   List<String> imgList = [];
   FlashMode? _currentFlashMode;
@@ -41,7 +42,26 @@ class _CaptureScreenState extends State<CaptureScreen> {
 
     // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
+    _getAvailableCameras();
   }
+  Future<void> _getAvailableCameras() async{
+    WidgetsFlutterBinding.ensureInitialized();
+    _availableCameras = await availableCameras();
+    _initCamera(_availableCameras.first);
+  }
+  Future<void> _initCamera(CameraDescription description) async{
+    _controller = CameraController(description, ResolutionPreset.max, enableAudio: true);
+
+    try{
+      await _controller.initialize();
+      // to notify the widgets that camera has been initialized and now camera preview can be done
+      setState((){});
+    }
+    catch(e){
+      print(e);
+    }
+  }
+
   void toggleCamera() {
     // If the current camera is the first camera (front), set the current camera index to the second camera (back).
     // Otherwise, set the current camera index to the first camera (front).
@@ -145,8 +165,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: (){
-                                  },
+                                  onPressed: _toggleCameraLens,
                                   icon: const Icon(
                                     Icons.flip_camera_android,
                                     size: 40,
@@ -216,6 +235,23 @@ class _CaptureScreenState extends State<CaptureScreen> {
       //   child: const Icon(Icons.camera_alt),
       // ),
     );
+  }
+  void _toggleCameraLens(){
+    final lensDirection =  _controller.description.lensDirection;
+    CameraDescription newDescription;
+    if(lensDirection == CameraLensDirection.front){
+      newDescription = _availableCameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
+    }
+    else{
+      newDescription = _availableCameras.firstWhere((description) => description.lensDirection == CameraLensDirection.front);
+    }
+
+    if(newDescription != null){
+      _initCamera(newDescription);
+    }
+    else{
+      print('Asked camera not available');
+    }
   }
 }
 
