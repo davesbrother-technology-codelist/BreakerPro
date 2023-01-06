@@ -5,7 +5,7 @@ import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen2.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
@@ -24,7 +24,7 @@ class MainDashboardUtils {
   ];
 
   static void addBreakerDialog(BuildContext context, PartsList partsList) {
-    if (partsList.partList.isEmpty) {
+    if (PartsList.partList.isEmpty) {
       Fluttertoast.showToast(msg: "Fetching Parts");
       return;
     }
@@ -95,13 +95,8 @@ class MainDashboardUtils {
                       onPressed: () => {
                             Navigator.of(context).pop(),
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => MultiProvider(
-                                providers: [
-                                  ChangeNotifierProvider<PartsList>(
-                                      create: (context) => partsList),
-                                ],
-                                child: const VehicleDetailsScreen(),
-                              ),
+                              builder: (context) =>
+                                  const VehicleDetailsScreen(),
                             ))
                           },
                       child: const Text(
@@ -115,7 +110,7 @@ class MainDashboardUtils {
         });
   }
 
-  static void addPartDialog(BuildContext context,PartsList partsList) {
+  static void addPartDialog(BuildContext context, PartsList partsList) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -183,13 +178,9 @@ class MainDashboardUtils {
                       onPressed: () => {
                             Navigator.of(context).pop(),
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => MultiProvider(
-                                  providers: [
-                                    ChangeNotifierProvider<PartsList>(
-                                        create: (context) => partsList),
-                                  ],
-                                  child: const VehicleDetailsScreen2(),
-                                ),))
+                              builder: (context) =>
+                                  const VehicleDetailsScreen2(),
+                            ))
                           },
                       child: const Text(
                         "MANUAL ENTRY",
@@ -262,8 +253,7 @@ class MainDashboardUtils {
                                     Navigator.of(context).pop(),
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                ScanPart()))
+                                            builder: (context) => ScanPart()))
                                   },
                               child: Text(
                                 "Find",
@@ -321,18 +311,18 @@ class MainDashboardUtils {
   }
 
   static void f4(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ScanStockReconcile()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
   }
 
   static void f5(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ScanImaging()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ScanImaging()));
   }
 
   static void f6(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => ManagePart()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ManagePart()));
   }
 
   static void f7(BuildContext context) {

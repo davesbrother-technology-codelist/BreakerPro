@@ -9,13 +9,11 @@ import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
 import 'capture_screen.dart';
 import 'package:breaker_pro/screens/main_dashboard.dart';
-
 
 // class Constants{
 //   String selectedItem='';
@@ -30,12 +28,12 @@ class VehicleDetailsScreen2 extends StatefulWidget {
 
 class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
   OutlineInputBorder border =
-  OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   TextStyle textStyle = TextStyle(fontSize: 17, color: MyTheme.grey);
   EdgeInsetsGeometry textEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(0, 10, 10, 10);
+      const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(10, 5, 10, 5);
+      const EdgeInsets.fromLTRB(10, 5, 10, 5);
   late PartsList partsList;
   late Map responseJson;
   bool modelEnable = true;
@@ -59,40 +57,31 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
   List<File> images = [];
   final ImagePicker _picker = ImagePicker();
 
-  late String selectedYear1='1999';
-  late String selectedYear2='2000';
-  late String selectedYear3='2001';
-
+  late String selectedYear1 = '1999';
+  late String selectedYear2 = '2000';
+  late String selectedYear3 = '2001';
 
   List<DropdownMenuItem<String>> years1 = [];
-
 
   DateTime? selectedDate1;
   DateTime? selectedDate2;
   DateTime? selectedDate3;
   DateTime? selectedDate4;
 
-
-
   late String formattedDate1;
-  String? formattedDate2  ;
+  String? formattedDate2;
   late String formattedDate3;
   late String formattedDate4;
 
-
-
-
   @override
   void initState() {
-    partsList = Provider.of<PartsList>(context, listen: false);
-    print(partsList.partList.length);
+    print(PartsList.partList.length);
     fetchSelectList();
     super.initState();
     formattedDate1 = '';
     formattedDate2 = '';
     formattedDate3 = '';
-    formattedDate4='';
-
+    formattedDate4 = '';
 
     int currentYear = DateTime.now().year;
     for (int i = 1980; i <= currentYear; i++) {
@@ -103,7 +92,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
         ),
       );
     }
-
   }
 
   @override
@@ -118,8 +106,8 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
             padding: const EdgeInsets.all(10),
             child: IconButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (ctx) => MainDashboard()));
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (ctx) => MainDashboard()));
               },
               icon: const Icon(Icons.arrow_back),
             ),
@@ -178,7 +166,8 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                 children: [
                   // customTextField("Manufacturing Year",
                   //     dropDownValue: mnfYearValue, menuItems: yearMenuItems),
-                  custom31TextField("Manufacturing Year",selectedYear1,years1),
+                  custom31TextField(
+                      "Manufacturing Year", selectedYear1, years1),
                   custom4D4TextField("On Site Date")
                   // customTextField("On Site Date",
                   //     dropDownValue: onSiteDateValue, menuItems: yearMenuItems)
@@ -187,12 +176,13 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               Row(
                 children: [
                   Expanded(
-                      child:custom31TextField("Year Range",selectedYear2,years1)
-                    // customTextField("Year Range",
-                    //     dropDownValue: yearFromValue,
-                    //     menuItems: yearMenuItems)
+                      child:
+                          custom31TextField("Year Range", selectedYear2, years1)
+                      // customTextField("Year Range",
+                      //     dropDownValue: yearFromValue,
+                      //     menuItems: yearMenuItems)
 
-                  ),
+                      ),
                   Padding(
                     padding: const EdgeInsets.only(top: 30),
                     child: Text(
@@ -200,21 +190,19 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                       style: textStyle,
                     ),
                   ),
-                  Expanded(
-                      child:
-                      custom31TextField("",selectedYear3,years1)
-                    // customTextField("",
-                    //     dropDownValue: yearToValue, menuItems: yearMenuItems)
-                  )
+                  Expanded(child: custom31TextField("", selectedYear3, years1)
+                      // customTextField("",
+                      //     dropDownValue: yearToValue, menuItems: yearMenuItems)
+                      )
                 ],
               ),
               Divider(
                 thickness: 2, // thickness of the line
                 indent: 10, // empty space to the leading edge of divider.
                 endIndent:
-                10, // empty space to the trailing edge of the divider.
+                    10, // empty space to the trailing edge of the divider.
                 color:
-                MyTheme.black, // The color to use when painting the line.
+                    MyTheme.black, // The color to use when painting the line.
                 height: 10, // The divider's height extent.
               ),
               const Padding(
@@ -247,9 +235,9 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                         height: 60,
                         child: TextField(
                             decoration: InputDecoration(
-                              enabledBorder: border,
-                              focusedBorder: border,
-                            ))),
+                          enabledBorder: border,
+                          focusedBorder: border,
+                        ))),
                   ],
                 ),
               ),
@@ -260,9 +248,9 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                 thickness: 2, // thickness of the line
                 indent: 10, // empty space to the leading edge of divider.
                 endIndent:
-                10, // empty space to the trailing edge of the divider.
+                    10, // empty space to the trailing edge of the divider.
                 color:
-                MyTheme.black, // The color to use when painting the line.
+                    MyTheme.black, // The color to use when painting the line.
                 height: 10, // The divider's height extent.
               ),
               Row(
@@ -300,9 +288,9 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                         height: 60,
                         child: TextField(
                             decoration: InputDecoration(
-                              enabledBorder: border,
-                              focusedBorder: border,
-                            ))),
+                          enabledBorder: border,
+                          focusedBorder: border,
+                        ))),
                   ],
                 ),
               ),
@@ -351,7 +339,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                           label: Text(
                             'Capture',
                             style:
-                            TextStyle(color: MyTheme.black, fontSize: 20),
+                                TextStyle(color: MyTheme.black, fontSize: 20),
                           ),
                           onPressed: openCamera,
                         ),
@@ -364,16 +352,15 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                           label: Text('Gallery',
                               style: TextStyle(
                                   color: MyTheme.black, fontSize: 20)),
-                          onPressed:() async {
+                          onPressed: () async {
                             // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                            var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            var image = await ImagePicker()
+                                .pickImage(source: ImageSource.gallery);
 
                             setState(() {
                               // images.add(image);
                               // images= pickedGallery.map((e) => File(e.path)).toList();
                               ImageList.imgList.add(image!.path);
-
-
                             });
                           },
                         ),
@@ -381,38 +368,39 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                     ),
                     ImageList.imgList.isNotEmpty
                         ? SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: 120,
-                      child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: ImageList.imgList.length,
-                          itemBuilder: (BuildContext ctxt, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0),
-                              child: Stack(
-                                // alignment: Alignment.bottomLeft,
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Image.file(
-                                        File(ImageList.imgList[index]),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      padding: EdgeInsets.all(0),
-                                      icon: Icon(Icons.close),
-                                      onPressed: () {
-                                        setState(() {
-                                          ImageList.imgList.removeAt(index);
-                                        });
-                                      },
-                                    ),
-                                  ]),
-                            );
-                          }),
-                    )
+                            width: MediaQuery.of(context).size.width,
+                            height: 120,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: ImageList.imgList.length,
+                                itemBuilder: (BuildContext ctxt, int index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Stack(
+                                        // alignment: Alignment.bottomLeft,
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Image.file(
+                                              File(ImageList.imgList[index]),
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            padding: EdgeInsets.all(0),
+                                            icon: Icon(Icons.close),
+                                            onPressed: () {
+                                              setState(() {
+                                                ImageList.imgList
+                                                    .removeAt(index);
+                                              });
+                                            },
+                                          ),
+                                        ]),
+                                  );
+                                }),
+                          )
                         : SizedBox()
                   ],
                 ),
@@ -434,13 +422,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => MultiProvider(
-                            providers: [
-                              ChangeNotifierProvider<PartsList>(
-                                  create: (context) => partsList),
-                            ],
-                            child: const AllocatePartsScreen(),
-                          ),
+                          builder: (context) => const AllocatePartsScreen(),
                         ));
                       },
                       child: Text(
@@ -456,7 +438,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
         ));
   }
 
-  Widget custom2TextField(String title,Widget name){
+  Widget custom2TextField(String title, Widget name) {
     return Container(
         padding: containerEdgeInsetsGeometry,
         width: MediaQuery.of(context).size.width / 2,
@@ -472,9 +454,10 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                 ),
               ),
               TextField(
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>name));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => name));
                     });
                   },
                   decoration: InputDecoration(
@@ -482,9 +465,9 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                     enabledBorder: border,
                     focusedBorder: border,
                   )),
-            ]
-        ));
+            ]));
   }
+
   Widget custom4D4TextField(String title) {
     return Container(
       padding: containerEdgeInsetsGeometry,
@@ -500,7 +483,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               style: textStyle,
             ),
           ),
-
           TextField(
             onTap: () async {
               final DateTime? picked = await showDatePicker(
@@ -512,7 +494,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               if (picked != null && picked != selectedDate4)
                 setState(() {
                   selectedDate4 = picked;
-
                 });
             },
             decoration: InputDecoration(
@@ -521,12 +502,11 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               focusedBorder: border,
             ),
           ),
-
-
         ],
       ),
     );
   }
+
   Widget custom4D3TextField(String title) {
     return Container(
       padding: containerEdgeInsetsGeometry,
@@ -542,7 +522,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               style: textStyle,
             ),
           ),
-
           TextField(
             onTap: () async {
               final DateTime? picked = await showDatePicker(
@@ -554,7 +533,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               if (picked != null && picked != selectedDate3)
                 setState(() {
                   selectedDate3 = picked;
-
                 });
             },
             decoration: InputDecoration(
@@ -563,12 +541,11 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               focusedBorder: border,
             ),
           ),
-
-
         ],
       ),
     );
   }
+
   Widget custom4D2TextField(String title) {
     return Container(
       padding: containerEdgeInsetsGeometry,
@@ -584,7 +561,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               style: textStyle,
             ),
           ),
-
           TextField(
             onTap: () async {
               final DateTime? picked = await showDatePicker(
@@ -596,7 +572,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               if (picked != null && picked != selectedDate2)
                 setState(() {
                   selectedDate2 = picked;
-
                 });
             },
             decoration: InputDecoration(
@@ -605,12 +580,11 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               focusedBorder: border,
             ),
           ),
-
-
         ],
       ),
     );
   }
+
   Widget custom4D1TextField(String title) {
     return Container(
       padding: containerEdgeInsetsGeometry,
@@ -637,7 +611,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               if (picked != null && picked != selectedDate1)
                 setState(() {
                   selectedDate1 = picked;
-
                 });
             },
             decoration: InputDecoration(
@@ -646,15 +619,13 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               focusedBorder: border,
             ),
           ),
-
-
-
-
         ],
       ),
     );
   }
-  Widget custom31TextField(String title,String selectedYear,List<DropdownMenuItem<String>> year) {
+
+  Widget custom31TextField(
+      String title, String selectedYear, List<DropdownMenuItem<String>> year) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -669,7 +640,6 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               style: textStyle,
             ),
           ),
-
           DropdownButtonFormField(
             isExpanded: true,
             menuMaxHeight: 300,
@@ -686,12 +656,11 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               focusedBorder: border,
             ),
           ),
-
-
         ],
       ),
     );
   }
+
   // Widget custom32TextField(String title,String selectedYear) {
   //   return Container(
   //     padding: containerEdgeInsetsGeometry,
@@ -770,8 +739,8 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
   // }
   Widget customTextField(String title,
       {String? dropDownValue,
-        List<DropdownMenuItem<String>>? menuItems,
-        bool enable = true}) {
+      List<DropdownMenuItem<String>>? menuItems,
+      bool enable = true}) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -790,49 +759,49 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
             height: 60,
             child: menuItems == null
                 ? TextField(
-                decoration: InputDecoration(
-                  enabledBorder: border,
-                  focusedBorder: border,
-                ))
+                    decoration: InputDecoration(
+                    enabledBorder: border,
+                    focusedBorder: border,
+                  ))
                 : DropdownButtonFormField(
-              isExpanded: true,
-              menuMaxHeight: 300,
-              decoration: InputDecoration(
-                  enabledBorder: border, focusedBorder: border),
-              value: dropDownValue,
-              items: menuItems,
-              onChanged: (String? newValue) {
-                // dropDownValue = newValue;
-                if (title == 'Make') {
-                  setState(() {
-                    dropDownValue = null;
-                    modelValue = null;
-                  });
-                  // modelEnable = true;
+                    isExpanded: true,
+                    menuMaxHeight: 300,
+                    decoration: InputDecoration(
+                        enabledBorder: border, focusedBorder: border),
+                    value: dropDownValue,
+                    items: menuItems,
+                    onChanged: (String? newValue) {
+                      // dropDownValue = newValue;
+                      if (title == 'Make') {
+                        setState(() {
+                          dropDownValue = null;
+                          modelValue = null;
+                        });
+                        // modelEnable = true;
 
-                  setState(() {
-                    modelMenuItems = createMenuList(newValue.toString(),
-                        modelMenuItems, responseJson);
-                  });
-                  // model = modelField("Model",
-                  //     dropDownValue: modelValue,
-                  //     menuItems: modelMenuItems,
-                  //     enable: modelEnable);
-                  //
-                  // print("Done");
-                  // for (DropdownMenuItem<String> a in modelMenuItems) {
-                  //   Text t = a.child as Text;
-                  //   print("${a.value} ${t.data}");
-                  // }
+                        setState(() {
+                          modelMenuItems = createMenuList(newValue.toString(),
+                              modelMenuItems, responseJson);
+                        });
+                        // model = modelField("Model",
+                        //     dropDownValue: modelValue,
+                        //     menuItems: modelMenuItems,
+                        //     enable: modelEnable);
+                        //
+                        // print("Done");
+                        // for (DropdownMenuItem<String> a in modelMenuItems) {
+                        //   Text t = a.child as Text;
+                        //   print("${a.value} ${t.data}");
+                        // }
 
-                  // setState(() {});
-                }
+                        // setState(() {});
+                      }
 
-                setState(() {
-                  dropDownValue = newValue;
-                });
-              },
-            ),
+                      setState(() {
+                        dropDownValue = newValue;
+                      });
+                    },
+                  ),
           ),
         ],
       ),
@@ -849,8 +818,8 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
 
   Widget modelField(String title,
       {String? dropDownValue,
-        List<DropdownMenuItem<String>>? menuItems,
-        bool enable = true}) {
+      List<DropdownMenuItem<String>>? menuItems,
+      bool enable = true}) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -869,26 +838,26 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
             height: 60,
             child: menuItems == null
                 ? TextField(
-                decoration: InputDecoration(
-                  enabledBorder: border,
-                  focusedBorder: border,
-                ))
+                    decoration: InputDecoration(
+                    enabledBorder: border,
+                    focusedBorder: border,
+                  ))
                 : DropdownButtonFormField(
-              isExpanded: true,
-              menuMaxHeight: 300,
-              decoration: InputDecoration(
-                  enabledBorder: border, focusedBorder: border),
-              value: dropDownValue,
-              items: menuItems,
-              // disabledHint: Text(dropDownValue.toString()),
-              onChanged: enable
-                  ? (String? newValue) {
-                setState(() {
-                  dropDownValue = newValue ?? "";
-                });
-              }
-                  : null,
-            ),
+                    isExpanded: true,
+                    menuMaxHeight: 300,
+                    decoration: InputDecoration(
+                        enabledBorder: border, focusedBorder: border),
+                    value: dropDownValue,
+                    items: menuItems,
+                    // disabledHint: Text(dropDownValue.toString()),
+                    onChanged: enable
+                        ? (String? newValue) {
+                            setState(() {
+                              dropDownValue = newValue ?? "";
+                            });
+                          }
+                        : null,
+                  ),
           ),
         ],
       ),
@@ -901,9 +870,9 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
     final firstCamera = cameras.first;
     state
         .push(MaterialPageRoute(
-        builder: (context) => CaptureScreen(
-          camera: firstCamera,
-        )))
+            builder: (context) => CaptureScreen(
+                  camera: firstCamera,
+                )))
         .then((value) => setState(() {}));
   }
 
@@ -924,7 +893,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
     List l = responseJson[title];
     menu = List<DropdownMenuItem<String>>.generate(
         l.length,
-            (index) => DropdownMenuItem(
+        (index) => DropdownMenuItem(
             value: l[index].toString(), child: Text(l[index])));
     // for (var a in menu) {
     //   print(a);

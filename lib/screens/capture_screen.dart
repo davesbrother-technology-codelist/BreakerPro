@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
-
 class CaptureScreen extends StatefulWidget {
   const CaptureScreen({Key? key, required this.camera}) : super(key: key);
   final CameraDescription camera;
@@ -17,14 +15,12 @@ class _CaptureScreenState extends State<CaptureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late CameraDescription camera;
-  List<CameraDescription> _availableCameras=[];
+  List<CameraDescription> _availableCameras = [];
 
   List<String> imgList = [];
   FlashMode? _currentFlashMode;
   int _selectedCameraIndex = 0;
   int currentCameraIndex = 0;
-
-
 
   @override
   void initState() {
@@ -44,20 +40,22 @@ class _CaptureScreenState extends State<CaptureScreen> {
     _initializeControllerFuture = _controller.initialize();
     _getAvailableCameras();
   }
-  Future<void> _getAvailableCameras() async{
+
+  Future<void> _getAvailableCameras() async {
     WidgetsFlutterBinding.ensureInitialized();
     _availableCameras = await availableCameras();
     _initCamera(_availableCameras.first);
   }
-  Future<void> _initCamera(CameraDescription description) async{
-    _controller = CameraController(description, ResolutionPreset.max, enableAudio: true);
 
-    try{
+  Future<void> _initCamera(CameraDescription description) async {
+    _controller =
+        CameraController(description, ResolutionPreset.max, enableAudio: true);
+
+    try {
       await _controller.initialize();
       // to notify the widgets that camera has been initialized and now camera preview can be done
-      setState((){});
-    }
-    catch(e){
+      setState(() {});
+    } catch (e) {
       print(e);
     }
   }
@@ -167,7 +165,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                 IconButton(
                                   onPressed:
                                       // (){},
-                                  _toggleCameraLens,
+                                      _toggleCameraLens,
                                   icon: const Icon(
                                     Icons.flip_camera_android,
                                     size: 40,
@@ -238,21 +236,21 @@ class _CaptureScreenState extends State<CaptureScreen> {
       // ),
     );
   }
-  void _toggleCameraLens(){
 
-    final lensDirection =  _controller.description.lensDirection;
+  void _toggleCameraLens() {
+    final lensDirection = _controller.description.lensDirection;
     CameraDescription newDescription;
-    if(lensDirection == CameraLensDirection.front){
-      newDescription = _availableCameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
-    }
-    else{
-      newDescription = _availableCameras.firstWhere((description) => description.lensDirection == CameraLensDirection.front);
+    if (lensDirection == CameraLensDirection.front) {
+      newDescription = _availableCameras.firstWhere((description) =>
+          description.lensDirection == CameraLensDirection.back);
+    } else {
+      newDescription = _availableCameras.firstWhere((description) =>
+          description.lensDirection == CameraLensDirection.front);
     }
 
-    if(newDescription != null){
+    if (newDescription != null) {
       _initCamera(newDescription);
-    }
-    else{
+    } else {
       print('Asked camera not available');
     }
   }

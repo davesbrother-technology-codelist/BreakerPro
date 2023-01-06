@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:breaker_pro/api/api_config.dart';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/screens/login_screen.dart';
+import 'package:breaker_pro/screens/settings_screen.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:breaker_pro/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
@@ -32,18 +34,25 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   @override
+  void dispose() {
+    Hive.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Container(
-          // height: 15,
-          // width: 15,
           padding: const EdgeInsets.all(5),
           child: Image.asset('assets/logo_breaker_pro.png'),
         ),
         actions: [
           IconButton(
-              onPressed: () => {},
+              onPressed: () => {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (builder) => const SettingsScreen()))
+                  },
               icon: Icon(
                 Icons.settings,
                 color: MyTheme.white,
@@ -155,11 +164,10 @@ class _MainDashboardState extends State<MainDashboard> {
                       if (index == 0) {
                         MainDashboardUtils.functionList[index]!(
                             context, partsList);
-                      }else if(index==1){
+                      } else if (index == 1) {
                         MainDashboardUtils.functionList[index]!(
                             context, partsList);
-                      }
-                      else {
+                      } else {
                         MainDashboardUtils.functionList[index]!(context);
                       }
                     },
@@ -308,10 +316,13 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   fetchPartsListNetwork() async {
-    print("PArts Liat");
+    print("Fetching Parts List");
     Map<String, dynamic> queryParams = ApiConfig.baseQueryParams;
     queryParams['index'] = "0";
-    await partsList.loadParts(
+    bool b = await partsList.loadParts(
         ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
+    if (b) {
+      setState(() {});
+    }
   }
 }

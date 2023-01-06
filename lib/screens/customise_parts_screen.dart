@@ -5,7 +5,7 @@ import 'package:breaker_pro/dataclass/vehicle.dart';
 import 'package:breaker_pro/screens/main_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
+
 import 'package:breaker_pro/screens/customise_parts_screen2.dart';
 import '../dataclass/part.dart';
 import '../my_theme.dart';
@@ -23,12 +23,12 @@ class CustomisePartsScreen extends StatefulWidget {
 
 class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   EdgeInsetsGeometry textEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(0, 10, 10, 10);
+      const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(10, 5, 10, 5);
+      const EdgeInsets.fromLTRB(10, 5, 10, 5);
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
-  OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   String? selectedItem1;
   String? selectedItem2;
 
@@ -60,8 +60,6 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   List<DropdownMenuItem<String>> dropdownItems1 = [];
   List<DropdownMenuItem<String>> dropdownItems2 = [];
 
-
-
   OutlineInputBorder focusedBorder = OutlineInputBorder(
       borderRadius: BorderRadius.zero,
       borderSide: BorderSide(width: 2, color: MyTheme.blue));
@@ -74,7 +72,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
 
   @override
   void initState() {
-    partsList = Provider.of<PartsList>(context, listen: false).partList;
+    partsList = PartsList.partList;
     super.initState();
     for (String item in items1) {
       dropdownItems1.add(DropdownMenuItem(
@@ -92,122 +90,117 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children:[
-        GestureDetector(
-          onTap: (){
-            _controller.close();
-
-          },
-          child: Scaffold(
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-            floatingActionButton: Container(
-              color: MyTheme.materialColor,
-              width: MediaQuery.of(context).size.width,
-              child: TextButton(
-                onPressed: () {
-                  uploadParts();
-                  uploadVehicle();
-                },
-                child: Text(
-                  "Upload",
-                  style: TextStyle(color: MyTheme.white),
-                ),
-              ),
-            ),
-            appBar: AppBar(
-              title: Text(
-                'Customise Parts',
+    return Stack(children: [
+      GestureDetector(
+        onTap: () {
+          _controller.close();
+        },
+        child: Scaffold(
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: Container(
+            color: MyTheme.materialColor,
+            width: MediaQuery.of(context).size.width,
+            child: TextButton(
+              onPressed: () {
+                uploadParts();
+                uploadVehicle();
+              },
+              child: Text(
+                "Upload",
                 style: TextStyle(color: MyTheme.white),
               ),
-              elevation: 0,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: MyTheme.white,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              actions: [
-                IconButton(
-                    onPressed: () => {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AddPart()))
-
-                    },
-                    icon: Icon(
-                      Icons.add_circle,
-                      color: MyTheme.white,
-                    )),
-                IconButton(
-                    onPressed: () => {
-                      _controller.open()
-                    },
-                    icon: Icon(
-                      Icons.filter_list,
-                      color: MyTheme.white,
-                    )),
-              ],
-            ),
-            body: Column(
-              children: [
-                Container(
-                  color: MyTheme.materialColor,
-                  padding: EdgeInsets.all(5),
-                  child: TextField(
-                    style: TextStyle(color: MyTheme.materialColor),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: MyTheme.white,
-                      border: border,
-                      focusedBorder: focusedBorder,
-                      enabledBorder: border,
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: MyTheme.black54,
-                      ),
-                      labelText: 'Type your keyword here',
-                      labelStyle: TextStyle(color: MyTheme.black54),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: partsList.length,
-                    controller: ScrollController(),
-                    separatorBuilder: (_, __) => const SizedBox(height: 5),
-                    itemBuilder: (context, index) => Container(
-                      height: 50,
-                      color: Colors.white,
-                      child: ListTile(
-                        onTap: () => {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => Customise()))
-                        },
-                        trailing: Text(partsList[index].id.toString()),
-                        title: Text(partsList[index].partName),
-                        // onChanged: (bool? value) {
-                        //   partsList[index].isSelected = value!;
-                        //   if (value == true) {
-                        //     selectedPartsList.add(partsList[index]);
-                        //   } else {
-                        //     selectedPartsList.remove(partsList[index]);
-                        //   }
-                        //   setState(() {});
-                        // },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
+          appBar: AppBar(
+            title: Text(
+              'Customise Parts',
+              style: TextStyle(color: MyTheme.white),
+            ),
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: MyTheme.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () => {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => AddPart()))
+                      },
+                  icon: Icon(
+                    Icons.add_circle,
+                    color: MyTheme.white,
+                  )),
+              IconButton(
+                  onPressed: () => {_controller.open()},
+                  icon: Icon(
+                    Icons.filter_list,
+                    color: MyTheme.white,
+                  )),
+            ],
+          ),
+          body: Column(
+            children: [
+              Container(
+                color: MyTheme.materialColor,
+                padding: EdgeInsets.all(5),
+                child: TextField(
+                  style: TextStyle(color: MyTheme.materialColor),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: MyTheme.white,
+                    border: border,
+                    focusedBorder: focusedBorder,
+                    enabledBorder: border,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: MyTheme.black54,
+                    ),
+                    labelText: 'Type your keyword here',
+                    labelStyle: TextStyle(color: MyTheme.black54),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: partsList.length,
+                  controller: ScrollController(),
+                  separatorBuilder: (_, __) => const SizedBox(height: 5),
+                  itemBuilder: (context, index) => Container(
+                    height: 50,
+                    color: Colors.white,
+                    child: ListTile(
+                      onTap: () => {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Customise()))
+                      },
+                      trailing: Text(partsList[index].id.toString()),
+                      title: Text(partsList[index].partName),
+                      // onChanged: (bool? value) {
+                      //   partsList[index].isSelected = value!;
+                      //   if (value == true) {
+                      //     selectedPartsList.add(partsList[index]);
+                      //   } else {
+                      //     selectedPartsList.remove(partsList[index]);
+                      //   }
+                      //   setState(() {});
+                      // },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        _buildBottomDrawer(context),
-
-      ]
-    );
+      ),
+      _buildBottomDrawer(context),
+    ]);
   }
 
   Future<void> uploadParts() async {
@@ -244,11 +237,12 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (ctx) => MainDashboard()));
   }
+
   Widget _buildBottomDrawer(BuildContext context) {
     return BottomDrawer(
       header: _buildBottomDrawerHead(context),
       body: _buildBottomDrawerBody(context),
-      headerHeight:0,
+      headerHeight: 0,
       drawerHeight: _bodyHeight,
       controller: _controller,
       boxShadow: [
@@ -269,43 +263,40 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         children: [
           Container(
             color: MyTheme.materialColor,
-            width: MediaQuery.of(context).size.width/3,
+            width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
-              onPressed:(){
+              onPressed: () {
                 _controller.close();
               },
-              child: Text("ALL",
-                style: TextStyle(
-                    color: MyTheme.white
-                ),
+              child: Text(
+                "ALL",
+                style: TextStyle(color: MyTheme.white),
               ),
             ),
           ),
           Container(
             color: MyTheme.materialColor,
-            width: MediaQuery.of(context).size.width/3,
+            width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
-              onPressed:(){
+              onPressed: () {
                 _controller.close();
               },
-              child: Text("APPLY FILTER",
-                style: TextStyle(
-                    color: MyTheme.white
-                ),
+              child: Text(
+                "APPLY FILTER",
+                style: TextStyle(color: MyTheme.white),
               ),
             ),
           ),
           Container(
             color: MyTheme.materialColor,
-            width: MediaQuery.of(context).size.width/3,
+            width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
-              onPressed:(){
+              onPressed: () {
                 _controller.close();
               },
-              child: Text("CLOSE",
-                style: TextStyle(
-                    color: MyTheme.white
-                ),
+              child: Text(
+                "CLOSE",
+                style: TextStyle(color: MyTheme.white),
               ),
             ),
           )
@@ -313,6 +304,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
       ),
     );
   }
+
   Widget _buildBottomDrawerBody(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -324,23 +316,23 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
               Container(
                 color: Colors.grey,
                 width: MediaQuery.of(context).size.width,
-                child: Text("Filter Option",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16
-                  ),
+                child: Text(
+                  "Filter Option",
+                  style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
-
-              customTextField("Pre Defined List",dropdownItems1,selectedItem1),
-              customTextField("Part Type",dropdownItems2,selectedItem2)
+              customTextField(
+                  "Pre Defined List", dropdownItems1, selectedItem1),
+              customTextField("Part Type", dropdownItems2, selectedItem2)
             ],
           ),
         ),
       ),
     );
   }
-  Widget customTextField(String title, List<DropdownMenuItem<String>> dropdownItems,String? selectedItem1) {
+
+  Widget customTextField(String title,
+      List<DropdownMenuItem<String>> dropdownItems, String? selectedItem1) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width,
@@ -373,6 +365,3 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     );
   }
 }
-
-
-

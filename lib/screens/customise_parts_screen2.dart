@@ -14,7 +14,7 @@ import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
@@ -70,13 +70,13 @@ class _CustomiseState extends State<Customise> {
     return MaterialApp(
       home: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
         floatingActionButton: Container(
           color: MyTheme.materialColor,
           width: MediaQuery.of(context).size.width,
           child: TextButton(
             onPressed: () {
-              Navigator.pop(context);           },
+              Navigator.pop(context);
+            },
             child: Text(
               "Save",
               style: TextStyle(color: MyTheme.white),
@@ -221,25 +221,26 @@ class _CustomiseState extends State<Customise> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
-                          child: TextField(
-                              onTap: () async {
-                                final DateTime? picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: selectedDate ?? DateTime.now(),
-                                  firstDate: DateTime(1980),
-                                  lastDate: DateTime.now(),
-                                );
-                                if (picked != null && picked != selectedDate)
-                                  setState(() {
-                                    selectedDate = picked;
-                                    formattedDate = DateFormat('dd/MM/yyyy').format(picked);
-                                  });
-                              },
-                              decoration: InputDecoration(
-                                hintText: formattedDate == '' ? '' : formattedDate,
-                                enabledBorder: border,
-                                focusedBorder: border
-                              ),
+                            child: TextField(
+                          onTap: () async {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate ?? DateTime.now(),
+                              firstDate: DateTime(1980),
+                              lastDate: DateTime.now(),
+                            );
+                            if (picked != null && picked != selectedDate)
+                              setState(() {
+                                selectedDate = picked;
+                                formattedDate =
+                                    DateFormat('dd/MM/yyyy').format(picked);
+                              });
+                          },
+                          decoration: InputDecoration(
+                              hintText:
+                                  formattedDate == '' ? '' : formattedDate,
+                              enabledBorder: border,
+                              focusedBorder: border),
                         )),
                       ),
                     )
@@ -264,7 +265,7 @@ class _CustomiseState extends State<Customise> {
                             label: Text(
                               'Capture',
                               style:
-                              TextStyle(color: MyTheme.black, fontSize: 20),
+                                  TextStyle(color: MyTheme.black, fontSize: 20),
                             ),
                             onPressed: openCamera,
                           ),
@@ -277,15 +278,15 @@ class _CustomiseState extends State<Customise> {
                             label: Text('Gallery',
                                 style: TextStyle(
                                     color: MyTheme.black, fontSize: 20)),
-                            onPressed:() async {
+                            onPressed: () async {
                               // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                              var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              var image = await ImagePicker()
+                                  .pickImage(source: ImageSource.gallery);
 
                               setState(() {
                                 // images.add(image);
                                 // images= pickedGallery.map((e) => File(e.path)).toList();
                                 ImageList.imgList.add(image!.path);
-
                               });
                             },
                           ),
@@ -293,41 +294,40 @@ class _CustomiseState extends State<Customise> {
                       ),
                       ImageList.imgList.isNotEmpty
                           ? SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: 120,
-                        child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: ImageList.imgList.length,
-                            itemBuilder: (BuildContext ctxt, int index) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0),
-                                child: Stack(
-                                  // alignment: Alignment.bottomLeft,
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Image.file(
-                                          File(ImageList.imgList[index]),
-                                          fit: BoxFit.fill,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        padding: EdgeInsets.all(0),
-                                        icon: Icon(Icons.close),
-                                        onPressed: () {
-                                          setState(() {
-                                            ImageList.imgList.removeAt(index);
-                                          });
-                                        },
-                                      ),
-                                    ]),
-                              );
-                            }),
-                      )
+                              width: MediaQuery.of(context).size.width,
+                              height: 120,
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: ImageList.imgList.length,
+                                  itemBuilder: (BuildContext ctxt, int index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Stack(
+                                          // alignment: Alignment.bottomLeft,
+                                          children: [
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Image.file(
+                                                File(ImageList.imgList[index]),
+                                                fit: BoxFit.fill,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              padding: EdgeInsets.all(0),
+                                              icon: Icon(Icons.close),
+                                              onPressed: () {
+                                                setState(() {
+                                                  ImageList.imgList
+                                                      .removeAt(index);
+                                                });
+                                              },
+                                            ),
+                                          ]),
+                                    );
+                                  }),
+                            )
                           : SizedBox(),
-
-
                     ],
                   ),
                 ),
@@ -404,9 +404,9 @@ class _CustomiseState extends State<Customise> {
     final firstCamera = cameras.first;
     state
         .push(MaterialPageRoute(
-        builder: (context) => CaptureScreen(
-          camera: firstCamera,
-        )))
+            builder: (context) => CaptureScreen(
+                  camera: firstCamera,
+                )))
         .then((value) => setState(() {}));
   }
 }

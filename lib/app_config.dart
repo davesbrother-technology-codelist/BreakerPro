@@ -16,6 +16,9 @@ class AppConfig {
   static String deviceName = "";
   static String osVersion = "";
 
+  static String imageAspectRatio = 'Default';
+  static String barcode = 'Qr code';
+
   static getDeviceInfo() async {
     deviceId = (await PlatformDeviceId.getDeviceId)!;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
