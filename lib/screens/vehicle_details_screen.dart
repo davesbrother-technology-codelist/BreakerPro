@@ -390,7 +390,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8.0),
                                     child: Stack(
-                                        // alignment: Alignment.bottomLeft,
+                                        alignment: Alignment.topRight,
                                         children: [
                                           Align(
                                             alignment: Alignment.centerLeft,

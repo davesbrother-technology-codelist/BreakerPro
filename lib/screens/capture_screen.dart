@@ -20,7 +20,12 @@ class _CaptureScreenState extends State<CaptureScreen> {
   List<String> imgList = [];
   FlashMode? _currentFlashMode;
   int currentCameraIndex = 0;
-
+  Map<String, IconData> map = {
+    'off': Icons.flash_off_sharp,
+    'on': Icons.flash_on_sharp,
+    'auto': Icons.flash_auto_sharp
+  };
+  String isFlashed = 'off';
   @override
   void dispose() {
     _controller.dispose();
@@ -80,7 +85,20 @@ class _CaptureScreenState extends State<CaptureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture')),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.close,
+          size: 30,
+          color: Colors.red ,
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        backgroundColor: Colors.transparent,
+
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -89,20 +107,37 @@ class _CaptureScreenState extends State<CaptureScreen> {
                 height: MediaQuery.of(context).size.height,
                 child: CameraPreview(
                   _controller,
-                  child: Stack(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    // alignment: Alignment.topRight,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: FloatingActionButton(
-                            // Provide an onPressed callback.
+                      Expanded(
+                        flex: 2,
+                        child: imgList.isNotEmpty
+                            ? Image.file(File(imgList.last))
+                            : SizedBox(),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                            onPressed: (){},
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.grey),
+                            ),
+                            child: Text(
+                              "Adjust",
+                            )),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: IconButton(
                             onPressed: () async {
                               try {
                                 // await _initializeControllerFuture;
                                 final image = await _controller.takePicture();
                                 if (!mounted) return;
-
                                 print(image.path);
                                 imgList.add(image.path);
                                 ImageList.vehicleImgList.add(image.path);
@@ -112,60 +147,57 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                 print(e);
                               }
                             },
-                            child: const Icon(Icons.camera_alt),
+                            icon: Icon(Icons.camera,
+                            size: 40,),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (isFlashed == 'off') {
+                                  isFlashed = 'on';
+                                  _controller.setFlashMode(FlashMode.torch);
+                                } else if (isFlashed == 'on') {
+                                  isFlashed = 'auto';
+                                  _controller.setFlashMode(FlashMode.auto);
+                                } else {
+                                  isFlashed = 'off';
+                                  _controller.setFlashMode(FlashMode.off);
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              map[isFlashed],
+                              size: 35,
+                            )),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: () {
+                            print('object');
+                            if (_currentFlashMode == FlashMode.off) {
+                              _currentFlashMode = FlashMode.torch;
+                            } else {
+                              _currentFlashMode = FlashMode.off;
+                            }
+                            setState(() {
+                              _controller.setFlashMode(_currentFlashMode!);
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.flashlight_on,
+                            size: 30,
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8.0, 8, 20, 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    print('object');
-                                    if (_currentFlashMode == FlashMode.off) {
-                                      _currentFlashMode = FlashMode.torch;
-                                    } else {
-                                      _currentFlashMode = FlashMode.off;
-                                    }
-                                    setState(() {
-                                      _controller
-                                          .setFlashMode(_currentFlashMode!);
-                                    });
-                                  },
-                                  icon: const Icon(
-                                    Icons.flash_on,
-                                    size: 40,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: _toggleCameraLens,
-                                  icon: const Icon(
-                                    Icons.flip_camera_android,
-                                    size: 40,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            width: 60,
-                            height: 80,
-                            color: Colors.grey,
-                            child: imgList.isNotEmpty
-                                ? Image.file(File(imgList.last))
-                                : SizedBox(),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _toggleCameraLens,
+                          icon: const Icon(
+                            Icons.flip_camera_android,
+                            size: 40,
                           ),
                         ),
                       ),
@@ -173,10 +205,46 @@ class _CaptureScreenState extends State<CaptureScreen> {
                   ),
                 ));
           } else {
+            // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
           }
         },
       ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      // floatingActionButton: FloatingActionButton(
+      //   // Provide an onPressed callback.
+      //   onPressed: () async {
+      //     // Take the Picture in a try / catch block. If anything goes wrong,
+      //     // catch the error.
+      //     try {
+      //       // Ensure that the camera is initialized.
+      //       await _initializeControllerFuture;
+      //
+      //       // Attempt to take a picture and get the file `image`
+      //       // where it was saved.
+      //       final image = await _controller.takePicture();
+      //
+      //       if (!mounted) return;
+      //       print(image.path);
+      //       imgList.add(image.path);
+      //
+      //       // If the picture was taken, display it on a new screen.
+      //       // await Navigator.of(context).push(
+      //       //   MaterialPageRoute(
+      //       //     builder: (context) => DisplayPictureScreen(
+      //       //       // Pass the automatically generated path to
+      //       //       // the DisplayPictureScreen widget.
+      //       //       imagePath: image.path,
+      //       //     ),
+      //       //   ),
+      //       // );
+      //     } catch (e) {
+      //       // If an error occurs, log the error to the console.
+      //       print(e);
+      //     }
+      //   },
+      //   child: const Icon(Icons.camera_alt),
+      // ),
     );
   }
 
@@ -197,4 +265,6 @@ class _CaptureScreenState extends State<CaptureScreen> {
       print('Asked camera not available');
     }
   }
+
+
 }
