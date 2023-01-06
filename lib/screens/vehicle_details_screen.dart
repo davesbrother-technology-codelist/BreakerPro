@@ -1,21 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../my_theme.dart';
 import 'capture_screen.dart';
-import 'package:breaker_pro/screens/main_dashboard.dart';
 
-// class Constants{
-//   String selectedItem='';
-// }
-// Constants item=Constants();
 class VehicleDetailsScreen extends StatefulWidget {
   const VehicleDetailsScreen({Key? key}) : super(key: key);
 
@@ -32,16 +26,35 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
       const EdgeInsets.fromLTRB(10, 5, 10, 5);
   late Map responseJson;
-  bool modelEnable = true;
+  bool modelEnable = false;
+
+  TextEditingController regNoController = TextEditingController();
+  TextEditingController stockRefController = TextEditingController();
+  TextEditingController ccController = TextEditingController();
+  TextEditingController typeModelController = TextEditingController();
+  TextEditingController uinController = TextEditingController();
+  TextEditingController colorController = TextEditingController();
+  TextEditingController transmissionController = TextEditingController();
+  TextEditingController engineCodeController = TextEditingController();
+  TextEditingController onSiteDateController = TextEditingController();
+  TextEditingController mileageController = TextEditingController();
+  TextEditingController costPriceController = TextEditingController();
+  TextEditingController collectionDateController = TextEditingController();
+  TextEditingController dePollutionDateController = TextEditingController();
+  TextEditingController destructionDateController = TextEditingController();
+  TextEditingController weightController = TextEditingController();
+  TextEditingController vehicleLocController = TextEditingController();
+  TextEditingController commentsController = TextEditingController();
+
   String? makeValue;
   String? modelValue;
   String? fuelValue;
   String? bodyStyleValue;
-  String? colourValue;
+
   String? mnfYearValue;
-  String? onSiteDateValue;
   String? yearFromValue;
   String? yearToValue;
+
   late List<DropdownMenuItem<String>> makeMenuItems = [];
   late List<DropdownMenuItem<String>> modelMenuItems = [];
   late List<DropdownMenuItem<String>> fuelMenuItems = [];
@@ -49,41 +62,24 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   late List<DropdownMenuItem<String>> colourMenuItems = [];
   late List<DropdownMenuItem<String>> yearMenuItems = [];
 
-  late Widget model;
   List<File> images = [];
-  final ImagePicker _picker = ImagePicker();
 
-  late String selectedYear1 = '1999';
-  late String selectedYear2 = '2000';
-  late String selectedYear3 = '2001';
-
-  List<DropdownMenuItem<String>> years1 = [];
-
-  DateTime? selectedDate1;
-  DateTime? selectedDate2;
-  DateTime? selectedDate3;
-  DateTime? selectedDate4;
-
-  late String formattedDate1;
-  String? formattedDate2;
-  late String formattedDate3;
-  late String formattedDate4;
+  List<DropdownMenuItem<String>> yearsList = [];
+  DateTime? destructionDate;
+  DateTime? dePollutionDate;
+  DateTime? collectionDate;
+  DateTime? onSiteDate;
 
   @override
   void initState() {
     fetchSelectList();
     super.initState();
-    formattedDate1 = '';
-    formattedDate2 = '';
-    formattedDate3 = '';
-    formattedDate4 = '';
-
     int currentYear = DateTime.now().year;
     for (int i = 1980; i <= currentYear; i++) {
-      years1.add(
+      yearsList.add(
         DropdownMenuItem(
-          child: Text(i.toString()),
           value: i.toString(),
+          child: Text(i.toString()),
         ),
       );
     }
@@ -91,10 +87,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    model = modelField("Model",
-        dropDownValue: modelValue,
-        menuItems: modelMenuItems,
-        enable: modelEnable);
     return Scaffold(
         appBar: AppBar(
           leading: Container(
@@ -116,8 +108,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             children: [
               Row(
                 children: [
-                  customTextField("Registration Number"),
-                  customTextField("Stock Reference")
+                  customTextField("Registration Number",
+                      controller: regNoController),
+                  customTextField("Stock Reference",
+                      controller: stockRefController)
                 ],
               ),
               Row(
@@ -125,7 +119,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                   customTextField("Make",
                       dropDownValue: makeValue, menuItems: makeMenuItems),
                   // custom2TextField("Make",Make()),
-                  customTextField("CC")
+                  customTextField("CC", controller: ccController)
                 ],
               ),
               Row(
@@ -135,7 +129,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       menuItems: modelMenuItems,
                       enable: modelEnable),
                   // model,
-                  customTextField("Type Model")
+                  customTextField("Type Model", controller: typeModelController)
                 ],
               ),
               Row(
@@ -148,21 +142,27 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                 ],
               ),
               Row(
-                children: [customTextField("UIN"), customTextField("Colour")],
+                children: [
+                  customTextField("UIN", controller: uinController),
+                  customTextField("Colour", controller: colorController)
+                ],
               ),
               Row(
                 children: [
-                  customTextField("Transmission"),
-                  customTextField("Engine Code")
+                  customTextField("Transmission",
+                      controller: transmissionController),
+                  customTextField("Engine Code",
+                      controller: engineCodeController)
                 ],
               ),
               Row(
                 children: [
                   // customTextField("Manufacturing Year",
                   //     dropDownValue: mnfYearValue, menuItems: yearMenuItems),
-                  custom31TextField(
-                      "Manufacturing Year", selectedYear1, years1),
-                  custom4D4TextField("On Site Date")
+                  yearDropDownTextField(
+                      "Manufacturing Year", mnfYearValue, yearsList),
+                  datePickerTextField(
+                      "On Site Date", onSiteDateController, onSiteDate)
                   // customTextField("On Site Date",
                   //     dropDownValue: onSiteDateValue, menuItems: yearMenuItems)
                 ],
@@ -170,8 +170,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               Row(
                 children: [
                   Expanded(
-                      child:
-                          custom31TextField("Year Range", selectedYear2, years1)
+                      child: yearDropDownTextField(
+                          "Year Range", yearFromValue, yearsList)
                       // customTextField("Year Range",
                       //     dropDownValue: yearFromValue,
                       //     menuItems: yearMenuItems)
@@ -184,7 +184,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       style: textStyle,
                     ),
                   ),
-                  Expanded(child: custom31TextField("", selectedYear3, years1)
+                  Expanded(
+                      child: yearDropDownTextField("", yearToValue, yearsList)
                       // customTextField("",
                       //     dropDownValue: yearToValue, menuItems: yearMenuItems)
                       )
@@ -210,7 +211,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                 ),
               ),
               Row(
-                children: [customTextField("Make"), customTextField("Engine")],
+                children: [
+                  customTextField("Make",
+                      controller: TextEditingController(text: makeValue)),
+                  customTextField("Engine")
+                ],
               ),
               Container(
                 padding: containerEdgeInsetsGeometry,
@@ -228,15 +233,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     SizedBox(
                         height: 60,
                         child: TextField(
-                            decoration: InputDecoration(
-                          enabledBorder: border,
-                          focusedBorder: border,
-                        ))),
+                          decoration: InputDecoration(
+                            enabledBorder: border,
+                            focusedBorder: border,
+                          ),
+                          controller: TextEditingController(text: modelValue),
+                        )),
                   ],
                 ),
               ),
               Row(
-                children: [customTextField("Style"), customTextField("Colour")],
+                children: [
+                  customTextField("Style",
+                      controller: TextEditingController(text: bodyStyleValue)),
+                  customTextField("Colour", controller: colorController)
+                ],
               ),
               Divider(
                 thickness: 2, // thickness of the line
@@ -249,20 +260,23 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               ),
               Row(
                 children: [
-                  customTextField("Mileage"),
-                  customTextField("Cost Price")
+                  customTextField("Mileage", controller: mileageController),
+                  customTextField("Cost Price", controller: costPriceController)
                 ],
               ),
               Row(
                 children: [
-                  custom4D3TextField("Collection Date"),
-                  custom4D2TextField("Depollution Date")
+                  datePickerTextField("Collection Date",
+                      collectionDateController, collectionDate),
+                  datePickerTextField("Depollution Date",
+                      dePollutionDateController, dePollutionDate)
                 ],
               ),
               Row(
                 children: [
-                  custom4D1TextField("Destruction Date"),
-                  customTextField("Weight")
+                  datePickerTextField("Destruction Date",
+                      destructionDateController, destructionDate),
+                  customTextField("Weight", controller: weightController)
                 ],
               ),
               Container(
@@ -281,10 +295,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     SizedBox(
                         height: 60,
                         child: TextField(
-                            decoration: InputDecoration(
-                          enabledBorder: border,
-                          focusedBorder: border,
-                        ))),
+                          decoration: InputDecoration(
+                            enabledBorder: border,
+                            focusedBorder: border,
+                          ),
+                          controller: vehicleLocController,
+                        )),
                   ],
                 ),
               ),
@@ -304,20 +320,22 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     SizedBox(
                         height: 100,
                         child: TextField(
-                            minLines: 3,
-                            maxLines: 5,
-                            decoration: InputDecoration(
-                              hintText: "Enter Comments",
-                              enabledBorder: border,
-                              focusedBorder: border,
-                            ))),
+                          minLines: 3,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: "Enter Comments",
+                            enabledBorder: border,
+                            focusedBorder: border,
+                          ),
+                          controller: commentsController,
+                        )),
                   ],
                 ),
               ),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                height: ImageList.imgList.isNotEmpty ? 200 : 80,
+                height: ImageList.vehicleImgList.isNotEmpty ? 200 : 80,
                 color: MyTheme.black12,
                 child: Column(
                   children: [
@@ -354,19 +372,19 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             setState(() {
                               // images.add(image);
                               // images= pickedGallery.map((e) => File(e.path)).toList();
-                              ImageList.imgList.add(image!.path);
+                              ImageList.vehicleImgList.add(image!.path);
                             });
                           },
                         ),
                       ],
                     ),
-                    ImageList.imgList.isNotEmpty
+                    ImageList.vehicleImgList.isNotEmpty
                         ? SizedBox(
                             width: MediaQuery.of(context).size.width,
                             height: 120,
                             child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: ImageList.imgList.length,
+                                itemCount: ImageList.vehicleImgList.length,
                                 itemBuilder: (BuildContext ctxt, int index) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -377,7 +395,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Image.file(
-                                              File(ImageList.imgList[index]),
+                                              File(ImageList
+                                                  .vehicleImgList[index]),
                                               fit: BoxFit.fill,
                                             ),
                                           ),
@@ -386,7 +405,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             icon: Icon(Icons.close),
                                             onPressed: () {
                                               setState(() {
-                                                ImageList.imgList
+                                                ImageList.vehicleImgList
                                                     .removeAt(index);
                                               });
                                             },
@@ -432,37 +451,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         ));
   }
 
-  Widget custom2TextField(String title, Widget name) {
-    return Container(
-        padding: containerEdgeInsetsGeometry,
-        width: MediaQuery.of(context).size.width / 2,
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: textEdgeInsetsGeometry,
-                child: Text(
-                  title,
-                  style: textStyle,
-                ),
-              ),
-              TextField(
-                  onTap: () {
-                    setState(() {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => name));
-                    });
-                  },
-                  decoration: InputDecoration(
-                    // hintText: '${Constants().selectedItem}',
-                    enabledBorder: border,
-                    focusedBorder: border,
-                  )),
-            ]));
-  }
-
-  Widget custom4D4TextField(String title) {
+  Widget datePickerTextField(
+      String title, TextEditingController controller, DateTime? selectedDate) {
+    if (title == 'On Site Date') {
+      controller.text = DateFormat.yMd().format(DateTime.now());
+    }
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -481,17 +474,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             onTap: () async {
               final DateTime? picked = await showDatePicker(
                 context: context,
-                initialDate: selectedDate4 ?? DateTime.now(),
+                initialDate: DateTime.now(),
                 firstDate: DateTime(1980),
                 lastDate: DateTime.now(),
               );
-              if (picked != null && picked != selectedDate4)
+              if (picked != null && picked != selectedDate) {
                 setState(() {
-                  selectedDate4 = picked;
+                  selectedDate = picked;
+                  controller.text = DateFormat.yMd().format(selectedDate!);
                 });
+              }
             },
+            readOnly: true,
+            controller: controller,
             decoration: InputDecoration(
-              hintText: selectedDate4 == '' ? '' : selectedDate4.toString(),
+              hintText: selectedDate == null ? "" : selectedDate.toString(),
               enabledBorder: border,
               focusedBorder: border,
             ),
@@ -501,125 +498,14 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
   }
 
-  Widget custom4D3TextField(String title) {
-    return Container(
-      padding: containerEdgeInsetsGeometry,
-      width: MediaQuery.of(context).size.width / 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: textEdgeInsetsGeometry,
-            child: Text(
-              title,
-              style: textStyle,
-            ),
-          ),
-          TextField(
-            onTap: () async {
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: selectedDate3 ?? DateTime.now(),
-                firstDate: DateTime(1980),
-                lastDate: DateTime.now(),
-              );
-              if (picked != null && picked != selectedDate3)
-                setState(() {
-                  selectedDate3 = picked;
-                });
-            },
-            decoration: InputDecoration(
-              hintText: selectedDate3 == '' ? '' : selectedDate3.toString(),
-              enabledBorder: border,
-              focusedBorder: border,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget custom4D2TextField(String title) {
-    return Container(
-      padding: containerEdgeInsetsGeometry,
-      width: MediaQuery.of(context).size.width / 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: textEdgeInsetsGeometry,
-            child: Text(
-              title,
-              style: textStyle,
-            ),
-          ),
-          TextField(
-            onTap: () async {
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: selectedDate2 ?? DateTime.now(),
-                firstDate: DateTime(1980),
-                lastDate: DateTime.now(),
-              );
-              if (picked != null && picked != selectedDate2)
-                setState(() {
-                  selectedDate2 = picked;
-                });
-            },
-            decoration: InputDecoration(
-              hintText: selectedDate2 == '' ? '' : selectedDate2.toString(),
-              enabledBorder: border,
-              focusedBorder: border,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget custom4D1TextField(String title) {
-    return Container(
-      padding: containerEdgeInsetsGeometry,
-      width: MediaQuery.of(context).size.width / 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: textEdgeInsetsGeometry,
-            child: Text(
-              title,
-              style: textStyle,
-            ),
-          ),
-          TextField(
-            onTap: () async {
-              final DateTime? picked = await showDatePicker(
-                context: context,
-                initialDate: selectedDate1 ?? DateTime.now(),
-                firstDate: DateTime(1980),
-                lastDate: DateTime.now(),
-              );
-              if (picked != null && picked != selectedDate1)
-                setState(() {
-                  selectedDate1 = picked;
-                });
-            },
-            decoration: InputDecoration(
-              hintText: selectedDate1 == '' ? '' : selectedDate1.toString(),
-              enabledBorder: border,
-              focusedBorder: border,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget custom31TextField(
-      String title, String selectedYear, List<DropdownMenuItem<String>> year) {
+  Widget yearDropDownTextField(
+      String title, String? selectedYear, List<DropdownMenuItem<String>> year) {
+    String label = '';
+    if (title == 'Year Range') {
+      label = 'Year From';
+    } else if (title == '') {
+      label = 'Year To';
+    }
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -645,7 +531,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               });
             },
             decoration: InputDecoration(
-              hintText: selectedYear,
+              hintText: selectedYear ?? label,
               enabledBorder: border,
               focusedBorder: border,
             ),
@@ -655,86 +541,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
   }
 
-  // Widget custom32TextField(String title,String selectedYear) {
-  //   return Container(
-  //     padding: containerEdgeInsetsGeometry,
-  //     width: MediaQuery.of(context).size.width / 2,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         Padding(
-  //           padding: textEdgeInsetsGeometry,
-  //           child: Text(
-  //             title,
-  //             style: textStyle,
-  //           ),
-  //         ),
-  //
-  //         DropdownButtonFormField(
-  //           isExpanded: true,
-  //           menuMaxHeight: 300,
-  //           value: selectedYear,
-  //           items: years3,
-  //           onChanged: (value) {
-  //             setState(() {
-  //               selectedYear = value!;
-  //             });
-  //           },
-  //           decoration: InputDecoration(
-  //             hintText: selectedYear,
-  //             enabledBorder: border,
-  //             focusedBorder: border,
-  //           ),
-  //         ),
-  //
-  //
-  //       ],
-  //     ),
-  //   );
-  // }
-  // Widget custom33TextField(String title,String selectedYear) {
-  //   return Container(
-  //     padding: containerEdgeInsetsGeometry,
-  //     width: MediaQuery.of(context).size.width / 2,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         Padding(
-  //           padding: textEdgeInsetsGeometry,
-  //           child: Text(
-  //             title,
-  //             style: textStyle,
-  //           ),
-  //         ),
-  //
-  //         DropdownButtonFormField(
-  //           isExpanded: true,
-  //           menuMaxHeight: 300,
-  //           value: selectedYear,
-  //           items: years2,
-  //           onChanged: (value) {
-  //             setState(() {
-  //               selectedYear = value!;
-  //             });
-  //           },
-  //           decoration: InputDecoration(
-  //             hintText: selectedYear,
-  //             enabledBorder: border,
-  //             focusedBorder: border,
-  //           ),
-  //         ),
-  //
-  //
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget customTextField(String title,
       {String? dropDownValue,
       List<DropdownMenuItem<String>>? menuItems,
-      bool enable = true}) {
+      bool enable = true,
+      TextEditingController? controller}) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -754,9 +565,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             child: menuItems == null
                 ? TextField(
                     decoration: InputDecoration(
-                    enabledBorder: border,
-                    focusedBorder: border,
-                  ))
+                      enabledBorder: border,
+                      focusedBorder: border,
+                    ),
+                    controller: controller,
+                  )
                 : DropdownButtonFormField(
                     isExpanded: true,
                     menuMaxHeight: 300,
@@ -765,30 +578,17 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     value: dropDownValue,
                     items: menuItems,
                     onChanged: (String? newValue) {
-                      // dropDownValue = newValue;
                       if (title == 'Make') {
                         setState(() {
                           dropDownValue = null;
                           modelValue = null;
+                          modelMenuItems.clear();
                         });
-                        // modelEnable = true;
 
                         setState(() {
                           modelMenuItems = createMenuList(newValue.toString(),
                               modelMenuItems, responseJson);
                         });
-                        // model = modelField("Model",
-                        //     dropDownValue: modelValue,
-                        //     menuItems: modelMenuItems,
-                        //     enable: modelEnable);
-                        //
-                        // print("Done");
-                        // for (DropdownMenuItem<String> a in modelMenuItems) {
-                        //   Text t = a.child as Text;
-                        //   print("${a.value} ${t.data}");
-                        // }
-
-                        // setState(() {});
                       }
 
                       setState(() {
@@ -804,9 +604,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   Future getImage() async {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-
     setState(() {
-      ImageList.imgList.add(image!.path);
+      ImageList.vehicleImgList.add(image!.path);
     });
   }
 
@@ -885,13 +684,118 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   createMenuList(
       String title, List<DropdownMenuItem<String>> menu, Map responseJson) {
     List l = responseJson[title];
+    menu.clear();
     menu = List<DropdownMenuItem<String>>.generate(
         l.length,
         (index) => DropdownMenuItem(
             value: l[index].toString(), child: Text(l[index])));
-    // for (var a in menu) {
-    //   print(a);
-    // }
     return menu;
   }
+
+// Widget custom2TextField(String title, Widget name) {
+//   return Container(
+//       padding: containerEdgeInsetsGeometry,
+//       width: MediaQuery.of(context).size.width / 2,
+//       child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Padding(
+//               padding: textEdgeInsetsGeometry,
+//               child: Text(
+//                 title,
+//                 style: textStyle,
+//               ),
+//             ),
+//             TextField(
+//                 onTap: () {
+//                   setState(() {
+//                     Navigator.push(context,
+//                         MaterialPageRoute(builder: (context) => name));
+//                   });
+//                 },
+//                 decoration: InputDecoration(
+//                   // hintText: '${Constants().selectedItem}',
+//                   enabledBorder: border,
+//                   focusedBorder: border,
+//                 )),
+//           ]));
+// }
+
+// Widget custom32TextField(String title,String selectedYear) {
+//   return Container(
+//     padding: containerEdgeInsetsGeometry,
+//     width: MediaQuery.of(context).size.width / 2,
+//     child: Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         Padding(
+//           padding: textEdgeInsetsGeometry,
+//           child: Text(
+//             title,
+//             style: textStyle,
+//           ),
+//         ),
+//
+//         DropdownButtonFormField(
+//           isExpanded: true,
+//           menuMaxHeight: 300,
+//           value: selectedYear,
+//           items: years3,
+//           onChanged: (value) {
+//             setState(() {
+//               selectedYear = value!;
+//             });
+//           },
+//           decoration: InputDecoration(
+//             hintText: selectedYear,
+//             enabledBorder: border,
+//             focusedBorder: border,
+//           ),
+//         ),
+//
+//
+//       ],
+//     ),
+//   );
+// }
+// Widget custom33TextField(String title,String selectedYear) {
+//   return Container(
+//     padding: containerEdgeInsetsGeometry,
+//     width: MediaQuery.of(context).size.width / 2,
+//     child: Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         Padding(
+//           padding: textEdgeInsetsGeometry,
+//           child: Text(
+//             title,
+//             style: textStyle,
+//           ),
+//         ),
+//
+//         DropdownButtonFormField(
+//           isExpanded: true,
+//           menuMaxHeight: 300,
+//           value: selectedYear,
+//           items: years2,
+//           onChanged: (value) {
+//             setState(() {
+//               selectedYear = value!;
+//             });
+//           },
+//           decoration: InputDecoration(
+//             hintText: selectedYear,
+//             enabledBorder: border,
+//             focusedBorder: border,
+//           ),
+//         ),
+//
+//
+//       ],
+//     ),
+//   );
+// }
 }

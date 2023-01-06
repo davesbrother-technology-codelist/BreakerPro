@@ -323,7 +323,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                height: ImageList.imgList.isNotEmpty ? 200 : 80,
+                height: ImageList.vehicleImgList.isNotEmpty ? 200 : 80,
                 color: MyTheme.black12,
                 child: Column(
                   children: [
@@ -360,19 +360,19 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                             setState(() {
                               // images.add(image);
                               // images= pickedGallery.map((e) => File(e.path)).toList();
-                              ImageList.imgList.add(image!.path);
+                              ImageList.vehicleImgList.add(image!.path);
                             });
                           },
                         ),
                       ],
                     ),
-                    ImageList.imgList.isNotEmpty
+                    ImageList.vehicleImgList.isNotEmpty
                         ? SizedBox(
                             width: MediaQuery.of(context).size.width,
                             height: 120,
                             child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: ImageList.imgList.length,
+                                itemCount: ImageList.vehicleImgList.length,
                                 itemBuilder: (BuildContext ctxt, int index) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -383,7 +383,8 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Image.file(
-                                              File(ImageList.imgList[index]),
+                                              File(ImageList
+                                                  .vehicleImgList[index]),
                                               fit: BoxFit.fill,
                                             ),
                                           ),
@@ -392,7 +393,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                                             icon: Icon(Icons.close),
                                             onPressed: () {
                                               setState(() {
-                                                ImageList.imgList
+                                                ImageList.vehicleImgList
                                                     .removeAt(index);
                                               });
                                             },
@@ -812,7 +813,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
-      ImageList.imgList.add(image!.path);
+      ImageList.vehicleImgList.add(image!.path);
     });
   }
 
