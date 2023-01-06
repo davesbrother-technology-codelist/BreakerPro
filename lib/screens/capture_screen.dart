@@ -107,101 +107,105 @@ class _CaptureScreenState extends State<CaptureScreen> {
                 height: MediaQuery.of(context).size.height,
                 child: CameraPreview(
                   _controller,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    // alignment: Alignment.topRight,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 2,
-                        child: imgList.isNotEmpty
-                            ? Image.file(File(imgList.last))
-                            : SizedBox(),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton(
-                            onPressed: (){},
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.grey),
-                            ),
-                            child: Text(
-                              "Adjust",
-                            )),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: IconButton(
-                            onPressed: () async {
-                              try {
-                                // await _initializeControllerFuture;
-                                final image = await _controller.takePicture();
-                                if (!mounted) return;
-                                print(image.path);
-                                imgList.add(image.path);
-                                ImageList.vehicleImgList.add(image.path);
-                                setState(() {});
-                              } catch (e) {
-                                // If an error occurs, log the error to the console.
-                                print(e);
-                              }
-                            },
-                            icon: Icon(Icons.camera,
-                            size: 40,),
-                        ),
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: Row(
 
-                      Expanded(
-                        child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                if (isFlashed == 'off') {
-                                  isFlashed = 'on';
-                                  _controller.setFlashMode(FlashMode.torch);
-                                } else if (isFlashed == 'on') {
-                                  isFlashed = 'auto';
-                                  _controller.setFlashMode(FlashMode.auto);
-                                } else {
-                                  isFlashed = 'off';
-                                  _controller.setFlashMode(FlashMode.off);
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      // alignment: Alignment.topRight,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 2,
+                          child: imgList.isNotEmpty
+                              ? Image.file(File(imgList.last))
+                              : SizedBox(),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: ElevatedButton(
+                              onPressed: (){},
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.grey),
+                              ),
+                              child: Text(
+                                "Adjust",
+                              )),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: IconButton(
+                              onPressed: () async {
+                                try {
+                                  // await _initializeControllerFuture;
+                                  final image = await _controller.takePicture();
+                                  if (!mounted) return;
+                                  print(image.path);
+                                  imgList.add(image.path);
+                                  ImageList.vehicleImgList.add(image.path);
+                                  setState(() {});
+                                } catch (e) {
+                                  // If an error occurs, log the error to the console.
+                                  print(e);
                                 }
+                              },
+                              icon: Icon(Icons.camera,
+                              size: 40,),
+                          ),
+                        ),
+
+                        Expanded(
+                          child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (isFlashed == 'off') {
+                                    isFlashed = 'on';
+                                    _controller.setFlashMode(FlashMode.torch);
+                                  } else if (isFlashed == 'on') {
+                                    isFlashed = 'auto';
+                                    _controller.setFlashMode(FlashMode.auto);
+                                  } else {
+                                    isFlashed = 'off';
+                                    _controller.setFlashMode(FlashMode.off);
+                                  }
+                                });
+                              },
+                              icon: Icon(
+                                map[isFlashed],
+                                size: 35,
+                              )),
+                        ),
+                        Expanded(
+                          child: IconButton(
+                            onPressed: () {
+                              print('object');
+                              if (_currentFlashMode == FlashMode.off) {
+                                _currentFlashMode = FlashMode.torch;
+                              } else {
+                                _currentFlashMode = FlashMode.off;
+                              }
+                              setState(() {
+                                _controller.setFlashMode(_currentFlashMode!);
                               });
                             },
-                            icon: Icon(
-                              map[isFlashed],
-                              size: 35,
-                            )),
-                      ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: () {
-                            print('object');
-                            if (_currentFlashMode == FlashMode.off) {
-                              _currentFlashMode = FlashMode.torch;
-                            } else {
-                              _currentFlashMode = FlashMode.off;
-                            }
-                            setState(() {
-                              _controller.setFlashMode(_currentFlashMode!);
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.flashlight_on,
-                            size: 30,
+                            icon: const Icon(
+                              Icons.flashlight_on,
+                              size: 30,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: _toggleCameraLens,
-                          icon: const Icon(
-                            Icons.flip_camera_android,
-                            size: 40,
+                        Expanded(
+                          child: IconButton(
+                            onPressed: _toggleCameraLens,
+                            icon: const Icon(
+                              Icons.flip_camera_android,
+                              size: 40,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ));
           } else {
