@@ -865,7 +865,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     state
         .push(MaterialPageRoute(
             builder: (context) => CaptureScreen(
-                  camera: firstCamera,
+                  cameras: cameras,
                 )))
         .then((value) => setState(() {}));
   }
