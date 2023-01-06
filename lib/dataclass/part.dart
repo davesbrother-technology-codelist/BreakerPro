@@ -34,6 +34,33 @@ class Part {
   @HiveField(9)
   bool isSelected = false;
 
+  @HiveField(10)
+  late String partCondition;
+
+  @HiveField(11)
+  double warranty = 0;
+
+  @HiveField(12)
+  int qty = 1;
+
+  @HiveField(13)
+  late double salesPrice = 0;
+
+  @HiveField(14)
+  late double costPrice = 0;
+
+  @HiveField(15)
+  late bool isDefault = false;
+
+  @HiveField(16)
+  late int mnfPartNo = 0;
+
+  @HiveField(17)
+  late String comments;
+
+  @HiveField(17)
+  late List<String> imgList;
+
   Part(
       this.id,
       this.partName,
@@ -58,7 +85,7 @@ class Part {
         json["EbayTitle"]);
   }
 
-  Map<String, String> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       "id": id.toString(),
       "partName": partName,
@@ -68,7 +95,16 @@ class Part {
       "defaultLocation": defaultLocation,
       "defaultDescription": defaultDescription,
       "postageOptionsCode": postageOptionsCode,
-      "ebayTitle": ebayTitle
+      "ebayTitle": ebayTitle,
+      "isSelected": isSelected,
+      "partCondition": partCondition,
+      "warranty": warranty,
+      "qty": qty,
+      "salesPrice": salesPrice,
+      "costPrice": costPrice,
+      "isDefault": isDefault,
+      "mnfPartNo": mnfPartNo,
+      "comments": comments,
     };
   }
 }

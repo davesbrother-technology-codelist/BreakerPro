@@ -1,28 +1,17 @@
-import 'package:breaker_pro/screens/customise_parts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../app_config.dart';
+import '../dataclass/part.dart';
 import '../my_theme.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
-import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
-import 'package:intl/intl.dart';
-
-import 'package:breaker_pro/screens/make.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:breaker_pro/dataclass/image_list.dart';
-import 'package:breaker_pro/screens/allocate_parts_screen.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
-import '../dataclass/parts_list.dart';
-import '../my_theme.dart';
 import 'capture_screen.dart';
-import 'package:breaker_pro/screens/main_dashboard.dart';
 
 class Customise extends StatefulWidget {
-  const Customise({Key? key}) : super(key: key);
+  const Customise({Key? key, required this.part}) : super(key: key);
+  final Part part;
 
   @override
   State<Customise> createState() => _CustomiseState();
@@ -36,8 +25,7 @@ class _CustomiseState extends State<Customise> {
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
-  String? selectedItem;
-  List<String> items = [
+  List<String> partConditionList = [
     'BRAND NEW',
     'GOOD',
     'PERFECT',
@@ -45,24 +33,47 @@ class _CustomiseState extends State<Customise> {
     'VERY GOOD',
     'WORN'
   ];
-  List<DropdownMenuItem<String>> dropdownItems = [];
+  List<DropdownMenuItem<String>> partConditionDropDownItems = [];
+  late Part part;
   bool isChecked1 = false;
   bool isChecked2 = false;
   bool isChecked3 = false;
   DateTime? selectedDate;
   String formattedDate = '';
   List<File> images = [];
-  final ImagePicker _picker = ImagePicker();
+
+  TextEditingController partLocEditingController =
+      TextEditingController(text: "");
+  TextEditingController warrantyEditingController = TextEditingController();
+  TextEditingController salesPriceEditingController = TextEditingController();
+  TextEditingController costPriceEditingController = TextEditingController();
+  TextEditingController qtyEditingController = TextEditingController(text: "1");
+  TextEditingController partDescEditingController = TextEditingController();
+  TextEditingController mnfPartNoEditingController = TextEditingController();
+  TextEditingController partCommentsEditingController = TextEditingController();
+  TextEditingController ebayTitleEditingController = TextEditingController();
+
+  String? partConditionValue;
+  String? postageOptionsValue;
+
   @override
   void initState() {
+    part = widget.part;
     super.initState();
-    for (String item in items) {
-      dropdownItems.add(DropdownMenuItem(
-        child: Text(item),
+    ebayTitleEditingController.text = part.ebayTitle;
+    for (String item in partConditionList) {
+      partConditionDropDownItems.add(DropdownMenuItem(
         value: item,
+        child: Text(item),
       ));
     }
     formattedDate = '';
+  }
+
+  @override
+  void dispose() {
+    ImageList.partImageList.clear();
+    super.dispose();
   }
 
   @override
@@ -75,7 +86,40 @@ class _CustomiseState extends State<Customise> {
           width: MediaQuery.of(context).size.width,
           child: TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              if (partLocEditingController.text.isNotEmpty ||
+                  warrantyEditingController.text.isNotEmpty ||
+                  salesPriceEditingController.text.isNotEmpty ||
+                  costPriceEditingController.text.isNotEmpty ||
+                  partDescEditingController.text.isNotEmpty ||
+                  mnfPartNoEditingController.text.isNotEmpty ||
+                  partCommentsEditingController.text.isNotEmpty ||
+                  formattedDate != "" ||
+                  partConditionValue != null ||
+                  postageOptionsValue != null) {
+                part.isSelected = true;
+              }
+
+              part.partCondition = partConditionValue.toString();
+              part.defaultLocation = partLocEditingController.text.toString();
+              try {
+                part.warranty = double.parse(warrantyEditingController.text);
+                part.salesPrice =
+                    double.parse(salesPriceEditingController.text);
+                part.costPrice = double.parse(costPriceEditingController.text);
+                part.qty = int.parse(qtyEditingController.text);
+                part.mnfPartNo = int.parse(mnfPartNoEditingController.text);
+              } catch (e) {
+                print("Failed to convert");
+              }
+
+              part.defaultDescription =
+                  partDescEditingController.text.toString();
+
+              part.comments = partCommentsEditingController.text.toString();
+              part.postageOptions = postageOptionsValue.toString();
+              part.ebayTitle = ebayTitleEditingController.text.toString();
+              part.imgList = ImageList.partImageList;
+              Navigator.pop(context, part);
             },
             child: Text(
               "Save",
@@ -104,13 +148,13 @@ class _CustomiseState extends State<Customise> {
           child: Container(
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Center(
                   child: Text(
-                    "ABS SENSOR (REAR DRIVER SIDE)",
-                    style: TextStyle(
+                    part.partName,
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                         color: Colors.grey),
@@ -118,20 +162,23 @@ class _CustomiseState extends State<Customise> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: [customTextField("Part Condition")],
+                  children: [
+                    customTextField("Part Condition", partConditionValue)
+                  ],
                 ),
                 Row(
                   children: [
-                    custom2TextField(
-                        "Part Location", 3 / 4, TextInputType.text),
-                    custom2TextField("Warranty", 1 / 4, TextInputType.number)
+                    custom2TextField("Part Location", 3 / 4, TextInputType.text,
+                        partLocEditingController),
+                    custom2TextField("Warranty", 1 / 4, TextInputType.number,
+                        warrantyEditingController)
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
+                  children: const [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Quantity In Stock',
                         style: TextStyle(color: Colors.grey, fontSize: 20),
@@ -141,10 +188,12 @@ class _CustomiseState extends State<Customise> {
                 ),
                 Row(
                   children: [
-                    custom2TextField(
-                        "Sales Price", 2 / 5, TextInputType.number),
-                    custom2TextField("Cost Price", 2 / 5, TextInputType.number),
-                    custom2TextField("Qty", 1 / 5, TextInputType.number)
+                    custom2TextField("Sales Price", 2 / 5, TextInputType.number,
+                        salesPriceEditingController),
+                    custom2TextField("Cost Price", 2 / 5, TextInputType.number,
+                        costPriceEditingController),
+                    custom2TextField("Qty", 1 / 5, TextInputType.number,
+                        qtyEditingController)
                   ],
                 ),
                 Row(
@@ -157,8 +206,8 @@ class _CustomiseState extends State<Customise> {
                             isChecked1 = value!;
                           });
                         }),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         "Set Defaults",
                         style: TextStyle(
@@ -169,15 +218,18 @@ class _CustomiseState extends State<Customise> {
                     )
                   ],
                 ),
-                custom2TextField("Part Description", 1, TextInputType.text),
-                custom2TextField("Manufacturer Part no", 1, TextInputType.text),
-                custom2TextField("Part Comments", 1, TextInputType.text),
-                customTextField("Postage Option"),
+                custom2TextField("Part Description", 1, TextInputType.text,
+                    partDescEditingController),
+                custom2TextField("Manufacturer Part no", 1, TextInputType.text,
+                    mnfPartNoEditingController),
+                custom2TextField("Part Comments", 1, TextInputType.text,
+                    partCommentsEditingController),
+                customTextField("Postage Option", postageOptionsValue),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
+                  children: const [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         'Marketing',
                         style: TextStyle(color: Colors.grey, fontSize: 20),
@@ -195,8 +247,8 @@ class _CustomiseState extends State<Customise> {
                             isChecked2 = value!;
                           });
                         }),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         "Ebay",
                         style: TextStyle(
@@ -207,11 +259,19 @@ class _CustomiseState extends State<Customise> {
                     )
                   ],
                 ),
-                custom2TextField("Ebay Title", 1, TextInputType.text),
+                custom2TextField("Ebay Title", 1, TextInputType.text,
+                    ebayTitleEditingController),
                 Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    Checkbox(
+                        value: isChecked3,
+                        onChanged: (value) {
+                          setState(() {
+                            isChecked3 = value!;
+                          });
+                        }),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text(
                         "Featured Web",
                         style: TextStyle(fontSize: 18),
@@ -229,13 +289,15 @@ class _CustomiseState extends State<Customise> {
                               firstDate: DateTime(1980),
                               lastDate: DateTime.now(),
                             );
-                            if (picked != null && picked != selectedDate)
+                            if (picked != null && picked != selectedDate) {
                               setState(() {
                                 selectedDate = picked;
                                 formattedDate =
                                     DateFormat('dd/MM/yyyy').format(picked);
                               });
+                            }
                           },
+                          readOnly: true,
                           decoration: InputDecoration(
                               hintText:
                                   formattedDate == '' ? '' : formattedDate,
@@ -249,7 +311,7 @@ class _CustomiseState extends State<Customise> {
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  height: ImageList.vehicleImgList.isNotEmpty ? 200 : 80,
+                  height: ImageList.partImageList.isNotEmpty ? 210 : 80,
                   color: MyTheme.black12,
                   child: Column(
                     children: [
@@ -284,51 +346,63 @@ class _CustomiseState extends State<Customise> {
                                   .pickImage(source: ImageSource.gallery);
 
                               setState(() {
-                                // images.add(image);
                                 // images= pickedGallery.map((e) => File(e.path)).toList();
-                                ImageList.vehicleImgList.add(image!.path);
+                                print(image?.path);
+                                ImageList.partImageList.add(image!.path);
                               });
                             },
                           ),
                         ],
                       ),
-                      ImageList.vehicleImgList.isNotEmpty
-                          ? SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: 120,
-                              child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: ImageList.vehicleImgList.length,
-                                  itemBuilder: (BuildContext ctxt, int index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Stack(
-                                          // alignment: Alignment.bottomLeft,
-                                          children: [
-                                            Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Image.file(
-                                                File(ImageList
-                                                    .vehicleImgList[index]),
-                                                fit: BoxFit.fill,
+                      ImageList.partImageList.isNotEmpty
+                          ? Align(
+                              alignment: Alignment.bottomLeft,
+                              child: SizedBox(
+                                height: 140,
+                                child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: ImageList.partImageList.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Stack(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: AspectRatio(
+                                              aspectRatio: AppConfig.aspectMap[
+                                                  AppConfig.imageAspectRatio],
+                                              child: SizedBox(
+                                                width: 9,
+                                                height: 16,
+                                                child: Image.file(File(ImageList
+                                                    .partImageList[index])),
                                               ),
                                             ),
-                                            IconButton(
-                                              padding: EdgeInsets.all(0),
-                                              icon: Icon(Icons.close),
+                                          ),
+                                          Positioned(
+                                            top: -5,
+                                            right: -13,
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.cancel,
+                                                color: Colors.black
+                                                    .withOpacity(0.7),
+                                                size: 20,
+                                              ),
                                               onPressed: () {
                                                 setState(() {
-                                                  ImageList.vehicleImgList
+                                                  ImageList.partImageList
                                                       .removeAt(index);
                                                 });
                                               },
                                             ),
-                                          ]),
-                                    );
-                                  }),
+                                          ),
+                                        ],
+                                      );
+                                    }),
+                              ),
                             )
-                          : SizedBox(),
+                          : const SizedBox()
                     ],
                   ),
                 ),
@@ -343,7 +417,7 @@ class _CustomiseState extends State<Customise> {
     );
   }
 
-  Widget customTextField(String title) {
+  Widget customTextField(String title, String? selectedItem) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width,
@@ -360,10 +434,22 @@ class _CustomiseState extends State<Customise> {
           ),
           DropdownButtonFormField(
             value: selectedItem,
-            items: dropdownItems,
+            items: partConditionDropDownItems,
             onChanged: (value) {
               setState(() {
                 selectedItem = value;
+                switch (title) {
+                  case 'Part Condition':
+                    {
+                      partConditionValue = value;
+                    }
+                    break;
+                  case 'Postage Option':
+                    {
+                      postageOptionsValue = value;
+                    }
+                    break;
+                }
               });
             },
             decoration: InputDecoration(
@@ -376,7 +462,8 @@ class _CustomiseState extends State<Customise> {
     );
   }
 
-  Widget custom2TextField(String title, double n, TextInputType TType) {
+  Widget custom2TextField(String title, double n, TextInputType TType,
+      TextEditingController? controller) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: (MediaQuery.of(context).size.width) * n,
@@ -392,6 +479,17 @@ class _CustomiseState extends State<Customise> {
               ),
             ),
             TextField(
+                minLines: title == 'Part Description' ||
+                        title == 'Part Comments' ||
+                        title == 'Ebay Title'
+                    ? 3
+                    : 1,
+                maxLines: title == 'Part Description' ||
+                        title == 'Part Comments' ||
+                        title == 'Ebay Title'
+                    ? 5
+                    : 1,
+                controller: controller,
                 keyboardType: TType,
                 decoration: InputDecoration(
                     enabledBorder: border, focusedBorder: border))
@@ -402,11 +500,11 @@ class _CustomiseState extends State<Customise> {
   openCamera() async {
     NavigatorState state = Navigator.of(context);
     final cameras = await availableCameras();
-    final firstCamera = cameras.first;
     state
         .push(MaterialPageRoute(
             builder: (context) => CaptureScreen(
                   cameras: cameras,
+                  type: "Part",
                 )))
         .then((value) => setState(() {}));
   }

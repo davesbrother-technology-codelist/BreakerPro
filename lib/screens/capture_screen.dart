@@ -6,8 +6,10 @@ import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 
 class CaptureScreen extends StatefulWidget {
-  const CaptureScreen({Key? key, required this.cameras}) : super(key: key);
+  const CaptureScreen({Key? key, required this.cameras, required this.type})
+      : super(key: key);
   final List<CameraDescription> cameras;
+  final String type;
 
   @override
   State<CaptureScreen> createState() => _CaptureScreenState();
@@ -27,8 +29,8 @@ class _CaptureScreenState extends State<CaptureScreen> {
     'on': Icons.flash_on_sharp,
     'auto': Icons.flash_auto_sharp
   };
+  late XFile image;
   String isFlashed = 'off';
-  late final image;
   @override
   void dispose() {
     _controller.dispose();
@@ -139,16 +141,27 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   print('image first');
                                   // img = await _cropImage(imageFile: img);
                                   CroppedFile? croppedImage =
-                                  await ImageCropper().cropImage(sourcePath: File(image.path).path);
-                                  print ('image after');
-                                  if (croppedImage == null) return null;
+                                      await ImageCropper().cropImage(
+                                          sourcePath: File(image.path).path);
+                                  print('image after');
+                                  if (croppedImage == null) return;
                                   // img=croppedImage.path as File?;
                                   print('image after');
                                   setState(() {
                                     imgList.add(croppedImage.path);
                                     imgList.remove(image.path);
-                                    ImageList.vehicleImgList.remove(image.path);
-                                    ImageList.vehicleImgList.add(croppedImage.path);
+                                    if (widget.type == 'Vehicle') {
+                                      ImageList.vehicleImgList
+                                          .remove(image.path);
+                                      ImageList.vehicleImgList
+                                          .add(croppedImage.path);
+                                    } else {
+                                      ImageList.partImageList
+                                          .remove(image.path);
+                                      ImageList.partImageList
+                                          .add(croppedImage.path);
+                                    }
+
                                     Navigator.of(context).pop();
                                   });
                                 } on PlatformException catch (e) {
@@ -173,10 +186,15 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                 image = await _controller.takePicture();
                                 if (!mounted) return;
                                 print(image.path);
-                                imgList.add(image.path);
-                                ImageList.vehicleImgList.add(image.path);
-
-                                setState(() {});
+                                setState(() {
+                                  if (widget.type == 'Vehicle') {
+                                    imgList.add(image.path);
+                                    ImageList.vehicleImgList.add(image.path);
+                                  } else {
+                                    imgList.add(image.path);
+                                    ImageList.partImageList.add(image.path);
+                                  }
+                                });
                               } catch (e) {
                                 // If an error occurs, log the error to the console.
                                 print(e);

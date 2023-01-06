@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:breaker_pro/screens/customise_parts_screen2.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/part.dart';
 import '../my_theme.dart';
 import 'dart:convert';
@@ -15,7 +16,9 @@ import 'package:http/http.dart' as http;
 import 'addPart.dart';
 
 class CustomisePartsScreen extends StatefulWidget {
-  const CustomisePartsScreen({Key? key}) : super(key: key);
+  const CustomisePartsScreen({Key? key, required this.vehicle})
+      : super(key: key);
+  final Vehicle vehicle;
 
   @override
   State<CustomisePartsScreen> createState() => _CustomisePartsScreenState();
@@ -29,36 +32,14 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
-  String? selectedItem1;
-  String? selectedItem2;
+  String? predefinedValue;
+  String? partTypeValue;
+  String search = "";
+  late List<String> preDefinedList;
+  late List<String> partTypeList;
 
-  List<String> items1 = [
-    '04-08 AUDI A4',
-    'BODY PARTS',
-    'ENGINE BAY',
-    'FULL LIST',
-    'INTERIOR',
-    'LIGHTS',
-    'MECHANICAL',
-    'NISSAN MICRA 03-10',
-    'RENAULT CLIO 05-09',
-    'VOLVO S40 04-07',
-    'VW PASSAT 01-05 EBAY',
-    'VW PASSAT 05-10'
-  ];
-  List<String> items2 = [
-    'INTERIOR',
-    'MECHANICAL',
-    'BODY PARTS',
-    'ENGINE BAY',
-    'WHEELS',
-    'LIGHTS',
-    'DASHBOARD BARE',
-    'GLASS',
-    'ELECTRICAL'
-  ];
-  List<DropdownMenuItem<String>> dropdownItems1 = [];
-  List<DropdownMenuItem<String>> dropdownItems2 = [];
+  List<DropdownMenuItem<String>> preDefinedDropDownItems = [];
+  List<DropdownMenuItem<String>> partTypeDropDownItems = [];
 
   OutlineInputBorder focusedBorder = OutlineInputBorder(
       borderRadius: BorderRadius.zero,
@@ -72,20 +53,31 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
 
   @override
   void initState() {
-    partsList = PartsList.partList;
+    partsList = PartsList.selectedPartList;
+    for (Part part in partsList) {
+      part.isSelected = false;
+    }
+    fetchPartType();
+    fetchParType();
     super.initState();
-    for (String item in items1) {
-      dropdownItems1.add(DropdownMenuItem(
-        child: Text(item),
+    for (String item in preDefinedList) {
+      preDefinedDropDownItems.add(DropdownMenuItem(
         value: item,
+        child: Text(item),
       ));
     }
-    for (String item in items2) {
-      dropdownItems2.add(DropdownMenuItem(
-        child: Text(item),
+    for (String item in partTypeList) {
+      partTypeDropDownItems.add(DropdownMenuItem(
         value: item,
+        child: Text(item),
       ));
     }
+  }
+
+  @override
+  void dispose() {
+    PartsList.selectedPartList.clear();
+    super.dispose();
   }
 
   @override
@@ -102,9 +94,20 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             color: MyTheme.materialColor,
             width: MediaQuery.of(context).size.width,
             child: TextButton(
-              onPressed: () {
-                uploadParts();
-                uploadVehicle();
+              onPressed: () async {
+                for (Part p in partsList) {
+                  if (p.isSelected) {
+                    PartsList.uploadPartList.add(p);
+                  }
+                }
+                PartsList.uploadVehicle = widget.vehicle;
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setBool('uploadVehicle', true);
+                prefs.setBool('uploadParts', true);
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (builder) => MainDashboard()));
+                // uploadParts();
+                // uploadVehicle();
               },
               child: Text(
                 "Upload",
@@ -129,10 +132,22 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             ),
             actions: [
               IconButton(
-                  onPressed: () => {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => AddPart()))
-                      },
+                  onPressed: () async {
+                    await Navigator.push<Part>(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AddPart()))
+                        .then((value) {
+                      if (value != null) {
+                        setState(() {
+                          Part p = value;
+                          p.isSelected = false;
+                          // PartsList.selectedPartList.add(p);
+                          partsList.add(p);
+                        });
+                      }
+                    });
+                  },
                   icon: Icon(
                     Icons.add_circle,
                     color: MyTheme.white,
@@ -152,6 +167,11 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                 padding: EdgeInsets.all(5),
                 child: TextField(
                   style: TextStyle(color: MyTheme.materialColor),
+                  onChanged: (String? value) {
+                    setState(() {
+                      search = value ?? "";
+                    });
+                  },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: MyTheme.white,
@@ -162,37 +182,62 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                       Icons.search,
                       color: MyTheme.black54,
                     ),
-                    labelText: 'Type your keyword here',
-                    labelStyle: TextStyle(color: MyTheme.black54),
+                    hintText: 'Type your keyword here',
+                    hintStyle: TextStyle(color: MyTheme.black54),
                   ),
                 ),
               ),
               Expanded(
-                child: ListView.separated(
+                child: ListView.builder(
                   itemCount: partsList.length,
                   controller: ScrollController(),
-                  separatorBuilder: (_, __) => const SizedBox(height: 5),
-                  itemBuilder: (context, index) => Container(
-                    height: 50,
-                    color: Colors.white,
-                    child: ListTile(
-                      onTap: () => {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => Customise()))
-                      },
-                      trailing: Text(partsList[index].id.toString()),
-                      title: Text(partsList[index].partName),
-                      // onChanged: (bool? value) {
-                      //   partsList[index].isSelected = value!;
-                      //   if (value == true) {
-                      //     selectedPartsList.add(partsList[index]);
-                      //   } else {
-                      //     selectedPartsList.remove(partsList[index]);
-                      //   }
-                      //   setState(() {});
-                      // },
-                    ),
-                  ),
+                  itemBuilder: (context, index) {
+                    if (predefinedValue != null &&
+                        !partsList[index]
+                            .predefinedList
+                            .contains(predefinedValue.toString())) {
+                      return const SizedBox.shrink();
+                    }
+                    if (partTypeValue != null &&
+                        partsList[index].partType != partTypeValue.toString()) {
+                      return const SizedBox.shrink();
+                    }
+                    if (search != "" &&
+                        !partsList[index]
+                            .partName
+                            .toLowerCase()
+                            .contains(search.toLowerCase())) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: SizedBox(
+                        height: 50,
+                        child: ListTile(
+                          tileColor: partsList[index].isSelected
+                              ? Colors.amberAccent
+                              : Colors.white,
+                          onTap: () => {
+                            Navigator.of(context)
+                                .push<Part>(MaterialPageRoute(
+                                    builder: (context) => Customise(
+                                          part: partsList[index],
+                                        )))
+                                .then((value) {
+                              setState(() {
+                                if (value != null) {
+                                  partsList[index] = value;
+                                  print(value.isSelected);
+                                }
+                              });
+                            }),
+                          },
+                          trailing: Text(partsList[index].id.toString()),
+                          title: Text(partsList[index].partName),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -221,7 +266,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   }
 
   Future<void> uploadVehicle() async {
-    Map m = {...ApiConfig.baseQueryParams, ...Vehicle().toJson()};
+    Map m = {...ApiConfig.baseQueryParams, ...widget.vehicle.toJson()};
     var r = await http.post(
       Uri.parse(
           "${ApiConfig.baseUrl}${ApiConfig.apiSubmitVehicle}?ClientID=${ApiConfig.baseQueryParams['clientid']}"),
@@ -266,7 +311,11 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
               onPressed: () {
-                _controller.close();
+                setState(() {
+                  predefinedValue = null;
+                  partTypeValue = null;
+                  _controller.close();
+                });
               },
               child: Text(
                 "ALL",
@@ -279,7 +328,10 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
               onPressed: () {
-                _controller.close();
+                setState(() {
+                  print(predefinedValue);
+                  _controller.close();
+                });
               },
               child: Text(
                 "APPLY FILTER",
@@ -308,7 +360,6 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   Widget _buildBottomDrawerBody(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
         height: _bodyHeight,
         child: SingleChildScrollView(
           child: Column(
@@ -316,14 +367,14 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
               Container(
                 color: Colors.grey,
                 width: MediaQuery.of(context).size.width,
-                child: Text(
+                child: const Text(
                   "Filter Option",
                   style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
               customTextField(
-                  "Pre Defined List", dropdownItems1, selectedItem1),
-              customTextField("Part Type", dropdownItems2, selectedItem2)
+                  "Pre Defined List", preDefinedDropDownItems, predefinedValue),
+              customTextField("Part Type", partTypeDropDownItems, partTypeValue)
             ],
           ),
         ),
@@ -334,8 +385,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   Widget customTextField(String title,
       List<DropdownMenuItem<String>> dropdownItems, String? selectedItem1) {
     return Container(
-      padding: containerEdgeInsetsGeometry,
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width - 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -348,11 +398,24 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             ),
           ),
           DropdownButtonFormField(
+            isExpanded: true,
             value: selectedItem1,
             items: dropdownItems,
             onChanged: (value) {
               setState(() {
-                selectedItem1 = value!;
+                selectedItem1 = value;
+                switch (title) {
+                  case 'Pre Defined List':
+                    {
+                      predefinedValue = value;
+                    }
+                    break;
+                  case 'Part Type':
+                    {
+                      partTypeValue = value;
+                    }
+                    break;
+                }
               });
             },
             decoration: InputDecoration(
@@ -363,5 +426,26 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         ],
       ),
     );
+  }
+
+  fetchPartType() {
+    List<String> l = List.generate(PartsList.partList.length,
+        (index) => PartsList.partList[index].partType);
+    var seen = <String>{};
+    partTypeList = l.where((part) => seen.add(part)).toList();
+  }
+
+  fetchParType() {
+    List<String> l = List.generate(PartsList.partList.length,
+        (index) => PartsList.partList[index].predefinedList);
+    var seen = <String>{};
+    var a = l.where((part) => seen.add(part)).toList();
+    List<String> y = [];
+    for (String b in a) {
+      y.addAll(b.split(","));
+    }
+    var seenn = <String>{};
+    List<String> an = y.where((part) => seenn.add(part)).toList();
+    preDefinedList = an.sublist(2);
   }
 }

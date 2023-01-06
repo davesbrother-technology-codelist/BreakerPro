@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'package:breaker_pro/dataclass/vehicle.dart';
 import 'package:intl/intl.dart';
 
 import 'package:breaker_pro/screens/make.dart';
@@ -323,7 +324,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                height: ImageList.vehicleImgList.isNotEmpty ? 200 : 80,
+                height: ImageList.partImageList.isNotEmpty ? 200 : 80,
                 color: MyTheme.black12,
                 child: Column(
                   children: [
@@ -360,19 +361,19 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                             setState(() {
                               // images.add(image);
                               // images= pickedGallery.map((e) => File(e.path)).toList();
-                              ImageList.vehicleImgList.add(image!.path);
+                              ImageList.partImageList.add(image!.path);
                             });
                           },
                         ),
                       ],
                     ),
-                    ImageList.vehicleImgList.isNotEmpty
+                    ImageList.partImageList.isNotEmpty
                         ? SizedBox(
                             width: MediaQuery.of(context).size.width,
                             height: 120,
                             child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: ImageList.vehicleImgList.length,
+                                itemCount: ImageList.partImageList.length,
                                 itemBuilder: (BuildContext ctxt, int index) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -393,7 +394,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                                             icon: Icon(Icons.close),
                                             onPressed: () {
                                               setState(() {
-                                                ImageList.vehicleImgList
+                                                ImageList.partImageList
                                                     .removeAt(index);
                                               });
                                             },
@@ -423,7 +424,9 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const AllocatePartsScreen(),
+                          builder: (context) => AllocatePartsScreen(
+                            vehicle: Vehicle(),
+                          ),
                         ));
                       },
                       child: Text(
@@ -813,7 +816,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
-      ImageList.vehicleImgList.add(image!.path);
+      ImageList.partImageList.add(image!.path);
     });
   }
 
@@ -872,6 +875,7 @@ class _VehicleDetailsScreen2State extends State<VehicleDetailsScreen2> {
     state
         .push(MaterialPageRoute(
             builder: (context) => CaptureScreen(
+                  type: 'Vehicle',
                   cameras: cameras,
                 )))
         .then((value) => setState(() {}));

@@ -4,11 +4,13 @@ import 'package:breaker_pro/screens/customise_parts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
 import '../dataclass/part.dart';
+import '../dataclass/vehicle.dart';
 import '../my_theme.dart';
-import 'main_dashboard.dart';
 
 class AllocatePartsScreen extends StatefulWidget {
-  const AllocatePartsScreen({Key? key}) : super(key: key);
+  const AllocatePartsScreen({Key? key, required this.vehicle})
+      : super(key: key);
+  final Vehicle vehicle;
 
   @override
   State<AllocatePartsScreen> createState() => _AllocatePartsScreenState();
@@ -22,60 +24,40 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
-  String? selectedItem1;
-  String? selectedItem2;
+  String? predefinedValue;
+  String? partTypeValue;
 
-  List<String> items1 = [
-    '04-08 AUDI A4',
-    'BODY PARTS',
-    'ENGINE BAY',
-    'FULL LIST',
-    'INTERIOR',
-    'LIGHTS',
-    'MECHANICAL',
-    'NISSAN MICRA 03-10',
-    'RENAULT CLIO 05-09',
-    'VOLVO S40 04-07',
-    'VW PASSAT 01-05 EBAY',
-    'VW PASSAT 05-10'
-  ];
-  List<String> items2 = [
-    'INTERIOR',
-    'MECHANICAL',
-    'BODY PARTS',
-    'ENGINE BAY',
-    'WHEELS',
-    'LIGHTS',
-    'DASHBOARD BARE',
-    'GLASS',
-    'ELECTRICAL'
-  ];
-  List<DropdownMenuItem<String>> dropdownItems1 = [];
-  List<DropdownMenuItem<String>> dropdownItems2 = [];
+  late List<String> preDefinedList;
+  late List<String> partTypeList;
+
+  List<DropdownMenuItem<String>> preDefinedDropDownItems = [];
+  List<DropdownMenuItem<String>> partTypeDropDownItems = [];
 
   OutlineInputBorder focusedBorder = OutlineInputBorder(
       borderRadius: BorderRadius.zero,
       borderSide: BorderSide(width: 2, color: MyTheme.blue));
   late List<Part> partsList;
-  List<Part> selectedPartsList = [];
   bool selectAll = false;
-  double _headerHeight = 60.0;
-  double _bodyHeight = 180.0;
-  BottomDrawerController _controller = BottomDrawerController();
+  final double _headerHeight = 60.0;
+  final double _bodyHeight = 300.0;
+  String search = "";
+  final BottomDrawerController _controller = BottomDrawerController();
   @override
   void initState() {
     partsList = PartsList.partList;
+    fetchPartType();
+    fetchParType();
     super.initState();
-    for (String item in items1) {
-      dropdownItems1.add(DropdownMenuItem(
-        child: Text(item),
+    for (String item in preDefinedList) {
+      preDefinedDropDownItems.add(DropdownMenuItem(
         value: item,
+        child: Text(item),
       ));
     }
-    for (String item in items2) {
-      dropdownItems2.add(DropdownMenuItem(
-        child: Text(item),
+    for (String item in partTypeList) {
+      partTypeDropDownItems.add(DropdownMenuItem(
         value: item,
+        child: Text(item),
       ));
     }
   }
@@ -91,15 +73,19 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           floatingActionButton: Container(
+            height: 50,
             color: MyTheme.materialColor,
             width: MediaQuery.of(context).size.width,
             child: TextButton(
               onPressed: () {
-                PartsList partsList = PartsList();
-                PartsList.partList = selectedPartsList;
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const CustomisePartsScreen(),
-                ));
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                  builder: (context) =>
+                      CustomisePartsScreen(vehicle: widget.vehicle),
+                ))
+                    .then((value) {
+                  setState(() {});
+                });
               },
               child: Text(
                 "Customise Parts",
@@ -116,16 +102,27 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: MyTheme.white),
               onPressed: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (ctx) => MainDashboard()));
+                Navigator.pop(context);
               },
             ),
             actions: [
               IconButton(
-                  onPressed: () => {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => AddPart()))
-                      },
+                  onPressed: () async {
+                    await Navigator.push<Part>(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AddPart()))
+                        .then((value) {
+                      if (value != null) {
+                        setState(() {
+                          Part p = value;
+                          p.isSelected = true;
+                          PartsList.selectedPartList.add(p);
+                          partsList.add(p);
+                        });
+                      }
+                    });
+                  },
                   icon: Icon(Icons.add_circle, color: MyTheme.white)),
               IconButton(
                   onPressed: () => {_controller.open()},
@@ -139,9 +136,14 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             children: [
               Container(
                 color: MyTheme.materialColor,
-                padding: EdgeInsets.all(5),
+                padding: const EdgeInsets.all(5),
                 child: TextField(
                   style: TextStyle(color: MyTheme.materialColor),
+                  onChanged: (String? value) {
+                    setState(() {
+                      search = value ?? "";
+                    });
+                  },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: MyTheme.white,
@@ -152,13 +154,13 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                       Icons.search,
                       color: MyTheme.black54,
                     ),
-                    labelText: 'Type your keyword here',
-                    labelStyle: TextStyle(color: MyTheme.black54),
+                    hintText: 'Type your keyword here',
+                    hintStyle: TextStyle(color: MyTheme.black54),
                   ),
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: CheckboxListTile(
                   tileColor: MyTheme.black12,
                   contentPadding: EdgeInsets.zero,
@@ -179,31 +181,52 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                 ),
               ),
               Expanded(
-                child: ListView.separated(
-                  itemCount: partsList.length,
-                  controller: ScrollController(),
-                  separatorBuilder: (_, __) => const SizedBox(height: 5),
-                  itemBuilder: (context, index) => Container(
-                    height: 50,
-                    color: Colors.white,
-                    child: CheckboxListTile(
-                      controlAffinity: ListTileControlAffinity.leading,
-                      value: partsList[index].isSelected,
-                      secondary: Text(partsList[index].id.toString()),
-                      title: Text(partsList[index].partName),
-                      onChanged: (bool? value) {
-                        partsList[index].isSelected = value!;
-                        if (value == true) {
-                          selectedPartsList.add(partsList[index]);
-                        } else {
-                          selectedPartsList.remove(partsList[index]);
-                        }
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                ),
+                child: ListView.builder(
+                    itemCount: partsList.length,
+                    controller: ScrollController(),
+                    itemBuilder: (context, index) {
+                      if (predefinedValue != null &&
+                          !partsList[index]
+                              .predefinedList
+                              .contains(predefinedValue.toString())) {
+                        return const SizedBox.shrink();
+                      }
+                      if (partTypeValue != null &&
+                          partsList[index].partType !=
+                              partTypeValue.toString()) {
+                        return const SizedBox.shrink();
+                      }
+
+                      if (search != "" &&
+                          !partsList[index]
+                              .partName
+                              .toLowerCase()
+                              .contains(search.toLowerCase())) {
+                        return const SizedBox.shrink();
+                      }
+                      return Container(
+                        height: 50,
+                        color: Colors.white,
+                        child: CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.leading,
+                          value: partsList[index].isSelected,
+                          secondary: Text(partsList[index].id.toString()),
+                          title: Text(partsList[index].partName),
+                          onChanged: (bool? value) {
+                            partsList[index].isSelected = value!;
+                            if (value == true) {
+                              PartsList.selectedPartList.add(partsList[index]);
+                            } else {
+                              PartsList.selectedPartList
+                                  .remove(partsList[index]);
+                            }
+                            setState(() {});
+                          },
+                        ),
+                      );
+                    }),
               ),
+              const SizedBox(height: 60)
             ],
           ),
         ),
@@ -240,7 +263,11 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
               onPressed: () {
-                _controller.close();
+                setState(() {
+                  predefinedValue = null;
+                  partTypeValue = null;
+                  _controller.close();
+                });
               },
               child: Text(
                 "ALL",
@@ -253,7 +280,10 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
               onPressed: () {
-                _controller.close();
+                setState(() {
+                  print(predefinedValue);
+                  _controller.close();
+                });
               },
               child: Text(
                 "APPLY FILTER",
@@ -282,7 +312,6 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   Widget _buildBottomDrawerBody(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
         height: _bodyHeight,
         child: SingleChildScrollView(
           child: Column(
@@ -290,14 +319,14 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
               Container(
                 color: Colors.grey,
                 width: MediaQuery.of(context).size.width,
-                child: Text(
+                child: const Text(
                   "Filter Option",
                   style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
               customTextField(
-                  "Pre Defined List", dropdownItems1, selectedItem1),
-              customTextField("Part Type", dropdownItems2, selectedItem2)
+                  "Pre Defined List", preDefinedDropDownItems, predefinedValue),
+              customTextField("Part Type", partTypeDropDownItems, partTypeValue)
             ],
           ),
         ),
@@ -308,8 +337,7 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   Widget customTextField(String title,
       List<DropdownMenuItem<String>> dropdownItems, String? selectedItem1) {
     return Container(
-      padding: containerEdgeInsetsGeometry,
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width - 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -322,11 +350,24 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             ),
           ),
           DropdownButtonFormField(
+            isExpanded: true,
             value: selectedItem1,
             items: dropdownItems,
             onChanged: (value) {
               setState(() {
-                selectedItem1 = value!;
+                selectedItem1 = value;
+                switch (title) {
+                  case 'Pre Defined List':
+                    {
+                      predefinedValue = value;
+                    }
+                    break;
+                  case 'Part Type':
+                    {
+                      partTypeValue = value;
+                    }
+                    break;
+                }
               });
             },
             decoration: InputDecoration(
@@ -337,5 +378,26 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
         ],
       ),
     );
+  }
+
+  fetchPartType() {
+    List<String> l =
+        List.generate(partsList.length, (index) => partsList[index].partType);
+    var seen = <String>{};
+    partTypeList = l.where((part) => seen.add(part)).toList();
+  }
+
+  fetchParType() {
+    List<String> l = List.generate(
+        partsList.length, (index) => partsList[index].predefinedList);
+    var seen = <String>{};
+    var a = l.where((part) => seen.add(part)).toList();
+    List<String> y = [];
+    for (String b in a) {
+      y.addAll(b.split(","));
+    }
+    var seenn = <String>{};
+    List<String> an = y.where((part) => seenn.add(part)).toList();
+    preDefinedList = an.sublist(2);
   }
 }

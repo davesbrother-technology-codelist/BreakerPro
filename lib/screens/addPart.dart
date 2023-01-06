@@ -1,6 +1,7 @@
+import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:flutter/material.dart';
+import '../dataclass/part.dart';
 import '../my_theme.dart';
-
 
 class AddPart extends StatefulWidget {
   const AddPart({Key? key}) : super(key: key);
@@ -11,13 +12,14 @@ class AddPart extends StatefulWidget {
 
 class _AddPartState extends State<AddPart> {
   EdgeInsetsGeometry textEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(0, 10, 10, 10);
+      const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(10, 5, 10, 5);
+      const EdgeInsets.fromLTRB(10, 5, 10, 5);
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
-  OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
-  String? selectedItem;
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+  String? partTypeValue;
+  TextEditingController partNameEditingController = TextEditingController();
   List<String> items = [
     'INTERIOR',
     'MECHANICAL',
@@ -30,23 +32,18 @@ class _AddPartState extends State<AddPart> {
     'ELECTRICAL'
   ];
   List<DropdownMenuItem<String>> dropdownItems = [];
-  bool isChecked1 = false;
-  bool isChecked2 = false;
-  bool isChecked3 = false;
-  DateTime? selectedDate;
-  String formattedDate = '';
 
   @override
-
   void initState() {
     super.initState();
     for (String item in items) {
       dropdownItems.add(DropdownMenuItem(
-        child: Text(item),
         value: item,
+        child: Text(item),
       ));
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,10 +54,11 @@ class _AddPartState extends State<AddPart> {
           width: MediaQuery.of(context).size.width,
           child: TextButton(
             onPressed: () {
-           Navigator.pop(context);
-           },
-
-
+              Navigator.pop(
+                  context,
+                  Part(0, partNameEditingController.text.toString(),
+                      partTypeValue.toString(), "", "", "", "", "", ""));
+            },
             child: Text(
               "Save",
               style: TextStyle(color: MyTheme.white),
@@ -69,7 +67,7 @@ class _AddPartState extends State<AddPart> {
         ),
         appBar: AppBar(
           backgroundColor: MyTheme.materialColor,
-          title: Text("Add Part"),
+          title: const Text("Add Part"),
           elevation: 0,
           leading: IconButton(
             icon: Icon(
@@ -83,16 +81,17 @@ class _AddPartState extends State<AddPart> {
         ),
         body: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-customTextField("Part Type"),
-            custom2TextField("Part Name", 1, TextInputType.text)
+            customTextField("Part Type"),
+            custom2TextField("Part Name", 1, TextInputType.text),
           ],
         ),
       ),
     );
   }
+
   Widget customTextField(String title) {
     return Container(
       padding: containerEdgeInsetsGeometry,
@@ -109,15 +108,15 @@ customTextField("Part Type"),
             ),
           ),
           DropdownButtonFormField(
-            value: selectedItem,
+            value: partTypeValue,
             items: dropdownItems,
             onChanged: (value) {
               setState(() {
-                selectedItem = value;
+                partTypeValue = value;
               });
             },
             decoration: InputDecoration(
-                hintText: selectedItem,
+                hintText: partTypeValue,
                 enabledBorder: border,
                 focusedBorder: border),
           ),
@@ -125,6 +124,7 @@ customTextField("Part Type"),
       ),
     );
   }
+
   Widget custom2TextField(String title, double n, TextInputType TType) {
     return Container(
       padding: containerEdgeInsetsGeometry,
@@ -141,6 +141,7 @@ customTextField("Part Type"),
               ),
             ),
             TextField(
+                controller: partNameEditingController,
                 keyboardType: TType,
                 decoration: InputDecoration(
                     enabledBorder: border, focusedBorder: border))

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:breaker_pro/api/api_config.dart';
+import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/screens/login_screen.dart';
 import 'package:breaker_pro/screens/settings_screen.dart';
@@ -13,6 +14,7 @@ import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
+import '../api/parts_repository.dart';
 import '../app_config.dart';
 import '../dataclass/parts_list.dart';
 
@@ -30,6 +32,7 @@ class _MainDashboardState extends State<MainDashboard> {
     partsList = PartsList();
     fetchSelectListNetwork();
     fetchPartsListNetwork();
+    upload();
     super.initState();
   }
 
@@ -323,6 +326,25 @@ class _MainDashboardState extends State<MainDashboard> {
         ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
     if (b) {
       setState(() {});
+    }
+  }
+
+  Future<void> upload() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? vUpload = prefs.getBool('uploadVehicle');
+    bool? pUpload = prefs.getBool('uploadParts');
+    if (pUpload == true) {
+      bool r = await PartRepository.uploadParts(PartsList.uploadPartList);
+      if (r) {
+        prefs.setBool('uploadParts', false);
+      }
+    }
+    if (vUpload == true) {
+      bool r = await VehicleRepository.uploadVehicle(PartsList.uploadVehicle);
+      // await VehicleRepository.fileUpload(PartsList.uploadVehicle);
+      if (r) {
+        prefs.setBool('uploadVehicle', false);
+      }
     }
   }
 }

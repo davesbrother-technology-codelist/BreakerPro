@@ -19,6 +19,13 @@ class AppConfig {
   static String imageAspectRatio = 'Default';
   static String barcode = 'Qr code';
 
+  static Map aspectMap = {
+    'Default': 9 / 16,
+    '1:1': 1 / 1,
+    '4:3': 3 / 4,
+    '6:9': 9 / 6,
+  };
+
   static getDeviceInfo() async {
     deviceId = (await PlatformDeviceId.getDeviceId)!;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();

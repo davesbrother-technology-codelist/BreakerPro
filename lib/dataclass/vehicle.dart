@@ -31,41 +31,47 @@ class Vehicle {
   String coddate = "";
   String weight = "";
   int uploadStatus = 1;
+  int cc = 0;
+  List<String> imgList = [];
+  String engineCode = "";
 
   Map<String, String> toJson() {
     return {
       "uniqueId": uniqueId.toString(),
-      "vehicleId": vehicleId,
-      "registrationNumber": registrationNumber,
-      "stockReference": stockReference,
+      "VehicleID": vehicleId,
+      "Reg": registrationNumber,
+      "StockRef": stockReference,
       "engineCapacity": engineCapacity,
-      "fuel": fuel,
-      "make": make,
-      "model": model,
-      "colour": colour,
-      "bodyStyle": bodyStyle,
-      "vin": vin,
-      "manufacturingYear": manufacturingYear,
-      "fromYear": fromYear,
+      "Fuel": fuel,
+      "Make": make,
+      "Model": model,
+      "Colour": colour,
+      "BodyStyle": bodyStyle,
+      "VIN": vin,
+      "ManYear": manufacturingYear,
+      "YearRange": '$fromYear-$toYear',
       "toYear": toYear,
-      "onSiteDate": onSiteDate,
-      "mileage": mileage,
-      "costPrice": costPrice,
-      "commentDetails": commentDetails,
-      "location": location,
+      "OnsiteDate": onSiteDate,
+      "Mileage": mileage,
+      "Cost": costPrice,
+      "Details": commentDetails,
+      "VehLocation": location,
       "type": type,
       "doors": doors,
       "transmission": transmission,
-      "ebayMake": ebayMake,
-      "ebayModel": ebayModel,
-      "ebayColor": ebayColor,
-      "ebayStyle": ebayStyle,
-      "ebayEngine": ebayEngine,
+      "Ebay_Make": ebayMake,
+      "Ebay_Model": ebayModel,
+      "Ebay_Colour": ebayColor,
+      "Ebay_Style": ebayStyle,
+      "Ebay_CC": ebayEngine,
       "collectiondate": collectiondate,
       "depollutiondate": depollutiondate,
       "coddate": coddate,
       "weight": weight,
       "uploadStatus": uploadStatus.toString(),
+      'VehCC': cc.toString(),
+      "engine_code": engineCode,
+      "Images": ""
     };
   }
 }

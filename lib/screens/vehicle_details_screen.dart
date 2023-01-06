@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:breaker_pro/api/vehicle_repository.dart';
+import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
@@ -7,8 +9,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../app_config.dart';
+import '../dataclass/vehicle.dart';
 import '../my_theme.dart';
 import 'capture_screen.dart';
+import 'main_dashboard.dart';
 
 class VehicleDetailsScreen extends StatefulWidget {
   const VehicleDetailsScreen({Key? key}) : super(key: key);
@@ -32,7 +37,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   TextEditingController stockRefController = TextEditingController();
   TextEditingController ccController = TextEditingController();
   TextEditingController typeModelController = TextEditingController();
-  TextEditingController uinController = TextEditingController();
+  TextEditingController vinController = TextEditingController();
   TextEditingController colorController = TextEditingController();
   TextEditingController transmissionController = TextEditingController();
   TextEditingController engineCodeController = TextEditingController();
@@ -61,8 +66,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   late List<DropdownMenuItem<String>> bodyStyleMenuItems = [];
   late List<DropdownMenuItem<String>> colourMenuItems = [];
   late List<DropdownMenuItem<String>> yearMenuItems = [];
-
-  List<File> images = [];
 
   List<DropdownMenuItem<String>> yearsList = [];
   DateTime? destructionDate;
@@ -143,7 +146,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               ),
               Row(
                 children: [
-                  customTextField("UIN", controller: uinController),
+                  customTextField("VIN", controller: vinController),
                   customTextField("Colour", controller: colorController)
                 ],
               ),
@@ -335,7 +338,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                height: ImageList.vehicleImgList.isNotEmpty ? 200 : 80,
+                height: ImageList.vehicleImgList.isNotEmpty ? 210 : 80,
                 color: MyTheme.black12,
                 child: Column(
                   children: [
@@ -379,30 +382,40 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       ],
                     ),
                     ImageList.vehicleImgList.isNotEmpty
-                        ? SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: 120,
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: ImageList.vehicleImgList.length,
-                                itemBuilder: (BuildContext ctxt, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Stack(
-                                        alignment: Alignment.topRight,
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Image.file(
-                                              File(ImageList
-                                                  .vehicleImgList[index]),
-                                              fit: BoxFit.fill,
+                        ? Align(
+                            alignment: Alignment.bottomLeft,
+                            child: SizedBox(
+                              height: 140,
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: ImageList.vehicleImgList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Stack(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: AspectRatio(
+                                            aspectRatio: AppConfig.aspectMap[
+                                                AppConfig.imageAspectRatio],
+                                            child: SizedBox(
+                                              width: 9,
+                                              height: 16,
+                                              child: Image.file(File(ImageList
+                                                  .vehicleImgList[index])),
                                             ),
                                           ),
-                                          IconButton(
-                                            padding: EdgeInsets.all(0),
-                                            icon: Icon(Icons.close),
+                                        ),
+                                        Positioned(
+                                          top: -5,
+                                          right: -13,
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.cancel,
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
+                                              size: 20,
+                                            ),
                                             onPressed: () {
                                               setState(() {
                                                 ImageList.vehicleImgList
@@ -410,11 +423,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               });
                                             },
                                           ),
-                                        ]),
-                                  );
-                                }),
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                            ),
                           )
-                        : SizedBox()
+                        : const SizedBox()
                   ],
                 ),
               ),
@@ -426,7 +441,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        openBreakingSparesDialog(context);
+                      },
                       child: Text(
                         'Breaking for Spares',
                         style: TextStyle(color: MyTheme.white, fontSize: 15),
@@ -434,8 +451,54 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     ),
                     TextButton(
                       onPressed: () {
+                        Vehicle vehicle = Vehicle();
+                        vehicle.imgList = ImageList.vehicleImgList;
+                        vehicle.registrationNumber =
+                            regNoController.text.toString();
+                        vehicle.stockReference =
+                            stockRefController.text.toString();
+                        vehicle.make = makeValue.toString();
+                        try {
+                          vehicle.cc = int.parse(ccController.text.toString());
+                        } catch (e) {
+                          print("Failedd");
+                        }
+
+                        vehicle.model = modelValue.toString();
+                        vehicle.type = typeModelController.text.toString();
+                        vehicle.fuel = fuelValue.toString();
+                        vehicle.bodyStyle = bodyStyleValue.toString();
+                        vehicle.vin = vinController.text.toString();
+                        vehicle.colour = colorController.text.toString();
+                        vehicle.transmission =
+                            transmissionController.text.toString();
+                        vehicle.engineCode =
+                            engineCodeController.text.toString();
+                        vehicle.manufacturingYear = mnfYearValue.toString();
+                        vehicle.onSiteDate =
+                            onSiteDateController.text.toString();
+                        vehicle.fromYear = yearFromValue.toString();
+                        vehicle.toYear = yearToValue.toString();
+                        vehicle.ebayMake = makeValue.toString();
+                        vehicle.engineCapacity =
+                            engineCodeController.toString();
+                        vehicle.ebayModel = modelValue.toString();
+                        vehicle.ebayStyle = bodyStyleValue.toString();
+                        vehicle.colour = colorController.text.toString();
+                        vehicle.mileage = mileageController.text.toString();
+                        vehicle.costPrice = costPriceController.text.toString();
+                        vehicle.collectiondate =
+                            collectionDateController.text.toString();
+                        vehicle.depollutiondate =
+                            dePollutionDateController.text.toString();
+                        vehicle.weight = weightController.text.toString();
+                        vehicle.location = vehicleLocController.text.toString();
+                        vehicle.commentDetails =
+                            commentsController.text.toString();
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const AllocatePartsScreen(),
+                          builder: (context) => AllocatePartsScreen(
+                            vehicle: vehicle,
+                          ),
                         ));
                       },
                       child: Text(
@@ -449,6 +512,77 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             ],
           ),
         ));
+  }
+
+  openBreakingSparesDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text("CANCEL"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget okButton = TextButton(
+      onPressed: () async {
+        Vehicle vehicle = Vehicle();
+        vehicle.imgList = ImageList.vehicleImgList;
+        vehicle.registrationNumber = regNoController.text.toString();
+        vehicle.stockReference = stockRefController.text.toString();
+        vehicle.make = makeValue.toString();
+        try {
+          vehicle.cc = int.parse(ccController.text.toString());
+        } catch (e) {
+          print("Failedd");
+        }
+
+        vehicle.model = modelValue.toString();
+        vehicle.type = typeModelController.text.toString();
+        vehicle.fuel = fuelValue.toString();
+        vehicle.bodyStyle = bodyStyleValue.toString();
+        vehicle.vin = vinController.text.toString();
+        vehicle.colour = colorController.text.toString();
+        vehicle.transmission = transmissionController.text.toString();
+        vehicle.engineCode = engineCodeController.text.toString();
+        vehicle.manufacturingYear = mnfYearValue.toString();
+        vehicle.onSiteDate = onSiteDateController.text.toString();
+        vehicle.fromYear = yearFromValue.toString();
+        vehicle.toYear = yearToValue.toString();
+        vehicle.ebayMake = makeValue.toString();
+        vehicle.engineCapacity = engineCodeController.toString();
+        vehicle.ebayModel = modelValue.toString();
+        vehicle.ebayStyle = bodyStyleValue.toString();
+        vehicle.colour = colorController.text.toString();
+        vehicle.mileage = mileageController.text.toString();
+        vehicle.costPrice = costPriceController.text.toString();
+        vehicle.collectiondate = collectionDateController.text.toString();
+        vehicle.depollutiondate = dePollutionDateController.text.toString();
+        vehicle.weight = weightController.text.toString();
+        vehicle.location = vehicleLocController.text.toString();
+        vehicle.commentDetails = commentsController.text.toString();
+
+        PartsList.uploadVehicle = vehicle;
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('uploadVehicle', true);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (builder) => MainDashboard()));
+      },
+      child: const Text("OK"),
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("OK to Add Breaking for Spares?"),
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   Widget datePickerTextField(
@@ -528,6 +662,23 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             onChanged: (value) {
               setState(() {
                 selectedYear = value!;
+                switch (title) {
+                  case 'Year Range':
+                    {
+                      yearFromValue = value;
+                    }
+                    break;
+                  case '':
+                    {
+                      yearToValue = value;
+                    }
+                    break;
+                  case 'Manufacturing Year':
+                    {
+                      mnfYearValue = value;
+                    }
+                    break;
+                }
               });
             },
             decoration: InputDecoration(
@@ -593,6 +744,29 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
                       setState(() {
                         dropDownValue = newValue;
+                        switch (title) {
+                          case 'Make':
+                            {
+                              makeValue = newValue;
+                            }
+                            break;
+
+                          case 'Model':
+                            {
+                              modelValue = newValue;
+                            }
+                            break;
+                          case 'Fuel':
+                            {
+                              fuelValue = newValue;
+                            }
+                            break;
+                          case 'Body Style':
+                            {
+                              bodyStyleValue = newValue;
+                            }
+                            break;
+                        }
                       });
                     },
                   ),
@@ -665,6 +839,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         .push(MaterialPageRoute(
             builder: (context) => CaptureScreen(
                   cameras: cameras,
+                  type: 'Vehicle',
                 )))
         .then((value) => setState(() {}));
   }
