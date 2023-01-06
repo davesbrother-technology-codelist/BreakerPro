@@ -1,6 +1,8 @@
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 
 class CaptureScreen extends StatefulWidget {
@@ -26,6 +28,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
     'auto': Icons.flash_auto_sharp
   };
   String isFlashed = 'off';
+  late final image;
   @override
   void dispose() {
     _controller.dispose();
@@ -47,6 +50,13 @@ class _CaptureScreenState extends State<CaptureScreen> {
     _initializeControllerFuture = _controller.initialize();
     // _getAvailableCameras();
   }
+
+  // Future<File?> _cropImage({required File imageFile}) async {
+  //   CroppedFile? croppedImage =
+  //       await ImageCropper().cropImage(sourcePath: imageFile.path);
+  //   if (croppedImage == null) return null;
+  //   return File(croppedImage.path);
+  // }
 
   Future<void> _getAvailableCameras() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -89,13 +99,12 @@ class _CaptureScreenState extends State<CaptureScreen> {
         child: Icon(
           Icons.close,
           size: 30,
-          color: Colors.red ,
+          color: Colors.red,
         ),
         onPressed: () {
           Navigator.pop(context);
         },
         backgroundColor: Colors.transparent,
-
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
 
@@ -110,7 +119,6 @@ class _CaptureScreenState extends State<CaptureScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: Row(
-
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       // alignment: Alignment.topRight,
@@ -124,7 +132,30 @@ class _CaptureScreenState extends State<CaptureScreen> {
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(
-                              onPressed: (){},
+                              onPressed: () async {
+                                try {
+                                  if (image == null) return;
+                                  File? img = File(image.path);
+                                  print('image first');
+                                  // img = await _cropImage(imageFile: img);
+                                  CroppedFile? croppedImage =
+                                  await ImageCropper().cropImage(sourcePath: File(image.path).path);
+                                  print ('image after');
+                                  if (croppedImage == null) return null;
+                                  // img=croppedImage.path as File?;
+                                  print('image after');
+                                  setState(() {
+                                    imgList.add(croppedImage.path);
+                                    imgList.remove(image.path);
+                                    ImageList.vehicleImgList.remove(image.path);
+                                    ImageList.vehicleImgList.add(croppedImage.path);
+                                    Navigator.of(context).pop();
+                                  });
+                                } on PlatformException catch (e) {
+                                  print(e);
+                                  Navigator.of(context).pop();
+                                }
+                              },
                               style: ButtonStyle(
                                 backgroundColor:
                                     MaterialStateProperty.all(Colors.grey),
@@ -136,25 +167,27 @@ class _CaptureScreenState extends State<CaptureScreen> {
                         Expanded(
                           flex: 2,
                           child: IconButton(
-                              onPressed: () async {
-                                try {
-                                  // await _initializeControllerFuture;
-                                  final image = await _controller.takePicture();
-                                  if (!mounted) return;
-                                  print(image.path);
-                                  imgList.add(image.path);
-                                  ImageList.vehicleImgList.add(image.path);
-                                  setState(() {});
-                                } catch (e) {
-                                  // If an error occurs, log the error to the console.
-                                  print(e);
-                                }
-                              },
-                              icon: Icon(Icons.camera,
-                              size: 40,),
+                            onPressed: () async {
+                              try {
+                                // await _initializeControllerFuture;
+                                image = await _controller.takePicture();
+                                if (!mounted) return;
+                                print(image.path);
+                                imgList.add(image.path);
+                                ImageList.vehicleImgList.add(image.path);
+
+                                setState(() {});
+                              } catch (e) {
+                                // If an error occurs, log the error to the console.
+                                print(e);
+                              }
+                            },
+                            icon: Icon(
+                              Icons.camera,
+                              size: 40,
+                            ),
                           ),
                         ),
-
                         Expanded(
                           child: IconButton(
                               onPressed: () {
@@ -269,6 +302,4 @@ class _CaptureScreenState extends State<CaptureScreen> {
       print('Asked camera not available');
     }
   }
-
-
 }
