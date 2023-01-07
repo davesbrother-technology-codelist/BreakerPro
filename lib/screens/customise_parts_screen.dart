@@ -292,8 +292,10 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool('uploadVehicle', true);
         prefs.setBool('uploadParts', true);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (builder) => MainDashboard()));
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (builder) => MainDashboard()),
+            (Route route) => false);
       },
       child: const Text("OK"),
     );
