@@ -12,6 +12,13 @@ class BarcodeScreen extends StatefulWidget {
 class _BarcodeScreenState extends State<BarcodeScreen> {
   String selected = "Qr code";
   List<String> barcodes = ["Qr code", "Lined"];
+
+  @override
+  void initState() {
+    selected = AppConfig.barcode;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,0 +1,375 @@
+25/12/2022 00:02:16handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:02:16handle task has pending taks? false
+25/12/2022 00:02:16Pending task in queue = 0
+25/12/2022 00:02:16handleVehiclePendingTask  called
+25/12/2022 00:02:16handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:08:07handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:08:07handle task has pending taks? false
+25/12/2022 00:08:07Pending task in queue = 0
+25/12/2022 00:08:07handleVehiclePendingTask  called
+25/12/2022 00:08:07handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:11:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:11:17handle task has pending taks? false
+25/12/2022 00:11:17Pending task in queue = 0
+25/12/2022 00:11:17handleVehiclePendingTask  called
+25/12/2022 00:11:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:11:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:11:17handle task has pending taks? false
+25/12/2022 00:11:17Pending task in queue = 0
+25/12/2022 00:11:17handleVehiclePendingTask  called
+25/12/2022 00:11:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:11:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:11:17handle task has pending taks? false
+25/12/2022 00:11:17Pending task in queue = 0
+25/12/2022 00:11:17handleVehiclePendingTask  called
+25/12/2022 00:11:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:17:16handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:17:16handle task has pending taks? false
+25/12/2022 00:17:16Pending task in queue = 0
+25/12/2022 00:17:16handleVehiclePendingTask  called
+25/12/2022 00:17:16handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:23:07handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:23:07handle task has pending taks? false
+25/12/2022 00:23:07Pending task in queue = 0
+25/12/2022 00:23:07handleVehiclePendingTask  called
+25/12/2022 00:23:07handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:26:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:26:17handle task has pending taks? false
+25/12/2022 00:26:17Pending task in queue = 0
+25/12/2022 00:26:17handleVehiclePendingTask  called
+25/12/2022 00:26:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:26:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:26:17handle task has pending taks? false
+25/12/2022 00:26:17Pending task in queue = 0
+25/12/2022 00:26:17handleVehiclePendingTask  called
+25/12/2022 00:26:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:26:18handle task has pending taks? false
+25/12/2022 00:26:18Pending task in queue = 0
+25/12/2022 00:26:18handleVehiclePendingTask  called
+25/12/2022 00:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:32:16handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:32:16handle task has pending taks? false
+25/12/2022 00:32:16Pending task in queue = 0
+25/12/2022 00:32:16handleVehiclePendingTask  called
+25/12/2022 00:32:16handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:38:07handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:38:07handle task has pending taks? false
+25/12/2022 00:38:07Pending task in queue = 0
+25/12/2022 00:38:07handleVehiclePendingTask  called
+25/12/2022 00:38:07handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:41:18handle task has pending taks? false
+25/12/2022 00:41:18Pending task in queue = 0
+25/12/2022 00:41:18handleVehiclePendingTask  called
+25/12/2022 00:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:41:18handle task has pending taks? false
+25/12/2022 00:41:18Pending task in queue = 0
+25/12/2022 00:41:18handleVehiclePendingTask  called
+25/12/2022 00:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:41:18handle task has pending taks? false
+25/12/2022 00:41:18Pending task in queue = 0
+25/12/2022 00:41:18handleVehiclePendingTask  called
+25/12/2022 00:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:47:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:47:17handle task has pending taks? false
+25/12/2022 00:47:17Pending task in queue = 0
+25/12/2022 00:47:17handleVehiclePendingTask  called
+25/12/2022 00:47:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:53:07handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:53:07handle task has pending taks? false
+25/12/2022 00:53:07Pending task in queue = 0
+25/12/2022 00:53:07handleVehiclePendingTask  called
+25/12/2022 00:53:07handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:56:18handle task has pending taks? false
+25/12/2022 00:56:18Pending task in queue = 0
+25/12/2022 00:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:56:18handle task has pending taks? false
+25/12/2022 00:56:18Pending task in queue = 0
+25/12/2022 00:56:18handleVehiclePendingTask  called
+25/12/2022 00:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 00:56:18handle task has pending taks? false
+25/12/2022 00:56:18Pending task in queue = 0
+25/12/2022 00:56:18handleVehiclePendingTask  called
+25/12/2022 00:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 00:56:18handleVehiclePendingTask  called
+25/12/2022 00:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:02:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:02:17handle task has pending taks? false
+25/12/2022 01:02:17Pending task in queue = 0
+25/12/2022 01:02:17handleVehiclePendingTask  called
+25/12/2022 01:02:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:08:07handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:08:07handle task has pending taks? false
+25/12/2022 01:08:07Pending task in queue = 0
+25/12/2022 01:08:07handleVehiclePendingTask  called
+25/12/2022 01:08:07handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:11:18handle task has pending taks? false
+25/12/2022 01:11:18Pending task in queue = 0
+25/12/2022 01:11:18handleVehiclePendingTask  called
+25/12/2022 01:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:11:18handle task has pending taks? false
+25/12/2022 01:11:18Pending task in queue = 0
+25/12/2022 01:11:18handleVehiclePendingTask  called
+25/12/2022 01:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:11:18handle task has pending taks? false
+25/12/2022 01:11:18Pending task in queue = 0
+25/12/2022 01:11:18handleVehiclePendingTask  called
+25/12/2022 01:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:17:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:17:17handle task has pending taks? false
+25/12/2022 01:17:17Pending task in queue = 0
+25/12/2022 01:17:17handleVehiclePendingTask  called
+25/12/2022 01:17:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:23:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:23:08handle task has pending taks? false
+25/12/2022 01:23:08Pending task in queue = 0
+25/12/2022 01:23:08handleVehiclePendingTask  called
+25/12/2022 01:23:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:26:18handle task has pending taks? false
+25/12/2022 01:26:18Pending task in queue = 0
+25/12/2022 01:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:26:18handle task has pending taks? false
+25/12/2022 01:26:18Pending task in queue = 0
+25/12/2022 01:26:18handleVehiclePendingTask  called
+25/12/2022 01:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:26:18handle task has pending taks? false
+25/12/2022 01:26:18Pending task in queue = 0
+25/12/2022 01:26:18handleVehiclePendingTask  called
+25/12/2022 01:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:26:18handleVehiclePendingTask  called
+25/12/2022 01:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:32:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:32:17handle task has pending taks? false
+25/12/2022 01:32:17Pending task in queue = 0
+25/12/2022 01:32:17handleVehiclePendingTask  called
+25/12/2022 01:32:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:38:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:38:08handle task has pending taks? false
+25/12/2022 01:38:08Pending task in queue = 0
+25/12/2022 01:38:08handleVehiclePendingTask  called
+25/12/2022 01:38:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:41:03handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:41:03handle task has pending taks? false
+25/12/2022 01:41:03Pending task in queue = 0
+25/12/2022 01:41:03handleVehiclePendingTask  called
+25/12/2022 01:41:03handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:41:03handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:41:03handle task has pending taks? false
+25/12/2022 01:41:03Pending task in queue = 0
+HomeScreen :
+HomeScreen : NO pending task
+25/12/2022 01:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:41:18handle task has pending taks? false
+25/12/2022 01:41:18Pending task in queue = 0
+25/12/2022 01:41:18handleVehiclePendingTask  called
+25/12/2022 01:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:41:18handle task has pending taks? false
+25/12/2022 01:41:18Pending task in queue = 0
+25/12/2022 01:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:41:18handle task has pending taks? false
+25/12/2022 01:41:18Pending task in queue = 0
+25/12/2022 01:41:18handleVehiclePendingTask  called
+25/12/2022 01:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:41:18handleVehiclePendingTask  called
+25/12/2022 01:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:47:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:47:17handle task has pending taks? false
+25/12/2022 01:47:17Pending task in queue = 0
+25/12/2022 01:47:17handleVehiclePendingTask  called
+25/12/2022 01:47:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:53:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:53:08handle task has pending taks? false
+25/12/2022 01:53:08Pending task in queue = 0
+25/12/2022 01:53:08handleVehiclePendingTask  called
+25/12/2022 01:53:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:56:03handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:56:03handle task has pending taks? false
+25/12/2022 01:56:03Pending task in queue = 0
+25/12/2022 01:56:03handleVehiclePendingTask  called
+25/12/2022 01:56:03handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:56:18handle task has pending taks? false
+25/12/2022 01:56:18Pending task in queue = 0
+25/12/2022 01:56:18handleVehiclePendingTask  called
+25/12/2022 01:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:56:18handle task has pending taks? false
+25/12/2022 01:56:18Pending task in queue = 0
+25/12/2022 01:56:18handleVehiclePendingTask  called
+25/12/2022 01:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 01:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 01:56:18handle task has pending taks? false
+25/12/2022 01:56:18Pending task in queue = 0
+25/12/2022 01:56:18handleVehiclePendingTask  called
+25/12/2022 01:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:02:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:02:17handle task has pending taks? false
+25/12/2022 02:02:17Pending task in queue = 0
+25/12/2022 02:02:17handleVehiclePendingTask  called
+25/12/2022 02:02:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:08:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:08:08handle task has pending taks? false
+25/12/2022 02:08:08Pending task in queue = 0
+25/12/2022 02:08:08handleVehiclePendingTask  called
+25/12/2022 02:08:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:11:03handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:11:03handle task has pending taks? false
+25/12/2022 02:11:03Pending task in queue = 0
+25/12/2022 02:11:03handleVehiclePendingTask  called
+25/12/2022 02:11:03handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:11:18handle task has pending taks? false
+25/12/2022 02:11:18Pending task in queue = 0
+25/12/2022 02:11:18handleVehiclePendingTask  called
+25/12/2022 02:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:11:18handle task has pending taks? false
+25/12/2022 02:11:18Pending task in queue = 0
+25/12/2022 02:11:18handleVehiclePendingTask  called
+25/12/2022 02:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:11:18handle task has pending taks? false
+25/12/2022 02:11:18Pending task in queue = 0
+25/12/2022 02:11:18handleVehiclePendingTask  called
+25/12/2022 02:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:17:17handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:17:17handle task has pending taks? false
+25/12/2022 02:17:17Pending task in queue = 0
+25/12/2022 02:17:17handleVehiclePendingTask  called
+25/12/2022 02:17:17handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:23:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:23:08handle task has pending taks? false
+25/12/2022 02:23:08Pending task in queue = 0
+25/12/2022 02:23:08handleVehiclePendingTask  called
+25/12/2022 02:23:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:26:03handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:26:03handle task has pending taks? false
+25/12/2022 02:26:03Pending task in queue = 0
+25/12/2022 02:26:03handleVehiclePendingTask  called
+25/12/2022 02:26:03handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:26:18handle task has pending taks? false
+25/12/2022 02:26:18Pending task in queue = 0
+25/12/2022 02:26:18handleVehiclePendingTask  called
+25/12/2022 02:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:26:18handle task has pending taks? false
+25/12/2022 02:26:18Pending task in queue = 0
+25/12/2022 02:26:18handleVehiclePendingTask  called
+25/12/2022 02:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:26:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:26:18handle task has pending taks? false
+25/12/2022 02:26:18Pending task in queue = 0
+25/12/2022 02:26:18handleVehiclePendingTask  called
+25/12/2022 02:26:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:32:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:32:18handle task has pending taks? false
+25/12/2022 02:32:18Pending task in queue = 0
+25/12/2022 02:32:18handleVehiclePendingTask  called
+25/12/2022 02:32:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:38:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:38:08handle task has pending taks? false
+25/12/2022 02:38:08Pending task in queue = 0
+25/12/2022 02:38:08handleVehiclePendingTask  called
+25/12/2022 02:38:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:41:03handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:41:03handle task has pending taks? false
+25/12/2022 02:41:03Pending task in queue = 0
+25/12/2022 02:41:03handleVehiclePendingTask  called
+25/12/2022 02:41:03handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:41:18handle task has pending taks? false
+25/12/2022 02:41:18Pending task in queue = 0
+25/12/2022 02:41:18handleVehiclePendingTask  called
+25/12/2022 02:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:41:18handle task has pending taks? false
+25/12/2022 02:41:18Pending task in queue = 0
+25/12/2022 02:41:18handleVehiclePendingTask  called
+25/12/2022 02:41:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:41:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:41:19handle task has pending taks? false
+25/12/2022 02:41:19Pending task in queue = 0
+25/12/2022 02:41:19handleVehiclePendingTask  called
+25/12/2022 02:41:19handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:47:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:47:18handle task has pending taks? false
+25/12/2022 02:47:18Pending task in queue = 0
+25/12/2022 02:47:18handleVehiclePendingTask  called
+25/12/2022 02:47:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:53:08handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:53:08handle task has pending taks? false
+25/12/2022 02:53:08Pending task in queue = 0
+25/12/2022 02:53:08handleVehiclePendingTask  called
+25/12/2022 02:53:08handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:56:04handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:56:04handle task has pending taks? false
+25/12/2022 02:56:04Pending task in queue = 0
+25/12/2022 02:56:04handleVehiclePendingTask  called
+25/12/2022 02:56:04handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:56:18handle task has pending taks? false
+25/12/2022 02:56:18Pending task in queue = 0
+25/12/2022 02:56:18handleVehiclePendingTask  called
+25/12/2022 02:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:56:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:56:18handle task has pending taks? false
+25/12/2022 02:56:18Pending task in queue = 0
+25/12/2022 02:56:18handleVehiclePendingTask  called
+25/12/2022 02:56:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 02:56:19handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 02:56:19handle task has pending taks? false
+25/12/2022 02:56:19Pending task in queue = 0
+25/12/2022 02:56:19handleVehiclePendingTask  called
+25/12/2022 02:56:19handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:02:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:02:18handle task has pending taks? false
+25/12/2022 03:02:18Pending task in queue = 0
+25/12/2022 03:02:18handleVehiclePendingTask  called
+25/12/2022 03:02:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:08:09handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:08:09handle task has pending taks? false
+25/12/2022 03:08:09Pending task in queue = 0
+25/12/2022 03:08:09handleVehiclePendingTask  called
+25/12/2022 03:08:09handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:11:04handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:11:04handle task has pending taks? false
+25/12/2022 03:11:04Pending task in queue = 0
+25/12/2022 03:11:04handleVehiclePendingTask  called
+25/12/2022 03:11:04handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:11:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:11:18handle task has pending taks? false
+25/12/2022 03:11:18Pending task in queue = 0
+25/12/2022 03:11:18handleVehiclePendingTask  called
+25/12/2022 03:11:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:11:19handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:11:19handle task has pending taks? false
+25/12/2022 03:11:19Pending task in queue = 0
+25/12/2022 03:11:19handleVehiclePendingTask  called
+25/12/2022 03:11:19handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:11:19handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:11:19handle task has pending taks? false
+25/12/2022 03:11:19Pending task in queue = 0
+25/12/2022 03:11:19handleVehiclePendingTask  called
+25/12/2022 03:11:19handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:17:18handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:17:18handle task has pending taks? false
+25/12/2022 03:17:18Pending task in queue = 0
+25/12/2022 03:17:18handleVehiclePendingTask  called
+25/12/2022 03:17:18handleVehiclePendingTask  called vehicle tasks 0
+25/12/2022 03:23:09handle task called && handleUploadTask Is Connected to internet: true
+25/12/2022 03:23:09handle task has pending taks? false
+25/12/2022 03:23:09Pending task in queue = 0
+25/12/2022 03:23:09handleVehiclePendingTask  called
+25/12/2022 03:23:09handleVehiclePendingTask  called vehicle tasks 0

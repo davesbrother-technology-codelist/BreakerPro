@@ -94,20 +94,10 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             color: MyTheme.materialColor,
             width: MediaQuery.of(context).size.width,
             child: TextButton(
-              onPressed: () async {
-                for (Part p in partsList) {
-                  if (p.isSelected) {
-                    PartsList.uploadPartList.add(p);
-                  }
-                }
-                PartsList.uploadVehicle = widget.vehicle;
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setBool('uploadVehicle', true);
-                prefs.setBool('uploadParts', true);
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (builder) => MainDashboard()));
+              onPressed: () {
                 // uploadParts();
                 // uploadVehicle();
+                openUploadDialog(context);
               },
               child: Text(
                 "Upload",
@@ -281,6 +271,47 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     Fluttertoast.showToast(msg: "Vehicle Upload Successful");
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (ctx) => MainDashboard()));
+  }
+
+  openUploadDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text("CANCEL"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget okButton = TextButton(
+      onPressed: () async {
+        for (Part p in partsList) {
+          if (p.isSelected) {
+            PartsList.uploadPartList.add(p);
+          }
+        }
+        PartsList.uploadVehicle = widget.vehicle;
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('uploadVehicle', true);
+        prefs.setBool('uploadParts', true);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (builder) => MainDashboard()));
+      },
+      child: const Text("OK"),
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Are you sure you want to upload?"),
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   Widget _buildBottomDrawer(BuildContext context) {

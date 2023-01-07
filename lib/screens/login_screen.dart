@@ -236,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // await partsList.loadParts(
       //     ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
       Navigator.pop(context);
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const MainDashboard(),
       ));
     } else if (result == 'User Active on Another Device') {

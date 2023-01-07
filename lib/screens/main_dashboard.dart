@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:archive/archive_io.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:breaker_pro/api/api_config.dart';
 import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/screens/login_screen.dart';
+import 'package:breaker_pro/screens/notification_screen.dart';
 import 'package:breaker_pro/screens/settings_screen.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
@@ -11,6 +15,9 @@ import 'package:breaker_pro/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_extend/share_extend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
@@ -67,13 +74,44 @@ class _MainDashboardState extends State<MainDashboard> {
                 color: MyTheme.white,
               )),
           IconButton(
-              onPressed: () => {},
+              onPressed: () async {
+                Directory? appDocDirectory =
+                    await getExternalStorageDirectory();
+                print(appDocDirectory);
+                var encoder = ZipFileEncoder();
+                encoder.create(
+                    "${appDocDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+
+                var assets = await rootBundle.loadString('AssetManifest.json');
+                Map json = jsonDecode(assets);
+                List files = json.keys
+                    .where((element) => element.startsWith('assets/logger/'))
+                    .toList();
+
+                for (var path in files) {
+                  final byteData = await rootBundle.load('$path');
+                  final file =
+                      File('${(await getTemporaryDirectory()).path}/$path');
+                  file.createSync(recursive: true);
+                  await file.writeAsBytes(byteData.buffer.asUint8List(
+                      byteData.offsetInBytes, byteData.lengthInBytes));
+                  encoder.addFile(file);
+                }
+                encoder.close();
+                File f = File(encoder.zipPath);
+                ShareExtend.share(f.path, "file");
+              },
               icon: Icon(
                 Icons.share,
                 color: MyTheme.white,
               )),
           IconButton(
-              onPressed: () => {},
+              onPressed: () => {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const NotificationScreen()))
+                  },
               icon: Icon(
                 Icons.notifications,
                 color: MyTheme.white,
@@ -87,7 +125,12 @@ class _MainDashboardState extends State<MainDashboard> {
                 color: MyTheme.white,
               )),
           IconButton(
-              onPressed: () => {},
+              onPressed: () => {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => super.widget))
+                  },
               icon: Icon(
                 Icons.refresh,
                 color: MyTheme.white,

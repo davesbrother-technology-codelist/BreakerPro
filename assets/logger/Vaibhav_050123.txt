@@ -1,0 +1,32 @@
+**************** Customize Parts clicked 20:24:57 2023/01/05 **************** 
+
+Selected Part Name: 3RD ROW SEAT BELT - DRIVER
+
+
+**************** Inserting Part Details clicked 20:25:04 2023/01/05 **************** 
+
+VehicleId : 5
+PartId : PRT202301052024570579
+PartName : 3RD ROW SEAT BELT - DRIVER
+PartType : INTERIOR
+SellPrise : 
+CostPrise : 
+Quantity : 1
+Condition : f
+Location : f
+Description : 
+SetDefault : 0
+Comment : 
+PostageOptions : Old 24 hrs 0.00 + Collection Only 0.00
+Ebay : false
+Image Name : 
+manPartNo : 
+Featured Web : false
+Featured Web Date : 
+ 
+
+**************** Customize Parts clicked 20:25:46 2023/01/05 **************** 
+
+Selected Part Name: RD ROW SEAT BELT - DRIVER,3RD ROW SEAT BELT - DRIVER
+
+

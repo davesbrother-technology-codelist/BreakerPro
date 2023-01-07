@@ -12,6 +12,13 @@ class AspectRatioScreen extends StatefulWidget {
 class _AspectRatioScreenState extends State<AspectRatioScreen> {
   String selected = "Default";
   List<String> aspectRatios = ["Default", "1:1", "4:3", "6:9"];
+
+  @override
+  void initState() {
+    selected = AppConfig.imageAspectRatio;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

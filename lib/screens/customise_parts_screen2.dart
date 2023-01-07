@@ -1,3 +1,4 @@
+import 'package:breaker_pro/screens/postage_dropdown_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../app_config.dart';
@@ -8,6 +9,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import 'capture_screen.dart';
+import 'drop_down_screen.dart';
 
 class Customise extends StatefulWidget {
   const Customise({Key? key, required this.part}) : super(key: key);
@@ -25,7 +27,7 @@ class _CustomiseState extends State<Customise> {
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
-  List<String> partConditionList = [
+  List<String> partConditionItems = [
     'BRAND NEW',
     'GOOD',
     'PERFECT',
@@ -33,7 +35,36 @@ class _CustomiseState extends State<Customise> {
     'VERY GOOD',
     'WORN'
   ];
-  List<DropdownMenuItem<String>> partConditionDropDownItems = [];
+  final List<String> postageItems = [
+    'Old 24 hrs 6.00 + Collection Only 0.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 28.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 24.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 18.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 12.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 36.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 40.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 50.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 6.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 60.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 9.60',
+    'Old 2-3 days 0.00 + Collection Only 0.00',
+    'Old 2-3 days 12.00 + Collection Only 0.00',
+    'Old 2-3 days 18.00 + Collection Only 0.00',
+    'Old 2-3 days 24.00 + Collection Only 0.00',
+    'Old 2-3 days 36.00 + Collection Only 0.00',
+    'Old 2-3 days 50.00 + Collection Only 0.00',
+    'Old 2-3 days 6.00 + Collection Only 0.00 + Collection Only 0.00',
+    'Old 2-3 days 60.00 + Collection Only 0.00',
+    'Old 2-3 days 9.60 + Collection Only 0.00',
+    'Old 24 hrs 0.00 + Collection Only 0.00',
+    'Old 24 hrs 12.00 + Collection Only 0.00',
+    'Old 24 hrs 18.00 + Collection Only 0.00',
+    'Old 24 hrs 36.00 + Collection Only 0.00',
+    'Old 24 hrs 9.60 + Collection Only 0.00',
+    'Old Collection Only 0.00'
+  ];
+  late List<bool> postageSelected =
+      List.generate(postageItems.length, (index) => false);
   late Part part;
   bool isChecked1 = false;
   bool isChecked2 = false;
@@ -52,21 +83,14 @@ class _CustomiseState extends State<Customise> {
   TextEditingController mnfPartNoEditingController = TextEditingController();
   TextEditingController partCommentsEditingController = TextEditingController();
   TextEditingController ebayTitleEditingController = TextEditingController();
-
-  String? partConditionValue;
-  String? postageOptionsValue;
+  TextEditingController partConditionController = TextEditingController();
+  TextEditingController postageOptionsController = TextEditingController();
 
   @override
   void initState() {
     part = widget.part;
     super.initState();
     ebayTitleEditingController.text = part.ebayTitle;
-    for (String item in partConditionList) {
-      partConditionDropDownItems.add(DropdownMenuItem(
-        value: item,
-        child: Text(item),
-      ));
-    }
     formattedDate = '';
   }
 
@@ -94,12 +118,12 @@ class _CustomiseState extends State<Customise> {
                   mnfPartNoEditingController.text.isNotEmpty ||
                   partCommentsEditingController.text.isNotEmpty ||
                   formattedDate != "" ||
-                  partConditionValue != null ||
-                  postageOptionsValue != null) {
+                  partConditionController.text.isNotEmpty ||
+                  postageOptionsController.text.isNotEmpty) {
                 part.isSelected = true;
               }
 
-              part.partCondition = partConditionValue.toString();
+              part.partCondition = partConditionController.text.toString();
               part.defaultLocation = partLocEditingController.text.toString();
               try {
                 part.warranty = double.parse(warrantyEditingController.text);
@@ -116,7 +140,7 @@ class _CustomiseState extends State<Customise> {
                   partDescEditingController.text.toString();
 
               part.comments = partCommentsEditingController.text.toString();
-              part.postageOptions = postageOptionsValue.toString();
+              part.postageOptions = postageOptionsController.text.toString();
               part.ebayTitle = ebayTitleEditingController.text.toString();
               part.imgList = ImageList.partImageList;
               Navigator.pop(context, part);
@@ -163,7 +187,9 @@ class _CustomiseState extends State<Customise> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    customTextField("Part Condition", partConditionValue)
+                    // customTextField("Part Condition", partConditionValue)
+                    customDropDownField("Part Condition", partConditionItems,
+                        partConditionController)
                   ],
                 ),
                 Row(
@@ -224,7 +250,9 @@ class _CustomiseState extends State<Customise> {
                     mnfPartNoEditingController),
                 custom2TextField("Part Comments", 1, TextInputType.text,
                     partCommentsEditingController),
-                customTextField("Postage Option", postageOptionsValue),
+                // customTextField("Postage Option", postageOptionsValue),
+                customDropDownField(
+                    "Postage Option", postageItems, postageOptionsController),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: const [
@@ -417,13 +445,32 @@ class _CustomiseState extends State<Customise> {
     );
   }
 
-  Widget customTextField(String title, String? selectedItem) {
+  Route createRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
+  Widget customDropDownField(
+      String title, List<String> menuItems, TextEditingController controller) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: textEdgeInsetsGeometry,
@@ -432,31 +479,56 @@ class _CustomiseState extends State<Customise> {
               style: textStyle,
             ),
           ),
-          DropdownButtonFormField(
-            value: selectedItem,
-            items: partConditionDropDownItems,
-            onChanged: (value) {
-              setState(() {
-                selectedItem = value;
-                switch (title) {
-                  case 'Part Condition':
-                    {
-                      partConditionValue = value;
+          SizedBox(
+              child: TextField(
+            readOnly: true,
+            onTap: () async {
+              if (title == "Postage Option") {
+                await Navigator.of(context)
+                    .push(createRoute(PostageDropDownScreen(
+                  dropDownItems: menuItems,
+                  title: title,
+                  selectedItems: postageSelected,
+                )))
+                    .then((value) {
+                  if (value == null) {
+                    return;
+                  }
+                  setState(() {
+                    String a = "";
+                    value = value as List;
+                    for (int i = 0; i < value.length; i++) {
+                      if (value[i]) {
+                        a += "${postageItems[i]} ,";
+                      }
                     }
-                    break;
-                  case 'Postage Option':
-                    {
-                      postageOptionsValue = value;
-                    }
-                    break;
-                }
-              });
+                    controller.text = a;
+                  });
+                });
+              } else {
+                await Navigator.of(context)
+                    .push(createRoute(
+                        DropDownScreen(dropDownItems: menuItems, title: title)))
+                    .then((value) {
+                  if (value == null) {
+                    return;
+                  }
+                  setState(() {
+                    controller.text = value['value'];
+                  });
+                });
+              }
             },
             decoration: InputDecoration(
-                hintText: selectedItem,
                 enabledBorder: border,
-                focusedBorder: border),
-          ),
+                focusedBorder: border,
+                suffixIcon: Icon(
+                  Icons.arrow_drop_down,
+                  color: MyTheme.grey,
+                )),
+            controller: controller,
+            maxLines: null,
+          )),
         ],
       ),
     );
