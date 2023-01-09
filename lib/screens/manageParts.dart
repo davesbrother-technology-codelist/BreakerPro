@@ -13,12 +13,12 @@ class ManagePart extends StatefulWidget {
 
 class _ManagePartState extends State<ManagePart> {
   OutlineInputBorder border =
-  OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   TextStyle textStyle = TextStyle(fontSize: 17, color: MyTheme.grey);
   EdgeInsetsGeometry textEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(0, 10, 10, 10);
+      const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(10, 5, 10, 5);
+      const EdgeInsets.fromLTRB(10, 5, 10, 5);
   late PartsList partsList;
   late Map responseJson;
   bool modelEnable = true;
@@ -49,7 +49,7 @@ class _ManagePartState extends State<ManagePart> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(238, 180, 22, .8),
-          leading:Container(
+          leading: Container(
             padding: const EdgeInsets.all(10),
             child: IconButton(
               onPressed: () {
@@ -58,117 +58,120 @@ class _ManagePartState extends State<ManagePart> {
               icon: const Icon(Icons.arrow_back),
             ),
           ),
-            title: Text(
-              "Manage Parts",
-              style: TextStyle(color: MyTheme.white),
-            ),
-
+          title: Text(
+            "Manage Parts",
+            style: TextStyle(color: MyTheme.white),
+          ),
         ),
         body: SingleChildScrollView(
           child: Container(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 30),
-                  child: Center(
-                      child: Image(
-                    image: AssetImage("assets/ic_manage.png"),
-                    height: 100,
-                    width: 90,
-                  )),
-                ),
-                Text(
-                  "Manage Parts",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                ),
-                SizedBox(
-                  height: 35,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 14, right: 14),
-                  child: TextFormField(
-                    controller: _controller,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: "Part ID",
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            borderSide:
-                                BorderSide(color: Colors.grey, width: 2))),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 30),
+                    child: Center(
+                        child: Image(
+                      image: AssetImage("assets/ic_manage.png"),
+                      height: 100,
+                      width: 90,
+                    )),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 150,
-                        color: Colors.grey,
-                        child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _controller =
-                                    TextEditingController(text: "1024-");
-                              });
-                            },
-                            child: Text(
-                              "Reset",
-                              style:
-                                  TextStyle(fontSize: 18, color: MyTheme.white),
-                            )),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Container(
-                          width: 200,
-                          color: MyTheme.materialColor,
+                  Text(
+                    "Manage Parts",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                  ),
+                  SizedBox(
+                    height: 35,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 14, right: 14),
+                    child: TextFormField(
+                      controller: _controller,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: "Part ID",
+                          hintStyle: TextStyle(color: Colors.grey),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                              borderSide:
+                                  BorderSide(color: Colors.grey, width: 2))),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 150,
+                          color: Colors.grey,
                           child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                setState(() {
+                                  _controller =
+                                      TextEditingController(text: "1024-");
+                                });
+                              },
                               child: Text(
-                                "Find",
-                                style:
-                                    TextStyle(fontSize: 18, color: MyTheme.white),
+                                "Reset",
+                                style: TextStyle(
+                                    fontSize: 18, color: MyTheme.white),
                               )),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Container(
+                            width: 200,
+                            color: MyTheme.materialColor,
+                            child: TextButton(
+                                onPressed: () {},
+                                child: Text(
+                                  "Find",
+                                  style: TextStyle(
+                                      fontSize: 18, color: MyTheme.white),
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  width: 360,
-                  color: MyTheme.materialColor,
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ScanPart()));
-                      },
-                      child: Text(
-                        "Scan Part",
-                        style: TextStyle(fontSize: 18, color: MyTheme.white),
-                      )),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  width: 360,
-                  color: MyTheme.materialColor,
-                  child: TextButton(
-                      onPressed: () {
-                        advanceSearch(context);
-                      },
-                      child: Text(
-                        "Advance Search",
-                        style: TextStyle(fontSize: 18, color: MyTheme.white),
-                      )),
-                ),
-              ],
+                  Container(
+                    width: 360,
+                    color: MyTheme.materialColor,
+                    child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ScanPart()));
+                        },
+                        child: Text(
+                          "Scan Part",
+                          style: TextStyle(fontSize: 18, color: MyTheme.white),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 360,
+                    color: MyTheme.materialColor,
+                    child: TextButton(
+                        onPressed: () {
+                          advanceSearch(context);
+                        },
+                        child: Text(
+                          "Advance Search",
+                          style: TextStyle(fontSize: 18, color: MyTheme.white),
+                        )),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -178,7 +181,6 @@ class _ManagePartState extends State<ManagePart> {
 
   void advanceSearch(BuildContext context) {
     showDialog(
-
         context: context,
         builder: (BuildContext context) {
           return Container(
@@ -186,106 +188,96 @@ class _ManagePartState extends State<ManagePart> {
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: AlertDialog(
-
               insetPadding: EdgeInsets.zero,
               contentPadding: EdgeInsets.zero,
               clipBehavior: Clip.antiAliasWithSaveLayer,
-
               content: Container(
-                width: MediaQuery.of(context).size.width*2,
-
+                width: MediaQuery.of(context).size.width * 2,
                 child: Builder(builder: (context) {
                   return Scaffold(
                       appBar: AppBar(
-                      leading: Container(
-                      padding: const EdgeInsets.all(10),
-                  child: IconButton(
-                  onPressed: () {
-                  Navigator.of(context).pop();
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                  ),
-                  ),
-                  title: Text(
-                  "Manage Parts",
-                  style: TextStyle(color: MyTheme.white),
-                  ),
-                  ),
-                  body: SingleChildScrollView(
-                  child: Column(
-                  children: [
-                  Row(
-                  children: [
-                  customTextField("VPN"),
-                  customTextField("Stock Reference")
-                  ],
-                  ),
-                  Row(
-                  children: [
-                  customTextField("Make"),
-                  customTextField("Model")
-                  ],
-                  ),
-                  Row(
-                  children: [
-                  customTextField("Manufacture Year"),
-                  // model,
-                  customTextField("Part Name")
-                  ],
-                  ),
-                  Row(
-                  children: [
-                  customTextField("Ebay Number"),
-                  customTextField("Location")
-                  ],
-                  ),
-                  Row(
-                  children: [customTextField("Part Number")],
-                  ),
-
-                  ],
-                  ),
-                  )
-                  );
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            icon: const Icon(Icons.arrow_back),
+                          ),
+                        ),
+                        title: Text(
+                          "Manage Parts",
+                          style: TextStyle(color: MyTheme.white),
+                        ),
+                      ),
+                      body: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                customTextField("VPN"),
+                                customTextField("Stock Reference")
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                customTextField("Make"),
+                                customTextField("Model")
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                customTextField("Manufacture Year"),
+                                // model,
+                                customTextField("Part Name")
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                customTextField("Ebay Number"),
+                                customTextField("Location")
+                              ],
+                            ),
+                            Row(
+                              children: [customTextField("Part Number")],
+                            ),
+                          ],
+                        ),
+                      ));
                 }),
-
               ),
               actions: [
-
                 Container(
                   width: 150,
-                color: Colors.grey,
-
-                  child: TextButton(onPressed: (){
-                    Navigator.of(context).pop();
-                  }, child: Text("Reset",
-                    style: TextStyle(
-                        fontSize:18,
-                        color: MyTheme.white
-
-                    ) ,
-                  )),
+                  color: Colors.grey,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        "Reset",
+                        style: TextStyle(fontSize: 18, color: MyTheme.white),
+                      )),
                 ),
                 Container(
                     width: 150,
-                    color:MyTheme.materialColor,
-                    child: TextButton(onPressed: (){
-
-                    }, child: Text("Find",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: MyTheme.white
-                ),
-                )))
+                    color: MyTheme.materialColor,
+                    child: TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          "Find",
+                          style: TextStyle(fontSize: 18, color: MyTheme.white),
+                        )))
               ],
             ),
           );
         });
   }
+
   Widget customTextField(String title,
       {String? dropDownValue,
-        List<DropdownMenuItem<String>>? menuItems,
-        bool enable = true}) {
+      List<DropdownMenuItem<String>>? menuItems,
+      bool enable = true}) {
     return Container(
       padding: containerEdgeInsetsGeometry,
       width: MediaQuery.of(context).size.width / 2,
@@ -304,60 +296,61 @@ class _ManagePartState extends State<ManagePart> {
             height: 60,
             child: menuItems == null
                 ? TextField(
-                decoration: InputDecoration(
-                  enabledBorder: border,
-                  focusedBorder: border,
-                ))
+                    decoration: InputDecoration(
+                    enabledBorder: border,
+                    focusedBorder: border,
+                  ))
                 : DropdownButtonFormField(
-              isExpanded: true,
-              menuMaxHeight: 300,
-              decoration: InputDecoration(
-                  enabledBorder: border, focusedBorder: border),
-              value: dropDownValue,
-              items: menuItems,
-              onChanged: (String? newValue) {
-                // dropDownValue = newValue;
-                if (title == 'Make') {
-                  setState(() {
-                    dropDownValue = null;
-                    modelValue = null;
-                  });
-                  // modelEnable = true;
+                    isExpanded: true,
+                    menuMaxHeight: 300,
+                    decoration: InputDecoration(
+                        enabledBorder: border, focusedBorder: border),
+                    value: dropDownValue,
+                    items: menuItems,
+                    onChanged: (String? newValue) {
+                      // dropDownValue = newValue;
+                      if (title == 'Make') {
+                        setState(() {
+                          dropDownValue = null;
+                          modelValue = null;
+                        });
+                        // modelEnable = true;
 
-                  setState(() {
-                    modelMenuItems = createMenuList(newValue.toString(),
-                        modelMenuItems, responseJson);
-                  });
-                  // model = modelField("Model",
-                  //     dropDownValue: modelValue,
-                  //     menuItems: modelMenuItems,
-                  //     enable: modelEnable);
-                  //
-                  // print("Done");
-                  // for (DropdownMenuItem<String> a in modelMenuItems) {
-                  //   Text t = a.child as Text;
-                  //   print("${a.value} ${t.data}");
-                  // }
+                        setState(() {
+                          modelMenuItems = createMenuList(newValue.toString(),
+                              modelMenuItems, responseJson);
+                        });
+                        // model = modelField("Model",
+                        //     dropDownValue: modelValue,
+                        //     menuItems: modelMenuItems,
+                        //     enable: modelEnable);
+                        //
+                        // print("Done");
+                        // for (DropdownMenuItem<String> a in modelMenuItems) {
+                        //   Text t = a.child as Text;
+                        //   print("${a.value} ${t.data}");
+                        // }
 
-                  // setState(() {});
-                }
+                        // setState(() {});
+                      }
 
-                setState(() {
-                  dropDownValue = newValue;
-                });
-              },
-            ),
+                      setState(() {
+                        dropDownValue = newValue;
+                      });
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
+
   createMenuList(
       String title, List<DropdownMenuItem<String>> menu, Map responseJson) {
     List l = responseJson[title];
     menu = List<DropdownMenuItem<String>>.generate(
         l.length,
-            (index) => DropdownMenuItem(
+        (index) => DropdownMenuItem(
             value: l[index].toString(), child: Text(l[index])));
     // for (var a in menu) {
     //   print(a);
@@ -365,4 +358,3 @@ class _ManagePartState extends State<ManagePart> {
     return menu;
   }
 }
-

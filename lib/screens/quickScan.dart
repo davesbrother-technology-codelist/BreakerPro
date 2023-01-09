@@ -1,3 +1,7 @@
+import 'dart:io' as Android;
+
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../my_theme.dart';
@@ -26,167 +30,209 @@ class _QuickScanState extends State<QuickScan>  {
     }
     );
   }
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+ @override
+ void initState() {
+   super.initState();
+   controller?.resumeCamera();
+
+  }
+  @override
+  void reassemble() async {
+    super.reassemble();
+    if(Android.Platform.isAndroid){
+await controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Scan (Double click on screen)"),
-      ),
+
       body: SingleChildScrollView(
         child: Center(
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: 400,
-                width: 400,
-
-                child: QRView(
-                    key: _gLobalkey,
-                    onQRViewCreated: qr
-                ),
-              ),
-              // Center(
-              //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
-              // ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
+          child: SafeArea(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Part ID',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                        color: Colors.grey
-                    ),),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    (result !=null) ? Text('${result!.code}') : Text('Scan a code')
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  children: [
-                    Text('Part Name',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey
-                      ),),
-                    Text('')
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  children: [
-                    Text('Current Location',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey
-                      ),),
-                    Text('')
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Row(
-                  children: [
-                    Text('Vehicle',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        color: Colors.grey
-                      ),),
-                    Text('')
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 14,right: 14),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Location",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      borderSide: BorderSide(
-                        color: Colors.grey,
-                        width: 2
-                      )
+                    Image.asset("assets/laser.png",
+                    height: 60,
+                      width: 50,
                     )
+                  ],
+                ),
+                Container(
+                  height:5* MediaQuery.of(context).size.height/9,
+                  width: 400,
+
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10,right: 10),
+                    child: QRView(
+
+                        key: _gLobalkey,
+                        onQRViewCreated: qr,
+                      cameraFacing: CameraFacing.back,
+                      overlay: QrScannerOverlayShape(
+                        borderLength: 20,
+                        borderWidth: 4,
+                        borderColor: Colors.lightGreenAccent,
+                        cutOutHeight:MediaQuery.of(context).size.height*0.26,
+                        cutOutWidth: MediaQuery.of(context).size.width*0.7,
+                      ),
+
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      color: MyTheme.materialColor,
-                      child: TextButton(onPressed: (){},
-                          child: Text("Set Location",
-                          style: TextStyle(
-                            fontSize:18,
-                            color: MyTheme.white
-
-                          ) ,
-                          )),
-                    ),
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Container(
-                      color: MyTheme.materialColor,
-                      child: TextButton(onPressed: (){},
-                          child: Text("Offline Mode",
-                            style: TextStyle(
-                                fontSize:18,
-                                color: MyTheme.white
-
-                            ) ,
-                          )),
-                    ),
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Container(
-                      color: MyTheme.materialColor,
-                      child: TextButton(onPressed: (){},
-                          child: Text("Exit",
-                            style: TextStyle(
-                                fontSize:18,
-                                color: MyTheme.white
-
-                            ) ,
-                          )),
-                    ),
-
-
-                  ],
+                // Center(
+                //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
+                // ),
+                SizedBox(
+                  height: 20,
                 ),
-              )
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Text('Part ID',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                          color: Colors.grey
+                      ),),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      (result !=null) ? Text('${result!.code}') : Text('')
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Text('Part Name',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey
+                        ),),
+                      Text('')
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Text('Current Location',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey
+                        ),),
+                      Text('')
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Text('Vehicle',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          color: Colors.grey
+                        ),),
+                      Text('')
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 14,right: 14),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Location",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                        borderSide: BorderSide(
+                          color: Colors.grey,
+                          width: 2
+                        )
+                      )
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(onPressed: (){},
+                            child: Text("Set Location",
+                            style: TextStyle(
+                              fontSize:18,
+                              color: MyTheme.white
 
-            ],
+                            ) ,
+                            )),
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(onPressed: (){},
+                            child: Text("Offline Mode",
+                              style: TextStyle(
+                                  fontSize:18,
+                                  color: MyTheme.white
+
+                              ) ,
+                            )),
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(onPressed: (){},
+                            child: Text("Exit",
+                              style: TextStyle(
+                                  fontSize:18,
+                                  color: MyTheme.white
+
+                              ) ,
+                            )),
+                      ),
+
+
+                    ],
+                  ),
+                )
+
+              ],
+            ),
           ),
         ),
       ),

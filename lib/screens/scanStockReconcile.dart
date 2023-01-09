@@ -33,93 +33,113 @@ class _ScanStockReconcileState extends State<ScanStockReconcile>  {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Scan (Double click on screen)"),
-      ),
+
       body: SingleChildScrollView(
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  height: 540,
-                  width: 400,
-
-                  child: QRView(
-                      key: _gLobalkey,
-                      onQRViewCreated: qr
+            child: SafeArea(
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Image.asset("assets/laser.png",
+                        height: 60,
+                        width: 40,
+                      )
+                    ],
                   ),
-                ),
-                SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Column(
-                              children: [
-                                Text('Scanned Parts',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold
-                                ),
-                                ),
+                  Container(
+                    height: 5*MediaQuery.of(context).size.height/7,
+                    width: 400,
 
-                              ],
-                            ),
-                            SizedBox(
-                              width:150 ,
-                            ),
-                            Column(
-                              children: [
-                                TextButton(onPressed: (){},
-                                    child:Text("Manage Part")),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: Container(
-                                    color: MyTheme.materialColor,
-                                    child: TextButton(onPressed: (){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>MainDashboard()));
-                                    },
-                                        child:Text("Exit",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: MyTheme.white
-                                          ),
-                                        )),
-                                  ),
-                                )
-                              ],
-                            )
-                          ],
-                        ),
-                        SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Container(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                  itemCount: results.length,
-                                  itemBuilder: (context,index){
-                                  return (results[index] !=null) ?
-                                      Padding(padding: const EdgeInsets.only(left: 8,bottom: 8),
-                                      child:    Text('${results[index]!.code}')
-                                      )
-                                   :
-                                  Text('No data found');
-                              }),
-                            ),
-                          ),
-                        ),
-
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10,right: 10),
+                      child: QRView(
+                        key: _gLobalkey,
+                        onQRViewCreated: qr,
+                        cameraFacing: CameraFacing.back,
+                        overlay: QrScannerOverlayShape(
+                          borderLength: 20,
+                          borderWidth: 4,
+                          borderColor: Colors.lightGreenAccent,
+                          cutOutHeight:MediaQuery.of(context).size.height*0.26,
+                          cutOutWidth: MediaQuery.of(context).size.width*0.7,
+                      ),),
                     ),
                   ),
-                ),
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Column(
+                                children: [
+                                  Text('Scanned Parts',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold
+                                  ),
+                                  ),
 
-              ],
+                                ],
+                              ),
+                              SizedBox(
+                                width:150 ,
+                              ),
+                              Column(
+                                children: [
+                                  TextButton(onPressed: (){},
+                                      child:Text("Manage Part")),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: Container(
+                                      color: MyTheme.materialColor,
+                                      child: TextButton(onPressed: (){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>MainDashboard()));
+                                      },
+                                          child:Text("Exit",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: MyTheme.white
+                                            ),
+                                          )),
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Container(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                    itemCount: results.length,
+                                    itemBuilder: (context,index){
+                                    return (results[index] !=null) ?
+                                        Padding(padding: const EdgeInsets.only(left: 8,bottom: 8),
+                                        child:    Text('${results[index]!.code}')
+                                        )
+                                     :
+                                    Text('No data found');
+                                }),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
             ),
           ),
         ),
