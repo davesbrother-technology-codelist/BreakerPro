@@ -6,10 +6,10 @@ import 'package:hive/hive.dart';
 import '../api/api_call.dart';
 
 class PartsList {
-  static List<Part> partList = [];
+  static List<Part>? partList = [];
   static List<Part> selectedPartList = [];
   static List<Part> uploadPartList = [];
-  static Vehicle uploadVehicle = Vehicle();
+  static Vehicle? uploadVehicle;
 
   Future<bool> loadParts(String url, Map<String, dynamic> queryParams) async {
     Box<Part> box = await Hive.openBox('partsBox');
@@ -20,7 +20,7 @@ class PartsList {
       partList =
           List<Part>.generate(l.length, (index) => Part.fromJson(l[index]));
       Map<dynamic, Part> boxMap = {
-        for (var part in partList) part.partName: part
+        for (var part in partList!) part.partName: part
       };
       box.putAll(boxMap);
       print("Added parts to HIVE");

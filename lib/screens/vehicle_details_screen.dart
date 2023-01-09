@@ -39,6 +39,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   TextEditingController typeModelController = TextEditingController();
   TextEditingController vinController = TextEditingController();
   TextEditingController colorController = TextEditingController();
+  TextEditingController colorEbayController = TextEditingController();
   TextEditingController transmissionController = TextEditingController();
   TextEditingController engineCodeController = TextEditingController();
   TextEditingController onSiteDateController = TextEditingController();
@@ -50,16 +51,18 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   TextEditingController weightController = TextEditingController();
   TextEditingController vehicleLocController = TextEditingController();
   TextEditingController commentsController = TextEditingController();
-  TextEditingController demoController = TextEditingController();
   TextEditingController makeController = TextEditingController(text: "");
+  TextEditingController makeEbayController = TextEditingController(text: "");
   TextEditingController modelController = TextEditingController(text: "");
+  TextEditingController modelEbayController = TextEditingController(text: "");
   TextEditingController fuelController = TextEditingController();
   TextEditingController bodyStyleController = TextEditingController(text: "");
   TextEditingController colourController = TextEditingController();
   TextEditingController mnfYearController = TextEditingController();
   TextEditingController yearFromController = TextEditingController();
   TextEditingController yearToController = TextEditingController();
-  TextEditingController engineController = TextEditingController();
+  TextEditingController engineEbayController = TextEditingController();
+  TextEditingController styleEbayController = TextEditingController();
 
   List<String> makeMenuItems = [];
   List<String> modelMenuItems = [];
@@ -67,6 +70,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   List<String> bodyStyleMenuItems = [];
   List<String> colourMenuItems = [];
   List<String> yearsList = [];
+
+  bool recall = false;
 
   DateTime? destructionDate;
   DateTime? dePollutionDate;
@@ -80,6 +85,32 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     int currentYear = DateTime.now().year;
     for (int i = 1980; i <= currentYear; i++) {
       yearsList.add(i.toString());
+    }
+    if (PartsList.uploadVehicle != null) {
+      Vehicle v = PartsList.uploadVehicle!;
+      regNoController.text = v.registrationNumber;
+      makeController.text = v.make;
+      ccController.text = v.cc;
+      modelController.text = v.model;
+      fuelController.text = v.fuel;
+      bodyStyleController.text = v.bodyStyle;
+      vinController.text = v.vin;
+      colourController.text = v.colour;
+      transmissionController.text = v.transmission;
+      engineCodeController.text = v.engineCode;
+      mnfYearController.text = v.manufacturingYear;
+      yearFromController.text =
+          DateFormat("yyyy-MM-dd").parse(v.fromYear).year.toString();
+      yearToController.text =
+          DateFormat("yyyy-MM-dd").parse(v.toYear).year.toString();
+      makeEbayController.text = v.ebayMake;
+      engineEbayController.text = v.ebayEngine;
+      modelEbayController.text = v.ebayModel;
+      styleEbayController.text = v.ebayStyle;
+      colorEbayController.text = v.ebayColor;
+      weightController.text = v.weight;
+      commentsController.text = v.commentDetails;
+      recall = true;
     }
   }
 
@@ -104,6 +135,30 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              recall
+                  ? Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.warning_outlined,
+                            color: MyTheme.materialColor,
+                          ),
+                        ),
+                        const Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              "Recalls are associated to this vehicle, please check the DVLA Safetly Recall site for more details",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  : const SizedBox(),
               Row(
                 children: [
                   customTextField("Registration Number", regNoController),
@@ -194,7 +249,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               Row(
                 children: [
                   customTextField("Make", makeController),
-                  customTextField("Engine", engineController)
+                  customTextField("Engine", engineEbayController)
                 ],
               ),
               Container(
@@ -435,7 +490,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             stockRefController.text.toString();
                         vehicle.make = makeController.text.toString();
                         try {
-                          vehicle.cc = int.parse(ccController.text.toString());
+                          vehicle.cc = ccController.text.toString();
                         } catch (e) {
                           print("Failedd");
                         }
@@ -456,12 +511,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             onSiteDateController.text.toString();
                         vehicle.fromYear = yearFromController.text.toString();
                         vehicle.toYear = yearToController.text.toString();
-                        vehicle.ebayMake = makeController.text.toString();
-                        vehicle.engineCapacity =
-                            engineCodeController.toString();
-                        vehicle.ebayModel = modelController.text.toString();
-                        vehicle.ebayStyle = bodyStyleController.text.toString();
+                        vehicle.ebayMake = makeEbayController.text.toString();
+                        vehicle.engineCode = engineCodeController.toString();
+                        vehicle.ebayModel = modelEbayController.text.toString();
+                        vehicle.ebayStyle = styleEbayController.text.toString();
                         vehicle.colour = colorController.text.toString();
+                        vehicle.ebayColor = colorEbayController.text.toString();
                         vehicle.mileage = mileageController.text.toString();
                         vehicle.costPrice = costPriceController.text.toString();
                         vehicle.collectiondate =
@@ -507,7 +562,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         vehicle.stockReference = stockRefController.text.toString();
         vehicle.make = makeController.text.toString();
         try {
-          vehicle.cc = int.parse(ccController.text.toString());
+          vehicle.cc = ccController.text.toString();
         } catch (e) {
           print("Failedd");
         }
@@ -524,11 +579,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         vehicle.onSiteDate = onSiteDateController.text.toString();
         vehicle.fromYear = yearFromController.text.toString();
         vehicle.toYear = yearToController.text.toString();
-        vehicle.ebayMake = makeController.text.toString();
-        vehicle.engineCapacity = engineCodeController.toString();
-        vehicle.ebayModel = modelController.text.toString();
-        vehicle.ebayStyle = bodyStyleController.text.toString();
+        vehicle.ebayMake = makeEbayController.text.toString();
+        vehicle.engineCode = engineCodeController.toString();
+        vehicle.ebayModel = modelEbayController.text.toString();
+        vehicle.ebayStyle = styleEbayController.text.toString();
         vehicle.colour = colorController.text.toString();
+        vehicle.ebayColor = colorEbayController.text.toString();
         vehicle.mileage = mileageController.text.toString();
         vehicle.costPrice = costPriceController.text.toString();
         vehicle.collectiondate = collectionDateController.text.toString();
@@ -803,111 +859,4 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     menu = List<String>.generate(l.length, (index) => l[index]);
     return menu;
   }
-
-// Widget custom2TextField(String title, Widget name) {
-//   return Container(
-//       padding: containerEdgeInsetsGeometry,
-//       width: MediaQuery.of(context).size.width / 2,
-//       child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Padding(
-//               padding: textEdgeInsetsGeometry,
-//               child: Text(
-//                 title,
-//                 style: textStyle,
-//               ),
-//             ),
-//             TextField(
-//                 onTap: () {
-//                   setState(() {
-//                     Navigator.push(context,
-//                         MaterialPageRoute(builder: (context) => name));
-//                   });
-//                 },
-//                 decoration: InputDecoration(
-//                   // hintText: '${Constants().selectedItem}',
-//                   enabledBorder: border,
-//                   focusedBorder: border,
-//                 )),
-//           ]));
-// }
-
-// Widget custom32TextField(String title,String selectedYear) {
-//   return Container(
-//     padding: containerEdgeInsetsGeometry,
-//     width: MediaQuery.of(context).size.width / 2,
-//     child: Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         Padding(
-//           padding: textEdgeInsetsGeometry,
-//           child: Text(
-//             title,
-//             style: textStyle,
-//           ),
-//         ),
-//
-//         DropdownButtonFormField(
-//           isExpanded: true,
-//           menuMaxHeight: 300,
-//           value: selectedYear,
-//           items: years3,
-//           onChanged: (value) {
-//             setState(() {
-//               selectedYear = value!;
-//             });
-//           },
-//           decoration: InputDecoration(
-//             hintText: selectedYear,
-//             enabledBorder: border,
-//             focusedBorder: border,
-//           ),
-//         ),
-//
-//
-//       ],
-//     ),
-//   );
-// }
-// Widget custom33TextField(String title,String selectedYear) {
-//   return Container(
-//     padding: containerEdgeInsetsGeometry,
-//     width: MediaQuery.of(context).size.width / 2,
-//     child: Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         Padding(
-//           padding: textEdgeInsetsGeometry,
-//           child: Text(
-//             title,
-//             style: textStyle,
-//           ),
-//         ),
-//
-//         DropdownButtonFormField(
-//           isExpanded: true,
-//           menuMaxHeight: 300,
-//           value: selectedYear,
-//           items: years2,
-//           onChanged: (value) {
-//             setState(() {
-//               selectedYear = value!;
-//             });
-//           },
-//           decoration: InputDecoration(
-//             hintText: selectedYear,
-//             enabledBorder: border,
-//             focusedBorder: border,
-//           ),
-//         ),
-//
-//
-//       ],
-//     ),
-//   );
-// }
 }

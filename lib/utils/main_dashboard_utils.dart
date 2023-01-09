@@ -1,8 +1,8 @@
+import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/screens/quickScan.dart';
 import 'package:breaker_pro/screens/scanImaging.dart';
 import 'package:breaker_pro/screens/scanStockReconcile.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
-import 'package:breaker_pro/screens/vehicle_details_screen2.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -11,6 +11,8 @@ import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
 import 'package:breaker_pro/screens/scanPart.dart';
 import 'package:breaker_pro/screens/manageParts.dart';
+
+import 'auth_utils.dart';
 
 class MainDashboardUtils {
   static List<Function?> functionList = [
@@ -24,7 +26,7 @@ class MainDashboardUtils {
   ];
 
   static void addBreakerDialog(BuildContext context, PartsList partsList) {
-    if (PartsList.partList.isEmpty) {
+    if (PartsList.partList!.isEmpty) {
       Fluttertoast.showToast(msg: "Fetching Parts");
       return;
     }
@@ -56,6 +58,22 @@ class MainDashboardUtils {
                     width: MediaQuery.of(context).size.width - 80,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
                     child: TextField(
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (String? vrn) async {
+                        if (vrn != null) {
+                          AuthUtils.showLoadingDialog(context);
+                          bool b =
+                              await VehicleRepository.findVehicleFromVRN(vrn);
+                          Navigator.pop(context);
+                          if (b) {
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => VehicleDetailsScreen()));
+                          }
+                        }
+                      },
                       decoration: InputDecoration(
                           focusColor: MyTheme.black,
                           focusedBorder: OutlineInputBorder(
@@ -76,6 +94,22 @@ class MainDashboardUtils {
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: TextField(
                       cursorColor: MyTheme.black,
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (String? stockref) async {
+                        if (stockref != null) {
+                          AuthUtils.showLoadingDialog(context);
+                          bool b = await VehicleRepository.findVehicleFromStock(
+                              stockref);
+                          Navigator.pop(context);
+                          if (b) {
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => VehicleDetailsScreen()));
+                          }
+                        }
+                      },
                       decoration: InputDecoration(
                           focusColor: MyTheme.black,
                           focusedBorder: OutlineInputBorder(
@@ -139,6 +173,22 @@ class MainDashboardUtils {
                     width: MediaQuery.of(context).size.width - 80,
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: TextField(
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (String? vrn) async {
+                        if (vrn != null) {
+                          AuthUtils.showLoadingDialog(context);
+                          bool b =
+                              await VehicleRepository.findVehicleFromVRN(vrn);
+                          Navigator.pop(context);
+                          if (b) {
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => VehicleDetailsScreen()));
+                          }
+                        }
+                      },
                       decoration: InputDecoration(
                           focusColor: MyTheme.black,
                           focusedBorder: OutlineInputBorder(
@@ -159,6 +209,22 @@ class MainDashboardUtils {
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: TextField(
                       cursorColor: MyTheme.black,
+                      textInputAction: TextInputAction.search,
+                      onSubmitted: (String? stockref) async {
+                        if (stockref != null) {
+                          AuthUtils.showLoadingDialog(context);
+                          bool b = await VehicleRepository.findVehicleFromStock(
+                              stockref);
+                          Navigator.pop(context);
+                          if (b) {
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => VehicleDetailsScreen()));
+                          }
+                        }
+                      },
                       decoration: InputDecoration(
                           focusColor: MyTheme.black,
                           focusedBorder: OutlineInputBorder(
@@ -179,7 +245,7 @@ class MainDashboardUtils {
                             Navigator.of(context).pop(),
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
-                                  const VehicleDetailsScreen2(),
+                                  const VehicleDetailsScreen(),
                             ))
                           },
                       child: const Text(

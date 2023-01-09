@@ -1,5 +1,5 @@
 class Vehicle {
-  int uniqueId = 0;
+  String uniqueId = "0";
   String vehicleId = "";
   String registrationNumber = "";
   String stockReference = "";
@@ -30,8 +30,8 @@ class Vehicle {
   String depollutiondate = "";
   String coddate = "";
   String weight = "";
-  int uploadStatus = 1;
-  int cc = 0;
+  String uploadStatus = "1";
+  String cc = "0";
   List<String> imgList = [];
   String engineCode = "";
 
@@ -50,7 +50,6 @@ class Vehicle {
       "VIN": vin,
       "ManYear": manufacturingYear,
       "YearRange": '$fromYear-$toYear',
-      "toYear": toYear,
       "OnsiteDate": onSiteDate,
       "Mileage": mileage,
       "Cost": costPrice,
@@ -73,5 +72,41 @@ class Vehicle {
       "engine_code": engineCode,
       "Images": ""
     };
+  }
+
+  Vehicle fromJson(Map<String, String> json) {
+    uniqueId = json["uniqueId"].toString();
+    vehicleId = json["VehicleID"].toString();
+    registrationNumber = json["Reg"].toString();
+    stockReference = json["StockRef"].toString();
+    engineCapacity = json["engineCapacity"].toString();
+    fuel = json["Fuel"].toString();
+    make = json["Make"].toString();
+    model = json["Model"].toString();
+    colour = json["Colour"].toString();
+    bodyStyle = json["BodyStyle"].toString();
+    vin = json["VIN"].toString();
+    manufacturingYear = json["ManYear"].toString();
+    onSiteDate = json["OnsiteDate"].toString();
+    mileage = json["Mileage"].toString();
+    costPrice = json["Cost"].toString();
+    commentDetails = json["Details"].toString();
+    location = json["VehLocation"].toString();
+    type = json["type"].toString();
+    doors = json["doors"].toString();
+    transmission = json["transmission"].toString();
+    ebayMake = json["Ebay_Make"].toString();
+    ebayModel = json["Ebay_Model"].toString();
+    ebayColor = json["Ebay_Colour"].toString();
+    ebayStyle = json["Ebay_Style"].toString();
+    ebayEngine = json["Ebay_CC"].toString();
+    collectiondate = json["collectiondate"].toString();
+    depollutiondate = json["depollutiondate"].toString();
+    coddate = json["coddate"].toString();
+    weight = json["weight"].toString();
+    uploadStatus = json["uploadStatus"].toString();
+    cc = json['VehCC'].toString();
+    engineCode = json["engine_code"].toString();
+    return this;
   }
 }

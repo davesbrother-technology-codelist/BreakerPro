@@ -462,15 +462,15 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   }
 
   fetchPartType() {
-    List<String> l = List.generate(PartsList.partList.length,
-        (index) => PartsList.partList[index].partType);
+    List<String> l = List.generate(PartsList.partList!.length,
+        (index) => PartsList.partList![index].partType);
     var seen = <String>{};
     partTypeList = l.where((part) => seen.add(part)).toList();
   }
 
   fetchParType() {
-    List<String> l = List.generate(PartsList.partList.length,
-        (index) => PartsList.partList[index].predefinedList);
+    List<String> l = List.generate(PartsList.partList!.length,
+        (index) => PartsList.partList![index].predefinedList);
     var seen = <String>{};
     var a = l.where((part) => seen.add(part)).toList();
     List<String> y = [];

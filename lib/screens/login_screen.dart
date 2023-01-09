@@ -240,6 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context) => const MainDashboard(),
       ));
     } else if (result == 'User Active on Another Device') {
+      Fluttertoast.showToast(msg: "User Active on Another Device");
       await openAlreadyActiveDialogue(context, queryParams);
     } else {
       Fluttertoast.showToast(

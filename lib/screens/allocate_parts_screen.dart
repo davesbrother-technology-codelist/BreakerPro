@@ -44,7 +44,7 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   final BottomDrawerController _controller = BottomDrawerController();
   @override
   void initState() {
-    partsList = PartsList.partList;
+    partsList = PartsList.partList!;
     fetchPartType();
     fetchParType();
     super.initState();

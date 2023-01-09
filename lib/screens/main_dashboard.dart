@@ -379,13 +379,14 @@ class _MainDashboardState extends State<MainDashboard> {
     if (pUpload == true) {
       bool r = await PartRepository.uploadParts(PartsList.uploadPartList);
       if (r) {
+        PartsList.uploadVehicle = null;
         prefs.setBool('uploadParts', false);
       }
     }
     if (vUpload == true) {
-      bool r = await VehicleRepository.uploadVehicle(PartsList.uploadVehicle);
-      // await VehicleRepository.fileUpload(PartsList.uploadVehicle);
+      bool r = await VehicleRepository.uploadVehicle(PartsList.uploadVehicle!);
       if (r) {
+        PartsList.partList = null;
         prefs.setBool('uploadVehicle', false);
       }
     }
