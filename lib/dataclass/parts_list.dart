@@ -2,6 +2,7 @@ import 'package:breaker_pro/dataclass/part.dart';
 import 'package:breaker_pro/dataclass/vehicle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_call.dart';
 
@@ -11,6 +12,7 @@ class PartsList {
   static List<Part>? uploadPartList = [];
   static Vehicle? uploadVehicle;
   static bool recall = false;
+  static SharedPreferences? prefs;
 
   Future<bool> loadParts(String url, Map<String, dynamic> queryParams) async {
     Box<Part> box = await Hive.openBox('partsBox');

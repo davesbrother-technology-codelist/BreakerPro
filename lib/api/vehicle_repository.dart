@@ -118,6 +118,10 @@ class VehicleRepository {
       MainDashboardUtils.titleList[0] =
           "Resume Work ( ${vehicle.make}-${model} )";
 
+      String vehicleString = jsonEncode(vehicle.toJson());
+      PartsList.prefs!.setString("vehicle", vehicleString);
+      print(PartsList.prefs!.getString("vehicle"));
+
       print("Vehicle LOOKUP ${MainDashboardUtils.titleList[0]}");
       return true;
     }
@@ -171,6 +175,10 @@ class VehicleRepository {
       String model = vehicle.model == "" ? "Model" : vehicle.model;
       MainDashboardUtils.titleList[0] =
           "Resume Work ( ${vehicle.make}-${model} )";
+
+      String vehicleString = jsonEncode(vehicle.toJson());
+      PartsList.prefs!.setString("vehicle", vehicleString);
+      print(PartsList.prefs!.getString("vehicle"));
 
       print("Stock LOOKUP ${MainDashboardUtils.titleList[0]}");
       return true;

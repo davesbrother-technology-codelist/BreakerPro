@@ -123,7 +123,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   void dispose() {
     if (makeController.text.isNotEmpty) {
       saveVehicle();
-      print("From dispose${PartsList.uploadVehicle!.make}");
     }
     super.dispose();
   }
@@ -147,7 +146,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           ),
           elevation: 0,
           bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(48.0),
+              preferredSize: recall ? Size.fromHeight(48) : Size.fromHeight(0),
               child: recall
                   ? Container(
                       color: Colors.white,
@@ -582,7 +581,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
   }
 
-  saveVehicle() {
+  saveVehicle() async {
     vehicle.imgList = ImageList.vehicleImgList;
     vehicle.registrationNumber = regNoController.text.toString();
     vehicle.stockReference = stockRefController.text.toString();
@@ -617,6 +616,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     String model = modelController.text.isEmpty ? "Model" : vehicle.model;
     MainDashboardUtils.titleList[0] =
         "Resume Work ( ${vehicle.make}-${model} )";
+
+    String vehicleString = jsonEncode(vehicle.toJson());
+    PartsList.prefs!.setString("vehicle", vehicleString);
+    print(PartsList.prefs!.getString("vehicle"));
 
     print("Save Vehicle ${MainDashboardUtils.titleList[0]}");
   }

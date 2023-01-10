@@ -25,6 +25,7 @@ import '../api/api_call.dart';
 import '../api/login_repository.dart';
 import '../api/parts_repository.dart';
 import '../dataclass/parts_list.dart';
+import '../dataclass/vehicle.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({Key? key}) : super(key: key);
@@ -249,6 +250,8 @@ class _MainDashboardState extends State<MainDashboard> {
                                         MainDashboardUtils.titleList[0] =
                                             "Add Breaker";
                                         PartsList.uploadVehicle = null;
+                                        PartsList.prefs!.remove('vehicle');
+                                        PartsList.recall = false;
                                       });
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -400,7 +403,9 @@ class _MainDashboardState extends State<MainDashboard> {
 
   fetchSelectListNetwork() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    PartsList.prefs = prefs;
     Map response;
+
     if (prefs.getString('selectList') == null) {
       AuthUtils.showLoadingDialog(context);
       await ApiConfig.fetchParamsFromStorage();
@@ -431,6 +436,18 @@ class _MainDashboardState extends State<MainDashboard> {
       String user = jsonEncode(m);
       prefs.setString('selectList', user);
       Navigator.pop(context);
+    }
+
+    if (prefs.getString('vehicle') != null) {
+      print(prefs.getString('vehicle'));
+      Vehicle v = Vehicle();
+      Map<String, String> map = Map<String, String>.from(
+          jsonDecode(prefs.getString('vehicle').toString()));
+      v.fromJson(map);
+      PartsList.uploadVehicle = v;
+      String model = v.model == "" ? "Model" : v.model;
+      MainDashboardUtils.titleList[0] = "Resume Work ( ${v.make}-${model} )";
+      setState(() {});
     }
   }
 
