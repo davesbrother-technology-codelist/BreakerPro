@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:archive/archive_io.dart';
+import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
 import 'package:breaker_pro/api/api_config.dart';
 import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/app_config.dart';
@@ -22,7 +24,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
 import '../api/parts_repository.dart';
-import '../app_config.dart';
 import '../dataclass/parts_list.dart';
 
 class MainDashboard extends StatefulWidget {
@@ -34,6 +35,7 @@ class MainDashboard extends StatefulWidget {
 
 class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
+  late Timer timer;
   @override
   void initState() {
     partsList = PartsList();
@@ -41,11 +43,14 @@ class _MainDashboardState extends State<MainDashboard> {
     fetchPartsListNetwork();
     upload();
     super.initState();
+    timer =
+        Timer.periodic(const Duration(seconds: 5), (Timer t) => checkLogin());
   }
 
   @override
   void dispose() {
     Hive.close();
+    timer.cancel();
     super.dispose();
   }
 
@@ -107,6 +112,8 @@ class _MainDashboardState extends State<MainDashboard> {
               )),
           IconButton(
               onPressed: () => {
+                    // openAlreadyActiveDialogue(
+                    //     context, ApiConfig.baseQueryParams)
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -208,8 +215,21 @@ class _MainDashboardState extends State<MainDashboard> {
                     onTap: () {
                       print(index);
                       if (index == 0) {
-                        MainDashboardUtils.functionList[index]!(
-                            context, partsList);
+                        if (PartsList.uploadVehicle != null) {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(
+                            builder: (context) => const VehicleDetailsScreen(),
+                          ))
+                              .then((value) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (_) => MainDashboard()),
+                                (Route r) => false);
+                          });
+                        } else {
+                          MainDashboardUtils.functionList[index]!(
+                              context, partsList);
+                        }
                       } else if (index == 1) {
                         MainDashboardUtils.functionList[index]!(
                             context, partsList);
@@ -217,53 +237,80 @@ class _MainDashboardState extends State<MainDashboard> {
                         MainDashboardUtils.functionList[index]!(context);
                       }
                     },
-                    child: Card(
-                        child: Padding(
-                            padding: const EdgeInsets.all(5),
-                            child: Row(children: [
-                              // Details
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Title
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 15, 0, 10),
-                                        child: Text(
-                                          MainDashboardUtils.titleList[index],
-                                          style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      // Subtitle
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10),
-                                        child: Text(
-                                          MainDashboardUtils
-                                              .subtitleList[index],
-                                          style: const TextStyle(fontSize: 15),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // Icon
-                              Container(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  height: 80,
-                                  width: 80,
-                                  child: MainDashboardUtils.imageList[index])
-                            ])))));
+                    child: PartsList.uploadVehicle != null && index == 0
+                        ? Column(
+                            children: [
+                              cardView(index),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        MainDashboardUtils.titleList[0] =
+                                            "Add Breaker";
+                                        PartsList.uploadVehicle = null;
+                                      });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      elevation: 0,
+                                      backgroundColor: Colors.black26,
+                                      minimumSize:
+                                          const Size.fromHeight(50), // NEW
+                                    ),
+                                    child: Text(
+                                      "RESET",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.normal),
+                                    )),
+                              )
+                            ],
+                          )
+                        : cardView(index)));
           }),
     );
+  }
+
+  Widget cardView(int index) {
+    return Card(
+        child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(children: [
+              // Details
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 15, 0, 10),
+                        child: Text(
+                          MainDashboardUtils.titleList[index],
+                          style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      // Subtitle
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          MainDashboardUtils.subtitleList[index],
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              // Icon
+              Container(
+                  padding: const EdgeInsets.only(right: 10),
+                  height: 80,
+                  width: 80,
+                  child: MainDashboardUtils.imageList[index])
+            ])));
   }
 
   logout() async {
@@ -285,6 +332,32 @@ class _MainDashboardState extends State<MainDashboard> {
     } else {
       Navigator.pop(context);
       Navigator.pop(context);
+      Fluttertoast.showToast(
+          msg: "Failed to Logout",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  logoutAnotherDevide(Map<String, dynamic> queryParams) async {
+    AuthUtils.showLoadingDialog(context);
+    final logoutParams = {
+      'clientid': queryParams['clientid'],
+      'username': queryParams['username']
+    };
+    String result = await AuthRepository.logout(
+        ApiConfig.baseUrl + ApiConfig.apiLogin, logoutParams);
+    if (result == "Successful Logout") {
+      print("Logout");
+      await login(queryParams);
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false);
       Fluttertoast.showToast(
           msg: "Failed to Logout",
           toastLength: Toast.LENGTH_SHORT,
@@ -377,18 +450,131 @@ class _MainDashboardState extends State<MainDashboard> {
     bool? vUpload = prefs.getBool('uploadVehicle');
     bool? pUpload = prefs.getBool('uploadParts');
     if (pUpload == true) {
-      bool r = await PartRepository.uploadParts(PartsList.uploadPartList);
+      bool r = await PartRepository.uploadParts(PartsList.uploadPartList!);
+
       if (r) {
-        PartsList.uploadVehicle = null;
+        PartsList.uploadPartList = null;
         prefs.setBool('uploadParts', false);
       }
     }
     if (vUpload == true) {
       bool r = await VehicleRepository.uploadVehicle(PartsList.uploadVehicle!);
+      await VehicleRepository.fileUpload(PartsList.uploadVehicle!);
       if (r) {
-        PartsList.partList = null;
+        PartsList.uploadVehicle = null;
         prefs.setBool('uploadVehicle', false);
       }
     }
+  }
+
+  login(Map<String, dynamic> queryParams) async {
+    final String result = await AuthRepository.login(
+        ApiConfig.baseUrl + ApiConfig.apiLogin, queryParams);
+
+    if (result == 'Login Successfully') {
+      await ApiConfig.uploadParamsToStorage(queryParams);
+      Navigator.pop(context);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainDashboard()),
+          (Route r) => false);
+    } else if (result == 'User Active on Another Device') {
+      Fluttertoast.showToast(msg: "User Active on Another Device");
+      await openAlreadyActiveDialogue(context, queryParams);
+    } else {
+      Fluttertoast.showToast(
+          msg: "User Account Doesn't Exist",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainDashboard()),
+          (Route r) => false);
+    }
+  }
+
+  Future<void> checkLogin() async {
+    Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiLogin);
+    uri = uri.replace(queryParameters: ApiConfig.baseQueryParams);
+    final response = await http.get(uri, headers: ApiConfig.headers);
+    String responseBody = utf8.decoder.convert(response.bodyBytes);
+    final Map<String, dynamic> responseJson = json.decode(responseBody);
+    String result = responseJson['result'];
+
+    if (result == 'User Active on Another Device') {
+      print(result);
+      timer.cancel();
+      openAlreadyActiveDialogue(context, ApiConfig.baseQueryParams);
+    }
+  }
+
+  openAlreadyActiveDialogue(
+      BuildContext context, Map<String, dynamic> queryParams) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          MainDashboardUtils.openUrl("https://breakerpro.co.uk/whatsapp");
+        },
+        icon: const Icon(Icons.whatsapp),
+        label: const Text("Whatsapp Chat"),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: MyTheme.greenWhatsapp,
+          textStyle: const TextStyle(fontSize: 15),
+        ),
+      ),
+      onPressed: () {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => LoginScreen()), (route) => false);
+      },
+    );
+    Widget logoutButton = TextButton(
+      onPressed: () {
+        logoutAnotherDevide(queryParams);
+      },
+      child: const Text("LOGOUT"),
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text(
+        "The App User is Already Active on Another Device",
+        textAlign: TextAlign.center,
+      ),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              "Do you want to Log Out of the other device and Log In on this device?",
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Text(
+              "Please contact us if you require an additional mobile app subscription for this devide.",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 10),
+            ),
+          ),
+        ],
+      ),
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      actions: [
+        cancelButton,
+        logoutButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }

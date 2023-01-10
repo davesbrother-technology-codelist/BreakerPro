@@ -285,7 +285,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
       onPressed: () async {
         for (Part p in partsList) {
           if (p.isSelected) {
-            PartsList.uploadPartList.add(p);
+            PartsList.uploadPartList!.add(p);
           }
         }
         PartsList.uploadVehicle = widget.vehicle;

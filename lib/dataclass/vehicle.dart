@@ -1,6 +1,6 @@
 class Vehicle {
   String uniqueId = "0";
-  String vehicleId = "";
+  String vehicleId = "45";
   String registrationNumber = "";
   String stockReference = "";
   String engineCapacity = "";

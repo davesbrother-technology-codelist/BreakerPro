@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/drop_down_screen.dart';
+import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
@@ -41,7 +42,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   TextEditingController colorController = TextEditingController();
   TextEditingController colorEbayController = TextEditingController();
   TextEditingController transmissionController = TextEditingController();
-  TextEditingController engineCodeController = TextEditingController();
+  TextEditingController engineCodeController = TextEditingController(text: "");
   TextEditingController onSiteDateController = TextEditingController();
   TextEditingController mileageController = TextEditingController();
   TextEditingController costPriceController = TextEditingController();
@@ -77,10 +78,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   DateTime? dePollutionDate;
   DateTime? collectionDate;
   DateTime? onSiteDate;
+  Vehicle vehicle = Vehicle();
 
   @override
   void initState() {
     fetchSelectList();
+    recall = PartsList.recall;
     super.initState();
     int currentYear = DateTime.now().year;
     for (int i = 1980; i <= currentYear; i++) {
@@ -88,30 +91,41 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     }
     if (PartsList.uploadVehicle != null) {
       Vehicle v = PartsList.uploadVehicle!;
-      regNoController.text = v.registrationNumber;
-      makeController.text = v.make;
-      ccController.text = v.cc;
-      modelController.text = v.model;
-      fuelController.text = v.fuel;
-      bodyStyleController.text = v.bodyStyle;
-      vinController.text = v.vin;
-      colourController.text = v.colour;
-      transmissionController.text = v.transmission;
-      engineCodeController.text = v.engineCode;
-      mnfYearController.text = v.manufacturingYear;
-      yearFromController.text =
-          DateFormat("yyyy-MM-dd").parse(v.fromYear).year.toString();
-      yearToController.text =
-          DateFormat("yyyy-MM-dd").parse(v.toYear).year.toString();
-      makeEbayController.text = v.ebayMake;
-      engineEbayController.text = v.ebayEngine;
-      modelEbayController.text = v.ebayModel;
-      styleEbayController.text = v.ebayStyle;
-      colorEbayController.text = v.ebayColor;
-      weightController.text = v.weight;
-      commentsController.text = v.commentDetails;
-      recall = true;
+
+      regNoController.text = v.registrationNumber ?? "";
+      makeController.text = v.make ?? "";
+      ccController.text = v.cc ?? "";
+      modelController.text = v.model ?? "";
+      fuelController.text = v.fuel ?? "";
+      bodyStyleController.text = v.bodyStyle ?? "";
+      vinController.text = v.vin ?? "";
+      colourController.text = v.colour ?? "";
+      transmissionController.text = v.transmission ?? "";
+      engineCodeController.text = v.engineCode ?? "";
+      mnfYearController.text = v.manufacturingYear ?? "";
+      yearFromController.text = v.fromYear.isNotEmpty
+          ? DateFormat("yyyy").parse(v.fromYear).year.toString()
+          : "";
+      yearToController.text = v.toYear.isNotEmpty
+          ? DateFormat("yyyy").parse(v.toYear).year.toString()
+          : "";
+      makeEbayController.text = v.ebayMake ?? "";
+      engineEbayController.text = v.ebayEngine ?? "";
+      modelEbayController.text = v.ebayModel ?? "";
+      styleEbayController.text = v.ebayStyle ?? "";
+      colorEbayController.text = v.ebayColor ?? "";
+      weightController.text = v.weight ?? "";
+      commentsController.text = v.commentDetails ?? "";
     }
+  }
+
+  @override
+  void dispose() {
+    if (makeController.text.isNotEmpty) {
+      saveVehicle();
+      print("From dispose${PartsList.uploadVehicle!.make}");
+    }
+    super.dispose();
   }
 
   @override
@@ -131,34 +145,64 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             "Vehicle Details",
             style: TextStyle(color: MyTheme.white),
           ),
+          elevation: 0,
+          bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(48.0),
+              child: recall
+                  ? Container(
+                      color: Colors.white,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(
+                              Icons.warning_outlined,
+                              color: MyTheme.materialColor,
+                            ),
+                          ),
+                          const Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "Recalls are associated to this vehicle, please check the DVLA Safetly Recall site for more details",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : SizedBox()),
         ),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              recall
-                  ? Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.warning_outlined,
-                            color: MyTheme.materialColor,
-                          ),
-                        ),
-                        const Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              "Recalls are associated to this vehicle, please check the DVLA Safetly Recall site for more details",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  : const SizedBox(),
+              // recall
+              //     ? Row(
+              //         children: [
+              //           Padding(
+              //             padding: EdgeInsets.all(8.0),
+              //             child: Icon(
+              //               Icons.warning_outlined,
+              //               color: MyTheme.materialColor,
+              //             ),
+              //           ),
+              //           const Expanded(
+              //             child: Padding(
+              //               padding: EdgeInsets.all(8.0),
+              //               child: Text(
+              //                 "Recalls are associated to this vehicle, please check the DVLA Safetly Recall site for more details",
+              //                 style: TextStyle(
+              //                     fontWeight: FontWeight.bold,
+              //                     color: Colors.black87),
+              //               ),
+              //             ),
+              //           )
+              //         ],
+              //       )
+              //     : const SizedBox(),
               Row(
                 children: [
                   customTextField("Registration Number", regNoController),
@@ -187,7 +231,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               Row(
                 children: [
                   customTextField("VIN", vinController),
-                  customTextField("Colour", colorController)
+                  customDropDownField(
+                      "Colour", colourMenuItems, colorController)
                 ],
               ),
               Row(
@@ -298,21 +343,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       isDigit: true)
                 ],
               ),
-              Row(
-                children: [
-                  datePickerTextField("Collection Date",
-                      collectionDateController, collectionDate),
-                  datePickerTextField("Depollution Date",
-                      dePollutionDateController, dePollutionDate)
-                ],
-              ),
-              Row(
-                children: [
-                  datePickerTextField("Destruction Date",
-                      destructionDateController, destructionDate),
-                  customTextField("Weight", weightController, isDigit: true)
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     datePickerTextField("Collection Date",
+              //         collectionDateController, collectionDate),
+              //     datePickerTextField("Depollution Date",
+              //         dePollutionDateController, dePollutionDate)
+              //   ],
+              // ),
+              // Row(
+              //   children: [
+              //     datePickerTextField("Destruction Date",
+              //         destructionDateController, destructionDate),
+              //     customTextField("Weight", weightController, isDigit: true)
+              //   ],
+              // ),
               Container(
                 padding: containerEdgeInsetsGeometry,
                 child: Column(
@@ -482,51 +527,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Vehicle vehicle = Vehicle();
-                        vehicle.imgList = ImageList.vehicleImgList;
-                        vehicle.registrationNumber =
-                            regNoController.text.toString();
-                        vehicle.stockReference =
-                            stockRefController.text.toString();
-                        vehicle.make = makeController.text.toString();
-                        try {
-                          vehicle.cc = ccController.text.toString();
-                        } catch (e) {
-                          print("Failedd");
-                        }
-
-                        vehicle.model = modelController.text.toString();
-                        vehicle.type = typeModelController.text.toString();
-                        vehicle.fuel = fuelController.text.toString();
-                        vehicle.bodyStyle = bodyStyleController.text.toString();
-                        vehicle.vin = vinController.text.toString();
-                        vehicle.colour = colorController.text.toString();
-                        vehicle.transmission =
-                            transmissionController.text.toString();
-                        vehicle.engineCode =
-                            engineCodeController.text.toString();
-                        vehicle.manufacturingYear =
-                            mnfYearController.text.toString();
-                        vehicle.onSiteDate =
-                            onSiteDateController.text.toString();
-                        vehicle.fromYear = yearFromController.text.toString();
-                        vehicle.toYear = yearToController.text.toString();
-                        vehicle.ebayMake = makeEbayController.text.toString();
-                        vehicle.engineCode = engineCodeController.toString();
-                        vehicle.ebayModel = modelEbayController.text.toString();
-                        vehicle.ebayStyle = styleEbayController.text.toString();
-                        vehicle.colour = colorController.text.toString();
-                        vehicle.ebayColor = colorEbayController.text.toString();
-                        vehicle.mileage = mileageController.text.toString();
-                        vehicle.costPrice = costPriceController.text.toString();
-                        vehicle.collectiondate =
-                            collectionDateController.text.toString();
-                        vehicle.depollutiondate =
-                            dePollutionDateController.text.toString();
-                        vehicle.weight = weightController.text.toString();
-                        vehicle.location = vehicleLocController.text.toString();
-                        vehicle.commentDetails =
-                            commentsController.text.toString();
+                        saveVehicle();
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => AllocatePartsScreen(
                             vehicle: vehicle,
@@ -556,44 +557,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
     Widget okButton = TextButton(
       onPressed: () async {
-        Vehicle vehicle = Vehicle();
-        vehicle.imgList = ImageList.vehicleImgList;
-        vehicle.registrationNumber = regNoController.text.toString();
-        vehicle.stockReference = stockRefController.text.toString();
-        vehicle.make = makeController.text.toString();
-        try {
-          vehicle.cc = ccController.text.toString();
-        } catch (e) {
-          print("Failedd");
-        }
-
-        vehicle.model = modelController.text.toString();
-        vehicle.type = typeModelController.text.toString();
-        vehicle.fuel = fuelController.text.toString();
-        vehicle.bodyStyle = bodyStyleController.text.toString();
-        vehicle.vin = vinController.text.toString();
-        vehicle.colour = colorController.text.toString();
-        vehicle.transmission = transmissionController.text.toString();
-        vehicle.engineCode = engineCodeController.text.toString();
-        vehicle.manufacturingYear = mnfYearController.text.toString();
-        vehicle.onSiteDate = onSiteDateController.text.toString();
-        vehicle.fromYear = yearFromController.text.toString();
-        vehicle.toYear = yearToController.text.toString();
-        vehicle.ebayMake = makeEbayController.text.toString();
-        vehicle.engineCode = engineCodeController.toString();
-        vehicle.ebayModel = modelEbayController.text.toString();
-        vehicle.ebayStyle = styleEbayController.text.toString();
-        vehicle.colour = colorController.text.toString();
-        vehicle.ebayColor = colorEbayController.text.toString();
-        vehicle.mileage = mileageController.text.toString();
-        vehicle.costPrice = costPriceController.text.toString();
-        vehicle.collectiondate = collectionDateController.text.toString();
-        vehicle.depollutiondate = dePollutionDateController.text.toString();
-        vehicle.weight = weightController.text.toString();
-        vehicle.location = vehicleLocController.text.toString();
-        vehicle.commentDetails = commentsController.text.toString();
-
-        PartsList.uploadVehicle = vehicle;
+        saveVehicle();
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool('uploadVehicle', true);
         Navigator.pushReplacement(
@@ -616,6 +580,45 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         return alert;
       },
     );
+  }
+
+  saveVehicle() {
+    vehicle.imgList = ImageList.vehicleImgList;
+    vehicle.registrationNumber = regNoController.text.toString();
+    vehicle.stockReference = stockRefController.text.toString();
+    vehicle.make = makeController.text.toString();
+    vehicle.cc = ccController.text.toString();
+    vehicle.model = modelController.text.toString();
+    vehicle.type = typeModelController.text.toString();
+    vehicle.fuel = fuelController.text.toString();
+    vehicle.bodyStyle = bodyStyleController.text.toString();
+    vehicle.vin = vinController.text.toString();
+    vehicle.colour = colorController.text.toString();
+    vehicle.transmission = transmissionController.text.toString();
+    vehicle.engineCode = engineCodeController.text.toString();
+    vehicle.manufacturingYear = mnfYearController.text.toString();
+    vehicle.onSiteDate = onSiteDateController.text.toString();
+    vehicle.fromYear = yearFromController.text.toString();
+    vehicle.toYear = yearToController.text.toString();
+    vehicle.ebayMake = makeEbayController.text.toString();
+    vehicle.ebayModel = modelEbayController.text.toString();
+    vehicle.ebayStyle = styleEbayController.text.toString();
+    vehicle.colour = colorController.text.toString();
+    vehicle.ebayColor = colorEbayController.text.toString();
+    vehicle.mileage = mileageController.text.toString();
+    vehicle.costPrice = costPriceController.text.toString();
+    vehicle.collectiondate = collectionDateController.text.toString();
+    vehicle.depollutiondate = dePollutionDateController.text.toString();
+    vehicle.weight = weightController.text.toString();
+    vehicle.location = vehicleLocController.text.toString();
+    vehicle.commentDetails = commentsController.text.toString();
+
+    PartsList.uploadVehicle = vehicle;
+    String model = modelController.text.isEmpty ? "Model" : vehicle.model;
+    MainDashboardUtils.titleList[0] =
+        "Resume Work ( ${vehicle.make}-${model} )";
+
+    print("Save Vehicle ${MainDashboardUtils.titleList[0]}");
   }
 
   Widget datePickerTextField(
@@ -737,6 +740,16 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           SizedBox(
               height: 60,
               child: TextField(
+                onChanged: (String? s) {
+                  if (title == "CC" && s != null) {
+                    setState(() {
+                      engineEbayController.text = s;
+                    });
+                  }
+                  if (makeController.text.isNotEmpty) {
+                    saveVehicle();
+                  }
+                },
                 decoration: InputDecoration(
                   enabledBorder: border,
                   focusedBorder: border,
@@ -778,6 +791,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     if (value == null) {
                       return;
                     }
+
                     setState(() {
                       if (value['title'] == 'Make' &&
                           !(makeController.text == value['value'])) {
@@ -786,6 +800,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             value['value'], modelMenuItems, responseJson);
                       }
                       controller.text = value['value'];
+
+                      setState(() {
+                        if (value['title'] == 'Make' ||
+                            value['title'] == 'Model') {
+                          saveVehicle();
+                        }
+                      });
                     });
                   });
                 },
@@ -845,6 +866,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String response = prefs.getString('selectList').toString();
     responseJson = jsonDecode(response);
+    print(responseJson);
+    if (makeController.text.isNotEmpty) {
+      modelMenuItems =
+          createMenuList(makeController.text, modelMenuItems, responseJson);
+    }
     makeMenuItems = createMenuList('MAKE', makeMenuItems, responseJson);
     fuelMenuItems = createMenuList('FUEL', fuelMenuItems, responseJson);
     bodyStyleMenuItems =

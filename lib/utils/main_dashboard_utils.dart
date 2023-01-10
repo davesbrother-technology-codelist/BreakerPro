@@ -12,6 +12,7 @@ import '../my_theme.dart';
 import 'package:breaker_pro/screens/scanPart.dart';
 import 'package:breaker_pro/screens/manageParts.dart';
 
+import '../screens/main_dashboard.dart';
 import 'auth_utils.dart';
 
 class MainDashboardUtils {
@@ -25,12 +26,13 @@ class MainDashboardUtils {
     f7
   ];
 
-  static void addBreakerDialog(BuildContext context, PartsList partsList) {
-    if (PartsList.partList!.isEmpty) {
+  static void addBreakerDialog(
+      BuildContext context, PartsList partsList) async {
+    if (PartsList.partList.isEmpty) {
       Fluttertoast.showToast(msg: "Fetching Parts");
       return;
     }
-    showDialog(
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -66,11 +68,18 @@ class MainDashboardUtils {
                               await VehicleRepository.findVehicleFromVRN(vrn);
                           Navigator.pop(context);
                           if (b) {
-                            Navigator.pop(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => VehicleDetailsScreen()));
+                            PartsList.recall = true;
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const VehicleDetailsScreen(),
+                            ))
+                                .then((value) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => MainDashboard()),
+                                  (Route r) => false);
+                            });
                           }
                         }
                       },
@@ -102,11 +111,18 @@ class MainDashboardUtils {
                               stockref);
                           Navigator.pop(context);
                           if (b) {
-                            Navigator.pop(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => VehicleDetailsScreen()));
+                            PartsList.recall = true;
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const VehicleDetailsScreen(),
+                            ))
+                                .then((value) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => MainDashboard()),
+                                  (Route r) => false);
+                            });
                           }
                         }
                       },
@@ -127,11 +143,18 @@ class MainDashboardUtils {
                   ),
                   TextButton(
                       onPressed: () => {
-                            Navigator.of(context).pop(),
-                            Navigator.of(context).push(MaterialPageRoute(
+                            // Navigator.of(context).pop(),
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
                               builder: (context) =>
                                   const VehicleDetailsScreen(),
                             ))
+                                .then((value) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => MainDashboard()),
+                                  (Route r) => false);
+                            })
                           },
                       child: const Text(
                         "MANUAL ENTRY",
