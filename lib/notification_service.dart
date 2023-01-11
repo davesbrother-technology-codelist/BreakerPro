@@ -35,7 +35,7 @@ class NotificationService extends ChangeNotifier {
 
     var platform = NotificationDetails(android: android, iOS: ios);
 
-    await _flutterLocalNotificationsPlugin.show(0, "BreakerPRO", "", platform,
+    await _flutterLocalNotificationsPlugin.show(0, "BreakerPRO", msg, platform,
         payload: "Welcome to demo app");
   }
 
