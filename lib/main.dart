@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/part.dart';
 import 'package:breaker_pro/my_theme.dart';
+import 'package:breaker_pro/notification_service.dart';
 import 'package:breaker_pro/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -45,6 +46,7 @@ Future<void> main() async {
   }
 
   WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initialize();
   await AppConfig.getDeviceInfo();
   // saveFile();
   await _getStoragePermission();

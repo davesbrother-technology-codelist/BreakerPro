@@ -1,11 +1,12 @@
-import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
-import 'package:breaker_pro/my_theme.dart';
+import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:intl/intl.dart';
 import 'dart:io';
+import 'package:path/path.dart' as path;
 
 class CaptureScreen extends StatefulWidget {
   const CaptureScreen({Key? key, required this.cameras, required this.type})
@@ -143,8 +144,8 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   print('image first');
                                   // img = await _cropImage(imageFile: img);
                                   CroppedFile? croppedImage =
-                                  await ImageCropper().cropImage(
-                                      sourcePath: File(image.path).path);
+                                      await ImageCropper().cropImage(
+                                          sourcePath: File(image.path).path);
                                   print('image after');
                                   if (croppedImage == null) return;
                                   // img=croppedImage.path as File?;
@@ -173,7 +174,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                               },
                               style: ButtonStyle(
                                 backgroundColor:
-                                MaterialStateProperty.all(Colors.grey),
+                                    MaterialStateProperty.all(Colors.grey),
                               ),
                               child: Text(
                                 "Adjust",
@@ -186,15 +187,21 @@ class _CaptureScreenState extends State<CaptureScreen> {
                               try {
                                 // await _initializeControllerFuture;
                                 image = await _controller.takePicture();
+                                File imgFile = File(image.path);
                                 if (!mounted) return;
-                                print(image.path);
+                                print(imgFile.path);
+                                String dir = path.dirname(imgFile.path);
+                                int count = PartsList.count;
+                                String newPath = path.join(dir,
+                                    'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                imgFile = await imgFile.rename(newPath);
                                 setState(() {
                                   if (widget.type == 'Vehicle') {
-                                    imgList.add(image.path);
-                                    ImageList.vehicleImgList.add(image.path);
+                                    imgList.add(imgFile.path);
+                                    ImageList.vehicleImgList.add(imgFile.path);
                                   } else {
-                                    imgList.add(image.path);
-                                    ImageList.partImageList.add(image.path);
+                                    imgList.add(imgFile.path);
+                                    ImageList.partImageList.add(imgFile.path);
                                   }
                                 });
                               } catch (e) {

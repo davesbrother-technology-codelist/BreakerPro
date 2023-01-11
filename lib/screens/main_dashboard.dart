@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive_io.dart';
+import 'package:breaker_pro/notification_service.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
@@ -24,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
 import '../api/parts_repository.dart';
+import '../dataclass/image_list.dart';
 import '../dataclass/parts_list.dart';
 import '../dataclass/vehicle.dart';
 
@@ -133,7 +135,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 color: MyTheme.white,
               )),
           IconButton(
-              onPressed: () => {
+              onPressed: () async => {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -252,6 +254,8 @@ class _MainDashboardState extends State<MainDashboard> {
                                         PartsList.uploadVehicle = null;
                                         PartsList.prefs!.remove('vehicle');
                                         PartsList.recall = false;
+                                        ImageList.vehicleImgList = [];
+                                        ImageList.partImageList = [];
                                       });
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -466,20 +470,38 @@ class _MainDashboardState extends State<MainDashboard> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? vUpload = prefs.getBool('uploadVehicle');
     bool? pUpload = prefs.getBool('uploadParts');
+    Vehicle? v = PartsList.uploadVehicle;
+    if (vUpload == true) {
+      setState(() {
+        MainDashboardUtils.titleList[0] = "Add Breaker";
+        PartsList.uploadVehicle = null;
+        PartsList.prefs!.remove('vehicle');
+        PartsList.recall = false;
+      });
+      bool r = await VehicleRepository.uploadVehicle(v!);
+      await VehicleRepository.fileUpload(v);
+      if (r) {
+        setState(() {
+          PartsList.uploadVehicle = null;
+          prefs.setBool('uploadVehicle', false);
+          MainDashboardUtils.titleList[0] = "Add Breaker";
+          PartsList.uploadVehicle = null;
+          PartsList.prefs!.remove('vehicle');
+          PartsList.recall = false;
+          ImageList.vehicleImgList = [];
+        });
+      }
+      if (pUpload == false || pUpload == null) {
+        NotificationService().instantNofitication("Upload Complete");
+      }
+    }
     if (pUpload == true) {
       bool r = await PartRepository.uploadParts(PartsList.uploadPartList!);
-
       if (r) {
         PartsList.uploadPartList = null;
         prefs.setBool('uploadParts', false);
-      }
-    }
-    if (vUpload == true) {
-      bool r = await VehicleRepository.uploadVehicle(PartsList.uploadVehicle!);
-      await VehicleRepository.fileUpload(PartsList.uploadVehicle!);
-      if (r) {
-        PartsList.uploadVehicle = null;
-        prefs.setBool('uploadVehicle', false);
+        ImageList.partImageList = [];
+        NotificationService().instantNofitication("Upload Complete");
       }
     }
   }

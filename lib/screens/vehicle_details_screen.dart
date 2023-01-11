@@ -58,7 +58,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   TextEditingController modelEbayController = TextEditingController(text: "");
   TextEditingController fuelController = TextEditingController();
   TextEditingController bodyStyleController = TextEditingController(text: "");
-  TextEditingController colourController = TextEditingController();
   TextEditingController mnfYearController = TextEditingController();
   TextEditingController yearFromController = TextEditingController();
   TextEditingController yearToController = TextEditingController();
@@ -93,13 +92,14 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       Vehicle v = PartsList.uploadVehicle!;
 
       regNoController.text = v.registrationNumber ?? "";
+      stockRefController.text = v.stockReference ?? "";
       makeController.text = v.make ?? "";
       ccController.text = v.cc ?? "";
       modelController.text = v.model ?? "";
       fuelController.text = v.fuel ?? "";
       bodyStyleController.text = v.bodyStyle ?? "";
       vinController.text = v.vin ?? "";
-      colourController.text = v.colour ?? "";
+      colorController.text = v.colour ?? "";
       transmissionController.text = v.transmission ?? "";
       engineCodeController.text = v.engineCode ?? "";
       mnfYearController.text = v.manufacturingYear ?? "";
@@ -116,6 +116,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       colorEbayController.text = v.ebayColor ?? "";
       weightController.text = v.weight ?? "";
       commentsController.text = v.commentDetails ?? "";
+      setState(() {});
     }
   }
 
@@ -178,30 +179,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              // recall
-              //     ? Row(
-              //         children: [
-              //           Padding(
-              //             padding: EdgeInsets.all(8.0),
-              //             child: Icon(
-              //               Icons.warning_outlined,
-              //               color: MyTheme.materialColor,
-              //             ),
-              //           ),
-              //           const Expanded(
-              //             child: Padding(
-              //               padding: EdgeInsets.all(8.0),
-              //               child: Text(
-              //                 "Recalls are associated to this vehicle, please check the DVLA Safetly Recall site for more details",
-              //                 style: TextStyle(
-              //                     fontWeight: FontWeight.bold,
-              //                     color: Colors.black87),
-              //               ),
-              //             ),
-              //           )
-              //         ],
-              //       )
-              //     : const SizedBox(),
               Row(
                 children: [
                   customTextField("Registration Number", regNoController),
@@ -292,7 +269,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
               ),
               Row(
                 children: [
-                  customTextField("Make", makeController),
+                  customTextField("Make", makeEbayController),
                   customTextField("Engine", engineEbayController)
                 ],
               ),
@@ -316,16 +293,16 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             enabledBorder: border,
                             focusedBorder: border,
                           ),
-                          controller:
-                              TextEditingController(text: modelController.text),
+                          controller: TextEditingController(
+                              text: modelEbayController.text),
                         )),
                   ],
                 ),
               ),
               Row(
                 children: [
-                  customTextField("Style", bodyStyleController),
-                  customTextField("Colour", colorController)
+                  customTextField("Style", styleEbayController),
+                  customTextField("Colour", colorEbayController)
                 ],
               ),
               Divider(
@@ -527,6 +504,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     TextButton(
                       onPressed: () {
                         saveVehicle();
+                        print("Passed ID" + vehicle.vehicleId);
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => AllocatePartsScreen(
                             vehicle: vehicle,
@@ -612,6 +590,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     vehicle.location = vehicleLocController.text.toString();
     vehicle.commentDetails = commentsController.text.toString();
 
+    vehicle.vehicleId =
+        "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.count.toString().padLeft(4, '0')}";
+
     PartsList.uploadVehicle = vehicle;
     String model = modelController.text.isEmpty ? "Model" : vehicle.model;
     MainDashboardUtils.titleList[0] =
@@ -622,6 +603,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     print(PartsList.prefs!.getString("vehicle"));
 
     print("Save Vehicle ${MainDashboardUtils.titleList[0]}");
+    print("Save Vehicle ${PartsList.uploadVehicle!.imgList}");
   }
 
   Widget datePickerTextField(

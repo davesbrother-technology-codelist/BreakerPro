@@ -289,6 +289,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
           }
         }
         PartsList.uploadVehicle = widget.vehicle;
+        print("GOT ID" + widget.vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool('uploadVehicle', true);
         prefs.setBool('uploadParts', true);

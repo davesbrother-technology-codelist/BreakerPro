@@ -13,6 +13,7 @@ class PartsList {
   static Vehicle? uploadVehicle;
   static bool recall = false;
   static SharedPreferences? prefs;
+  static int count = 1;
 
   Future<bool> loadParts(String url, Map<String, dynamic> queryParams) async {
     Box<Part> box = await Hive.openBox('partsBox');

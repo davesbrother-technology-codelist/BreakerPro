@@ -57,6 +57,7 @@ dependencies:
   permission_handler: ^10.2.0
   share_extend: ^2.0.0
   archive: ^3.3.5
+  flutter_local_notifications: ^13.0.0
 
 dev_dependencies:
   flutter_test:
