@@ -23,11 +23,9 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
   String? predefinedValue;
   String? partTypeValue;
 
-  late List<String> preDefinedList;
-  late List<String> partTypeList;
+  late List<String> columnList=['first','second'];
 
   List<DropdownMenuItem<String>> preDefinedDropDownItems = [];
-  List<DropdownMenuItem<String>> partTypeDropDownItems = [];
 
   OutlineInputBorder focusedBorder = OutlineInputBorder(
       borderRadius: BorderRadius.zero,
@@ -41,7 +39,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
   void initState() {
     super.initState();
 
-    for (String item in preDefinedList) {
+    for (String item in columnList) {
       preDefinedDropDownItems.add(DropdownMenuItem(
         value: item,
         child: Text(item),
@@ -344,20 +342,17 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
     return Container(
       height: _headerHeight,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
             color: MyTheme.materialColor,
             width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
               onPressed: () {
-                setState(() {
-                  predefinedValue = null;
-                  partTypeValue = null;
-                  _controller1.close();
-                });
               },
               child: Text(
-                "ALL",
+                "",
                 style: TextStyle(color: MyTheme.white),
               ),
             ),
