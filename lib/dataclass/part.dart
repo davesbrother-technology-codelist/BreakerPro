@@ -5,7 +5,7 @@ part 'part.g.dart';
 @HiveType(typeId: 0)
 class Part {
   @HiveField(0)
-  late int id;
+  late int id = 0;
 
   @HiveField(1)
   late String partName;
@@ -35,7 +35,7 @@ class Part {
   bool isSelected = false;
 
   @HiveField(10)
-  late String partCondition;
+  late String partCondition = "";
 
   @HiveField(11)
   double warranty = 0;
@@ -53,13 +53,17 @@ class Part {
   late bool isDefault = false;
 
   @HiveField(16)
-  late int mnfPartNo = 0;
+  late String mnfPartNo = "";
 
   @HiveField(17)
-  late String comments;
+  late String comments = "";
 
   @HiveField(17)
-  late List<String> imgList;
+  late List<String> imgList = [];
+
+  bool forUpload = false;
+  bool status = false;
+  String partId = "";
 
   Part(
       this.id,
@@ -87,24 +91,22 @@ class Part {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id.toString(),
-      "partName": partName,
-      "partType": partType,
-      "predefinedList": predefinedList,
-      "postageOptions": postageOptions,
-      "defaultLocation": defaultLocation,
-      "defaultDescription": defaultDescription,
-      "postageOptionsCode": postageOptionsCode,
-      "ebayTitle": ebayTitle,
-      "isSelected": isSelected,
-      "partCondition": partCondition,
-      "warranty": warranty,
-      "qty": qty,
-      "salesPrice": salesPrice,
-      "costPrice": costPrice,
-      "isDefault": isDefault,
-      "mnfPartNo": mnfPartNo,
-      "comments": comments,
+      "PartID": partId,
+      "PartName": partName,
+      "PartType": partType,
+      "PostageRate": postageOptions,
+      "PartLocation": defaultLocation,
+      "PartDescription": defaultDescription,
+      "PostageCode": postageOptionsCode,
+      "Ebay_Title": ebayTitle,
+      "PartCondition": partCondition,
+      "warranty": warranty.toString(),
+      "Qty": qty.toString(),
+      "PartSellPrice": salesPrice.toString(),
+      "costPrice": costPrice.toString(),
+      "ManPartNo": mnfPartNo,
+      "PartComments": comments,
+      "status": status.toString()
     };
   }
 }

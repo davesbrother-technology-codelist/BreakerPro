@@ -18,7 +18,7 @@ class VehicleRepository {
   static Future<bool> uploadVehicle(Vehicle vehicle) async {
     NotificationService().instantNofitication("1/5 - Uploading Vehicle Data");
     Map m = {...ApiConfig.baseQueryParams, ...vehicle.toJson()};
-    print("VEHICLE ID " + m['VehicleID']);
+    print(vehicle.toJson());
     var r = await http.post(
       Uri.parse(
           "${ApiConfig.baseUrl}${ApiConfig.apiSubmitVehicle}?ClientID=${ApiConfig.baseQueryParams['clientid']}"),

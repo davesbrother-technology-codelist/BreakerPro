@@ -44,9 +44,9 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   final BottomDrawerController _controller = BottomDrawerController();
   @override
   void initState() {
-    partsList = PartsList.partList!;
-    fetchPartType();
-    fetchParType();
+    partsList = List<Part>.from(PartsList.partList);
+    fetchPartTypeList();
+    fetchPreDefinedList();
     super.initState();
     for (String item in preDefinedList) {
       preDefinedDropDownItems.add(DropdownMenuItem(
@@ -60,6 +60,12 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
         child: Text(item),
       ));
     }
+  }
+
+  @override
+  void dispose() {
+    PartsList.partList = partsList;
+    super.dispose();
   }
 
   @override
@@ -78,14 +84,10 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(
+                Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) =>
                       CustomisePartsScreen(vehicle: widget.vehicle),
-                ))
-                    .then((value) {
-                  setState(() {});
-                });
+                ));
               },
               child: Text(
                 "Customise Parts",
@@ -161,24 +163,29 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
               ),
               Container(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: CheckboxListTile(
-                  tileColor: MyTheme.black12,
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  value: selectAll,
-                  title: const Text(
-                    "Select All",
-                    textAlign: TextAlign.left,
-                  ),
-                  onChanged: (bool? value) {
-                    setState(() {
-                      for (Part part in partsList) {
-                        part.isSelected = value!;
-                        selectAll = value;
-                      }
-                    });
-                  },
-                ),
+                child: GestureDetector(
+                    onTap: () async {
+                      await openSelectAll(context);
+                      setState(() {
+                        for (Part part in partsList) {
+                          part.isSelected = selectAll;
+                        }
+                        if (selectAll) {
+                          PartsList.selectedPartList = partsList;
+                        } else {
+                          PartsList.selectedPartList = [];
+                        }
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Checkbox(value: selectAll, onChanged: (bool? value) {}),
+                        const Text(
+                          "Select All",
+                          style: TextStyle(fontSize: 18),
+                        )
+                      ],
+                    )),
               ),
               Expanded(
                 child: ListView.builder(
@@ -380,14 +387,14 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
     );
   }
 
-  fetchPartType() {
+  fetchPartTypeList() {
     List<String> l =
         List.generate(partsList.length, (index) => partsList[index].partType);
     var seen = <String>{};
     partTypeList = l.where((part) => seen.add(part)).toList();
   }
 
-  fetchParType() {
+  fetchPreDefinedList() {
     List<String> l = List.generate(
         partsList.length, (index) => partsList[index].predefinedList);
     var seen = <String>{};
@@ -399,5 +406,39 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
     var seenn = <String>{};
     List<String> an = y.where((part) => seenn.add(part)).toList();
     preDefinedList = an.sublist(2);
+  }
+
+  openSelectAll(BuildContext context) async {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text("CANCEL"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget okButton = TextButton(
+      onPressed: () {
+        setState(() {
+          selectAll = !selectAll;
+        });
+        Navigator.pop(context);
+      },
+      child: const Text("OK"),
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Click OK to Select All Parts"),
+      actions: [
+        cancelButton,
+        okButton,
+      ],
+    );
+    // show the dialog
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }

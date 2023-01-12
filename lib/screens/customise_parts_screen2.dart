@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../app_config.dart';
 import '../dataclass/part.dart';
+import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'dart:io';
@@ -37,10 +38,11 @@ class _CustomiseState extends State<Customise> {
   ];
   final List<String> postageItems = [
     'Old 24 hrs 6.00 + Collection Only 0.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 28.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 24.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 18.00',
+    'Old 24 hrs 0.00 + Collection Only 0.00',
     '2-3 days 0.00 + Collection 0.00 + 24 Hrs 12.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 18.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 24.00',
+    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 28.00',
     '2-3 days 0.00 + Collection 0.00 + 24 Hrs 36.00',
     '2-3 days 0.00 + Collection 0.00 + 24 Hrs 40.00',
     '2-3 days 0.00 + Collection 0.00 + 24 Hrs 50.00',
@@ -56,7 +58,6 @@ class _CustomiseState extends State<Customise> {
     'Old 2-3 days 6.00 + Collection Only 0.00 + Collection Only 0.00',
     'Old 2-3 days 60.00 + Collection Only 0.00',
     'Old 2-3 days 9.60 + Collection Only 0.00',
-    'Old 24 hrs 0.00 + Collection Only 0.00',
     'Old 24 hrs 12.00 + Collection Only 0.00',
     'Old 24 hrs 18.00 + Collection Only 0.00',
     'Old 24 hrs 36.00 + Collection Only 0.00',
@@ -90,8 +91,20 @@ class _CustomiseState extends State<Customise> {
   void initState() {
     part = widget.part;
     super.initState();
-    ebayTitleEditingController.text = part.ebayTitle;
+    ebayTitleEditingController.text =
+        "${PartsList.uploadVehicle!.ebayMake} ${PartsList.uploadVehicle!.ebayModel} ${part.partName}";
     formattedDate = '';
+    partConditionController.text = part.partCondition;
+    // partLocEditingController.text = part.defaultLocation;
+    // warrantyEditingController.text = part.warranty.toString();
+    // salesPriceEditingController.text = part.salesPrice.toString();
+    qtyEditingController.text = part.qty.toString();
+    // partDescEditingController.text = part.defaultDescription;
+    mnfPartNoEditingController.text = part.mnfPartNo;
+    partCommentsEditingController.text = part.comments;
+    postageOptionsController.text = part.postageOptions;
+
+    ImageList.partImageList = part.imgList;
   }
 
   @override
@@ -120,7 +133,7 @@ class _CustomiseState extends State<Customise> {
                   formattedDate != "" ||
                   partConditionController.text.isNotEmpty ||
                   postageOptionsController.text.isNotEmpty) {
-                part.isSelected = true;
+                part.forUpload = true;
               }
 
               part.partCondition = partConditionController.text.toString();
@@ -131,7 +144,7 @@ class _CustomiseState extends State<Customise> {
                     double.parse(salesPriceEditingController.text);
                 part.costPrice = double.parse(costPriceEditingController.text);
                 part.qty = int.parse(qtyEditingController.text);
-                part.mnfPartNo = int.parse(mnfPartNoEditingController.text);
+                part.mnfPartNo = mnfPartNoEditingController.text.toString();
               } catch (e) {
                 print("Failed to convert");
               }
@@ -142,7 +155,8 @@ class _CustomiseState extends State<Customise> {
               part.comments = partCommentsEditingController.text.toString();
               part.postageOptions = postageOptionsController.text.toString();
               part.ebayTitle = ebayTitleEditingController.text.toString();
-              part.imgList = ImageList.partImageList;
+              part.imgList = List.from(ImageList.partImageList);
+              print(part.imgList);
               Navigator.pop(context, part);
             },
             child: Text(
@@ -421,6 +435,7 @@ class _CustomiseState extends State<Customise> {
                                                 setState(() {
                                                   ImageList.partImageList
                                                       .removeAt(index);
+                                                  // part.imgList.removeAt(index);
                                                 });
                                               },
                                             ),

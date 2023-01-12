@@ -45,17 +45,19 @@ class _PostageDropDownScreenState extends State<PostageDropDownScreen> {
                 },
               ),
             ),
-            body: ListView.builder(itemBuilder: (context, index) {
-              return CheckboxListTile(
-                title: Text(dropDownItems[index]),
-                controlAffinity: ListTileControlAffinity.leading,
-                value: widget.selectedItems[index],
-                onChanged: (bool? value) {
-                  setState(() {
-                    widget.selectedItems[index] = value!;
-                  });
-                },
-              );
-            })));
+            body: ListView.builder(
+                itemCount: dropDownItems.length,
+                itemBuilder: (context, index) {
+                  return CheckboxListTile(
+                    title: Text(dropDownItems[index]),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: widget.selectedItems[index],
+                    onChanged: (bool? value) {
+                      setState(() {
+                        widget.selectedItems[index] = value!;
+                      });
+                    },
+                  );
+                })));
   }
 }

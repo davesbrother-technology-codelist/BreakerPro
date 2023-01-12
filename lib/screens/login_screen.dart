@@ -11,7 +11,8 @@ import '../api/api_config.dart';
 import '../my_theme.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key, required this.noLogin}) : super(key: key);
+  final bool noLogin;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -37,10 +38,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    loginFromCache();
-    clientIdController = TextEditingController();
-    usernameController = TextEditingController();
-    passwordController = TextEditingController();
+    if (widget.noLogin) {
+      loginFromCache();
+    }
+
+    clientIdController = TextEditingController(
+        text: ApiConfig.baseQueryParams['clientid'] ?? "");
+    usernameController = TextEditingController(
+        text: ApiConfig.baseQueryParams['username'] ?? "");
+    passwordController = TextEditingController(
+        text: ApiConfig.baseQueryParams['password'] ?? "");
     super.initState();
   }
 

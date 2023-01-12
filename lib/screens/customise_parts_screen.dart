@@ -5,8 +5,8 @@ import 'package:breaker_pro/dataclass/vehicle.dart';
 import 'package:breaker_pro/screens/main_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'package:breaker_pro/screens/customise_parts_screen2.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/part.dart';
 import '../my_theme.dart';
@@ -53,9 +53,12 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
 
   @override
   void initState() {
+    PartsList.uploadVehicle = widget.vehicle;
     partsList = PartsList.selectedPartList;
     for (Part part in partsList) {
-      part.isSelected = false;
+      part.partId =
+          "PRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.partCount.toString().padLeft(4, '0')}";
+      PartsList.partCount += 1;
     }
     fetchPartType();
     fetchParType();
@@ -75,12 +78,6 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   }
 
   @override
-  void dispose() {
-    PartsList.selectedPartList.clear();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Stack(children: [
       GestureDetector(
@@ -95,8 +92,6 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextButton(
               onPressed: () {
-                // uploadParts();
-                // uploadVehicle();
                 openUploadDialog(context);
               },
               child: Text(
@@ -204,7 +199,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                       child: SizedBox(
                         height: 50,
                         child: ListTile(
-                          tileColor: partsList[index].isSelected
+                          tileColor: partsList[index].forUpload
                               ? Colors.amberAccent
                               : Colors.white,
                           onTap: () => {
@@ -217,7 +212,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                               setState(() {
                                 if (value != null) {
                                   partsList[index] = value;
-                                  print(value.isSelected);
+                                  print(partsList[index].imgList);
                                 }
                               });
                             }),
@@ -284,12 +279,11 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     Widget okButton = TextButton(
       onPressed: () async {
         for (Part p in partsList) {
-          if (p.isSelected) {
+          if (p.forUpload) {
             PartsList.uploadPartList!.add(p);
+            print(p.imgList);
           }
         }
-        PartsList.uploadVehicle = widget.vehicle;
-        print("GOT ID" + widget.vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool('uploadVehicle', true);
         prefs.setBool('uploadParts', true);
@@ -463,15 +457,15 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   }
 
   fetchPartType() {
-    List<String> l = List.generate(PartsList.partList!.length,
-        (index) => PartsList.partList![index].partType);
+    List<String> l = List.generate(PartsList.partList.length,
+        (index) => PartsList.partList[index].partType);
     var seen = <String>{};
     partTypeList = l.where((part) => seen.add(part)).toList();
   }
 
   fetchParType() {
-    List<String> l = List.generate(PartsList.partList!.length,
-        (index) => PartsList.partList![index].predefinedList);
+    List<String> l = List.generate(PartsList.partList.length,
+        (index) => PartsList.partList[index].predefinedList);
     var seen = <String>{};
     var a = l.where((part) => seen.add(part)).toList();
     List<String> y = [];

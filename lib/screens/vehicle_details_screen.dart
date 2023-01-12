@@ -591,7 +591,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     vehicle.commentDetails = commentsController.text.toString();
 
     vehicle.vehicleId =
-        "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.count.toString().padLeft(4, '0')}";
+        "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.vehicleCount.toString().padLeft(4, '0')}";
 
     PartsList.uploadVehicle = vehicle;
     String model = modelController.text.isEmpty ? "Model" : vehicle.model;
@@ -778,11 +778,34 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     }
 
                     setState(() {
+                      switch (value['title']) {
+                        case 'Make':
+                          {
+                            makeEbayController.text = value['value'];
+                          }
+                          break;
+                        case 'Model':
+                          {
+                            modelEbayController.text = value['value'];
+                          }
+                          break;
+                        case 'Body Style':
+                          {
+                            styleEbayController.text = value['value'];
+                          }
+                          break;
+                        case 'Colour':
+                          {
+                            colorEbayController.text = value['value'];
+                          }
+                          break;
+                      }
                       if (value['title'] == 'Make' &&
                           !(makeController.text == value['value'])) {
                         modelController.clear();
                         modelMenuItems = createMenuList(
                             value['value'], modelMenuItems, responseJson);
+                        modelEbayController.text = "";
                       }
                       controller.text = value['value'];
 

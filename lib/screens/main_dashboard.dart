@@ -334,8 +334,12 @@ class _MainDashboardState extends State<MainDashboard> {
       print("Logout");
       Navigator.of(context).pop();
       Navigator.of(context).pop();
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (builder) => LoginScreen()));
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (_) => const LoginScreen(
+                    noLogin: false,
+                  )),
+          (route) => false);
     } else {
       Navigator.pop(context);
       Navigator.pop(context);
@@ -350,7 +354,7 @@ class _MainDashboardState extends State<MainDashboard> {
     }
   }
 
-  logoutAnotherDevide(Map<String, dynamic> queryParams) async {
+  logoutAnotherDevice(Map<String, dynamic> queryParams) async {
     AuthUtils.showLoadingDialog(context);
     final logoutParams = {
       'clientid': queryParams['clientid'],
@@ -360,10 +364,18 @@ class _MainDashboardState extends State<MainDashboard> {
         ApiConfig.baseUrl + ApiConfig.apiLogin, logoutParams);
     if (result == "Successful Logout") {
       print("Logout");
-      await login(queryParams);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (_) => const LoginScreen(
+                    noLogin: false,
+                  )),
+          (route) => false);
     } else {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(
+              builder: (_) => const LoginScreen(
+                    noLogin: false,
+                  )),
           (route) => false);
       Fluttertoast.showToast(
           msg: "Failed to Logout",
@@ -414,7 +426,7 @@ class _MainDashboardState extends State<MainDashboard> {
       AuthUtils.showLoadingDialog(context);
       await ApiConfig.fetchParamsFromStorage();
       var q = ApiConfig.baseQueryParams;
-      q['index'] = "1";
+      // q['index'] = "1";
       response =
           await ApiCall.get(ApiConfig.baseUrl + ApiConfig.apiSelectList, q);
 
@@ -497,10 +509,12 @@ class _MainDashboardState extends State<MainDashboard> {
     }
     if (pUpload == true) {
       bool r = await PartRepository.uploadParts(PartsList.uploadPartList!);
+      await PartRepository.fileUpload(PartsList.uploadPartList!, v!.vehicleId);
       if (r) {
-        PartsList.uploadPartList = null;
+        PartsList.uploadPartList = [];
         prefs.setBool('uploadParts', false);
         ImageList.partImageList = [];
+        fetchPartsListNetwork();
         NotificationService().instantNofitication("Upload Complete");
       }
     }
@@ -566,12 +580,16 @@ class _MainDashboardState extends State<MainDashboard> {
       ),
       onPressed: () {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => LoginScreen()), (route) => false);
+            MaterialPageRoute(
+                builder: (_) => const LoginScreen(
+                      noLogin: false,
+                    )),
+            (route) => false);
       },
     );
     Widget logoutButton = TextButton(
       onPressed: () {
-        logoutAnotherDevide(queryParams);
+        logoutAnotherDevice(queryParams);
       },
       child: const Text("LOGOUT"),
     );

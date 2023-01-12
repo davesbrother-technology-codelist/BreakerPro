@@ -191,15 +191,20 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                 if (!mounted) return;
                                 print(imgFile.path);
                                 String dir = path.dirname(imgFile.path);
-                                int count = PartsList.count;
-                                String newPath = path.join(dir,
-                                    'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                imgFile = await imgFile.rename(newPath);
+
                                 setState(() {
                                   if (widget.type == 'Vehicle') {
+                                    int count = PartsList.vehicleCount;
+                                    String newPath = path.join(dir,
+                                        'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                    imgFile = imgFile.renameSync(newPath);
                                     imgList.add(imgFile.path);
                                     ImageList.vehicleImgList.add(imgFile.path);
                                   } else {
+                                    int count = PartsList.partCount;
+                                    String newPath = path.join(dir,
+                                        'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                    imgFile = imgFile.renameSync(newPath);
                                     imgList.add(imgFile.path);
                                     ImageList.partImageList.add(imgFile.path);
                                   }
