@@ -3,6 +3,7 @@ import 'package:breaker_pro/screens/quickScan.dart';
 import 'package:breaker_pro/screens/scanImaging.dart';
 import 'package:breaker_pro/screens/scanStockReconcile.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
+import 'package:breaker_pro/screens/workOrderScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -20,10 +21,10 @@ class MainDashboardUtils {
     addBreakerDialog,
     addPartDialog,
     scanLocationDialogue,
-    f4,
-    f5,
-    f6,
-    f7
+    ScanStockReconcileFunction,
+    ScanImagingFunction,
+    ManagePartsFunction,
+    WorkOrdersFunction
   ];
 
   static void addBreakerDialog(
@@ -399,23 +400,23 @@ class MainDashboardUtils {
         });
   }
 
-  static void f4(BuildContext context) {
+  static void ScanStockReconcileFunction(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
   }
 
-  static void f5(BuildContext context) {
+  static void ScanImagingFunction(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => ScanImaging()));
   }
 
-  static void f6(BuildContext context) {
+  static void ManagePartsFunction(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => ManagePart()));
   }
 
-  static void f7(BuildContext context) {
-    print("f7");
+  static void WorkOrdersFunction(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>WorkOrderScreen()));
   }
 
   static List<String> titleList = [
