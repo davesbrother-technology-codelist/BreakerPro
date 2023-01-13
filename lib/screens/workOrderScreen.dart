@@ -1,6 +1,25 @@
 import 'package:bottom_drawer/bottom_drawer.dart';
 import 'package:breaker_pro/my_theme.dart';
 import 'package:flutter/material.dart';
+class Item {
+  final String column1;
+  final String column2;
+  final String column3;
+  final String column4;
+
+  Item({
+    required this.column1,
+    required this.column2,
+    required this.column3,
+    required this.column4,
+  });
+// other methods
+}
+List<Item> myList = [
+  Item(column1: "value1", column2: "value2", column3: "value3", column4: "value4"),
+  Item(column1: "value5", column2: "value6", column3: "value7", column4: "value8"),
+  //add more items as needed
+];
 
 class WorkOrderScreen extends StatefulWidget {
   const WorkOrderScreen({Key? key}) : super(key: key);
@@ -11,6 +30,7 @@ class WorkOrderScreen extends StatefulWidget {
 
 class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProviderStateMixin {
   String? _selectedValue;
+  TextStyle customTextStyle=TextStyle(fontWeight: FontWeight.bold,color: MyTheme.materialColor);
   late AnimationController _controller;
   final BottomDrawerController _controller1 = BottomDrawerController();
   EdgeInsetsGeometry textEdgeInsetsGeometry =
@@ -306,9 +326,46 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
                             )))
                       ],
                     ),
-                  ),
 
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                    Table(
+
+                    border: TableBorder.all(width:1, color:Colors.black45), //table border
+                    children: [
+
+                      TableRow(
+
+                          children: [
+                            TableCell(child: Text("Invoice Details",style:customTextStyle)),
+                            TableCell(child: Text("Date",style: customTextStyle,)),
+                            TableCell(child: Text("Order Details",style: customTextStyle,)),
+                            TableCell(child: Text("Location",style: customTextStyle,))
+                          ],
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(238, 180, 22, .1)
+                        )
+                      ),
+
+                      TableRow(
+                          children: [
+                            TableCell(child: Text("1.")),
+                            TableCell(child: Text("Krishna Karki")),
+                            TableCell(child: Text("Nepal, Kathmandu")),
+                            TableCell(child: Text("Nepal"))
+                          ]
+                      ),
+
+
+                    ],
+            )
+
+
+                    ]),
+                  ),
                 ],
+
               ),
 
             ),
