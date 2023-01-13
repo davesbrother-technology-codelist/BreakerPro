@@ -42,7 +42,7 @@ class VehicleRepository {
     NotificationService().instantNofitication("1/5 - Uploading Vehicle Data");
     String url =
         "${ApiConfig.baseUrl}${ApiConfig.apiSubmitVehicle}?ClientID=${ApiConfig.baseQueryParams['clientid']}";
-    String msg = "\n--Uploading Vehicle--\n\n\nUrl:$url\nParams:\n\n";
+    String msg = "\n\n\n--Uploading Vehicle--\n\n\nUrl:$url\nParams:\n\n";
     msg += vehicle.addLog();
     Map m = {...ApiConfig.baseQueryParams, ...vehicle.toJson()};
     print(vehicle.toJson());
@@ -103,7 +103,7 @@ class VehicleRepository {
       String filename = image.path.split("/").last.toString();
       print(filename);
       String msg =
-          "\n--Uploading Vehicle Image--\n\n\nURL:${uri.toString()}\n\nFilename:$filename\n\n";
+          "\n\n--Uploading Vehicle Image--\n\n\nURL:${uri.toString()}\n\nFilename:$filename\n\n";
 
       msg += "\nClientID: ${ApiConfig.baseQueryParams['clientid']}";
       msg += "\nVehicleID: ${vehicle.vehicleId}";

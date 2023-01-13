@@ -44,7 +44,7 @@ class PartRepository {
       Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
       Uri url = Uri.parse(
           "${ApiConfig.baseUrl}${ApiConfig.apiSubmitParts}?Clientid=${ApiConfig.baseQueryParams['clientid']}");
-      String msg = "\nUploading Parts:\n\nURL:${url.toString()}\nParams:\n\n";
+      String msg = "\n\nUploading Parts:\n\nURL:${url.toString()}\nParams:\n\n";
       msg += "DeviceId:${ApiConfig.baseQueryParams['deviceid']}\n";
       msg += "App version:${ApiConfig.baseQueryParams['appversion']}\n";
       msg += "OsVersion:${ApiConfig.baseQueryParams['osversion']}\n";
@@ -118,7 +118,7 @@ class PartRepository {
 
       for (int i = 0; i < imgList.length; i++) {
         String msg =
-            "\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
+            "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
         msg += "URL: $uri";
         File image = imgList[i];
         NotificationService().instantNofitication(

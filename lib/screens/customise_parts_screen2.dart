@@ -182,7 +182,7 @@ class _CustomiseState extends State<Customise> {
                   isDebuggable: true);
 
               String msg =
-                  "\n\n**************** Inserting Part Details clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \n\n";
+                  "\n\n\n\n**************** Inserting Part Details clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \n\n";
               msg += part.addLog();
               FlutterLogs.logToFile(
                   logFileName:

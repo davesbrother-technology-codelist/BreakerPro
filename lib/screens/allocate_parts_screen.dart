@@ -89,7 +89,7 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             child: TextButton(
               onPressed: () {
                 String msg =
-                    "\n\n**************** Customize Parts clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \nSelected Part Name: ";
+                    "\n\n\n\n**************** Customize Parts clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \nSelected Part Name: ";
 
                 for (Part part in PartsList.selectedPartList) {
                   msg += "${part.partName.toString()} ,";
