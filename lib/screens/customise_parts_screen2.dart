@@ -1,6 +1,8 @@
 import 'package:breaker_pro/screens/postage_dropdown_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:intl/intl.dart';
+import '../api/api_config.dart';
 import '../app_config.dart';
 import '../dataclass/part.dart';
 import '../dataclass/parts_list.dart';
@@ -122,7 +124,7 @@ class _CustomiseState extends State<Customise> {
           color: MyTheme.materialColor,
           width: MediaQuery.of(context).size.width,
           child: TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (partLocEditingController.text.isNotEmpty ||
                   warrantyEditingController.text.isNotEmpty ||
                   salesPriceEditingController.text.isNotEmpty ||
@@ -157,6 +159,36 @@ class _CustomiseState extends State<Customise> {
               part.ebayTitle = ebayTitleEditingController.text.toString();
               part.imgList = List.from(ImageList.partImageList);
               print(part.imgList);
+              await FlutterLogs.initLogs(
+                  logLevelsEnabled: [
+                    LogLevel.INFO,
+                    LogLevel.WARNING,
+                    LogLevel.ERROR,
+                    LogLevel.SEVERE
+                  ],
+                  timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+                  directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
+                  logTypesEnabled: [
+                    "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+                    "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+                    "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+                  ],
+                  logFileExtension: LogFileExtension.TXT,
+                  logsWriteDirectoryName: "MyLogs",
+                  logsExportDirectoryName: "MyLogs/Exported",
+                  logsExportZipFileName:
+                      "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+                  debugFileOperations: true,
+                  isDebuggable: true);
+
+              String msg =
+                  "\n\n**************** Inserting Part Details clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \n\n";
+              msg += part.addLog();
+              FlutterLogs.logToFile(
+                  logFileName:
+                      "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
+                  overwrite: false,
+                  logMessage: msg);
               Navigator.pop(context, part);
             },
             child: Text(

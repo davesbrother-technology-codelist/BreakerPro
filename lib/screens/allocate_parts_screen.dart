@@ -3,6 +3,10 @@ import 'package:breaker_pro/screens/addPart.dart';
 import 'package:breaker_pro/screens/customise_parts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
+import 'package:flutter_logs/flutter_logs.dart';
+import 'package:intl/intl.dart';
+import '../api/api_config.dart';
+import '../app_config.dart';
 import '../dataclass/part.dart';
 import '../dataclass/vehicle.dart';
 import '../my_theme.dart';
@@ -84,6 +88,17 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextButton(
               onPressed: () {
+                String msg =
+                    "\n\n**************** Customize Parts clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \nSelected Part Name: ";
+
+                for (Part part in PartsList.selectedPartList) {
+                  msg += "${part.partName.toString()} ,";
+                }
+                FlutterLogs.logToFile(
+                    logFileName:
+                        "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
+                    overwrite: false,
+                    logMessage: msg);
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) =>
                       CustomisePartsScreen(vehicle: widget.vehicle),

@@ -5,7 +5,7 @@ import 'package:archive/archive_io.dart';
 import 'package:breaker_pro/notification_service.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:breaker_pro/api/api_config.dart';
 import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/app_config.dart';
@@ -41,13 +41,14 @@ class _MainDashboardState extends State<MainDashboard> {
   late Timer timer;
   @override
   void initState() {
+    initialiseLog();
     partsList = PartsList();
     fetchSelectListNetwork();
     fetchPartsListNetwork();
     upload();
     super.initState();
     timer =
-        Timer.periodic(const Duration(seconds: 5), (Timer t) => checkLogin());
+        Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
   }
 
   @override
@@ -83,31 +84,36 @@ class _MainDashboardState extends State<MainDashboard> {
               )),
           IconButton(
               onPressed: () async {
-                Directory? appDocDirectory =
-                    await getExternalStorageDirectory();
-                print(appDocDirectory);
+                Directory? externalDirectory;
+
+                if (Platform.isIOS) {
+                  externalDirectory = await getApplicationDocumentsDirectory();
+                } else {
+                  externalDirectory = await getExternalStorageDirectory();
+                }
+                print(externalDirectory);
                 var encoder = ZipFileEncoder();
                 encoder.create(
-                    "${appDocDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+                    "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
-                var assets = await rootBundle.loadString('AssetManifest.json');
-                Map json = jsonDecode(assets);
-                List files = json.keys
-                    .where((element) => element.startsWith('assets/logger/'))
-                    .toList();
+                encoder.addDirectory(
+                    Directory("${externalDirectory.path}/MyLogs/Logs"),
+                    includeDirName: false);
+                // }
 
-                for (var path in files) {
-                  final byteData = await rootBundle.load('$path');
-                  final file =
-                      File('${(await getTemporaryDirectory()).path}/$path');
-                  file.createSync(recursive: true);
-                  await file.writeAsBytes(byteData.buffer.asUint8List(
-                      byteData.offsetInBytes, byteData.lengthInBytes));
-                  encoder.addFile(file);
-                }
+                // for (var path in files) {
+                //   final byteData = await rootBundle.load('$path');
+                //   final file =
+                //       File('${(await getTemporaryDirectory()).path}/$path');
+                //   file.createSync(recursive: true);
+                //   await file.writeAsBytes(byteData.buffer.asUint8List(
+                //       byteData.offsetInBytes, byteData.lengthInBytes));
+                //   encoder.addFile(file);
+                // }
                 encoder.close();
                 File f = File(encoder.zipPath);
-                ShareExtend.share(f.path, "file");
+                print(f.path);
+                ShareExtend.share(f.path.split('/').last.toString(), "file");
               },
               icon: Icon(
                 Icons.share,
@@ -430,6 +436,12 @@ class _MainDashboardState extends State<MainDashboard> {
       response =
           await ApiCall.get(ApiConfig.baseUrl + ApiConfig.apiSelectList, q);
 
+      FlutterLogs.logToFile(
+          logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+          overwrite: false,
+          logMessage:
+              "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} SELECT LIST $ApiConfig.baseUrl + ApiConfig.apiSelectList Success $response\n");
+
       List responseList = response['selects'] as List;
       Map<String, dynamic> m = {};
       for (Map a in responseList) {
@@ -483,6 +495,7 @@ class _MainDashboardState extends State<MainDashboard> {
     bool? vUpload = prefs.getBool('uploadVehicle');
     bool? pUpload = prefs.getBool('uploadParts');
     Vehicle? v = PartsList.uploadVehicle;
+    print("VV: ${PartsList.uploadVehicle!.imgList}");
     if (vUpload == true) {
       setState(() {
         MainDashboardUtils.titleList[0] = "Add Breaker";
@@ -491,6 +504,7 @@ class _MainDashboardState extends State<MainDashboard> {
         PartsList.recall = false;
       });
       bool r = await VehicleRepository.uploadVehicle(v!);
+
       await VehicleRepository.fileUpload(v);
       if (r) {
         setState(() {
@@ -508,7 +522,8 @@ class _MainDashboardState extends State<MainDashboard> {
       }
     }
     if (pUpload == true) {
-      bool r = await PartRepository.uploadParts(PartsList.uploadPartList!);
+      bool r = await PartRepository.uploadParts(
+          PartsList.uploadPartList!, v!.vehicleId);
       await PartRepository.fileUpload(PartsList.uploadPartList!, v!.vehicleId);
       if (r) {
         PartsList.uploadPartList = [];
@@ -549,12 +564,14 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> checkLogin() async {
-    Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiLogin);
-    uri = uri.replace(queryParameters: ApiConfig.baseQueryParams);
-    final response = await http.get(uri, headers: ApiConfig.headers);
-    String responseBody = utf8.decoder.convert(response.bodyBytes);
-    final Map<String, dynamic> responseJson = json.decode(responseBody);
-    String result = responseJson['result'];
+    // Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiLogin);
+    // uri = uri.replace(queryParameters: ApiConfig.baseQueryParams);
+    // final response = await http.get(uri, headers: ApiConfig.headers);
+    // String responseBody = utf8.decoder.convert(response.bodyBytes);
+    // final Map<String, dynamic> responseJson = json.decode(responseBody);
+    // String result = responseJson['result'];
+    String result = await AuthRepository.login(
+        ApiConfig.baseUrl + ApiConfig.apiLogin, ApiConfig.baseQueryParams);
 
     if (result == 'User Active on Another Device') {
       print(result);
@@ -633,5 +650,29 @@ class _MainDashboardState extends State<MainDashboard> {
         return alert;
       },
     );
+  }
+
+  Future<void> initialiseLog() async {
+    await FlutterLogs.initLogs(
+        logLevelsEnabled: [
+          LogLevel.INFO,
+          LogLevel.WARNING,
+          LogLevel.ERROR,
+          LogLevel.SEVERE
+        ],
+        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
+        logTypesEnabled: [
+          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+        ],
+        logFileExtension: LogFileExtension.TXT,
+        logsWriteDirectoryName: "MyLogs",
+        logsExportDirectoryName: "MyLogs/Exported",
+        logsExportZipFileName:
+            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+        debugFileOperations: true,
+        isDebuggable: true);
   }
 }

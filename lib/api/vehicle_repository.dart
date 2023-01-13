@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import '../dataclass/parts_list.dart';
 import '../dataclass/vehicle.dart';
@@ -16,23 +18,49 @@ import 'package:async/async.dart';
 
 class VehicleRepository {
   static Future<bool> uploadVehicle(Vehicle vehicle) async {
+    await FlutterLogs.initLogs(
+        logLevelsEnabled: [
+          LogLevel.INFO,
+          LogLevel.WARNING,
+          LogLevel.ERROR,
+          LogLevel.SEVERE
+        ],
+        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
+        logTypesEnabled: [
+          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+        ],
+        logFileExtension: LogFileExtension.TXT,
+        logsWriteDirectoryName: "MyLogs",
+        logsExportDirectoryName: "MyLogs/Exported",
+        logsExportZipFileName:
+            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+        debugFileOperations: true,
+        isDebuggable: true);
     NotificationService().instantNofitication("1/5 - Uploading Vehicle Data");
+    String url =
+        "${ApiConfig.baseUrl}${ApiConfig.apiSubmitVehicle}?ClientID=${ApiConfig.baseQueryParams['clientid']}";
+    String msg = "\n--Uploading Vehicle--\n\n\nUrl:$url\nParams:\n\n";
+    msg += vehicle.addLog();
     Map m = {...ApiConfig.baseQueryParams, ...vehicle.toJson()};
     print(vehicle.toJson());
     var r = await http.post(
-      Uri.parse(
-          "${ApiConfig.baseUrl}${ApiConfig.apiSubmitVehicle}?ClientID=${ApiConfig.baseQueryParams['clientid']}"),
-      // headers: <String, String>{
-      //   'Content-Type': 'application/json; charset=UTF-8',
-      // },
+      Uri.parse(url),
       body: m,
     );
     print("Vehicle Upload");
     print(r.body);
     Map response = jsonDecode(r.body);
+    msg += "\nResult: $response\n";
 
     if (response['Result'] == "Inserted Successfully") {
       Fluttertoast.showToast(msg: "Vehicle Upload Successful");
+      FlutterLogs.logToFile(
+          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+          overwrite: false,
+          logMessage: msg);
       return true;
     } else {
       Fluttertoast.showToast(msg: "Failed to Upload Vehicle");
@@ -41,6 +69,27 @@ class VehicleRepository {
   }
 
   static fileUpload(Vehicle vehicle) async {
+    await FlutterLogs.initLogs(
+        logLevelsEnabled: [
+          LogLevel.INFO,
+          LogLevel.WARNING,
+          LogLevel.ERROR,
+          LogLevel.SEVERE
+        ],
+        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
+        logTypesEnabled: [
+          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+        ],
+        logFileExtension: LogFileExtension.TXT,
+        logsWriteDirectoryName: "MyLogs",
+        logsExportDirectoryName: "MyLogs/Exported",
+        logsExportZipFileName:
+            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+        debugFileOperations: true,
+        isDebuggable: true);
     print("\n\n Uploading Photos\n\n");
     List<File> imgList = List.generate(ImageList.vehicleImgList.length,
         (index) => File(ImageList.vehicleImgList[index]));
@@ -53,14 +102,23 @@ class VehicleRepository {
       print(image.path);
       String filename = image.path.split("/").last.toString();
       print(filename);
+      String msg =
+          "\n--Uploading Vehicle Image--\n\n\nURL:${uri.toString()}\n\nFilename:$filename\n\n";
 
+      msg += "\nClientID: ${ApiConfig.baseQueryParams['clientid']}";
+      msg += "\nVehicleID: ${vehicle.vehicleId}";
+      msg += "\nPartID: ";
+      msg += "\nappversion: ${ApiConfig.baseQueryParams['appversion']}";
+      msg += "\ndeviceid: ${ApiConfig.baseQueryParams['deviceid']}";
+      msg += "\nosversion: ${ApiConfig.baseQueryParams['osversion']}";
+      msg += "\nfile: $filename";
       Map<String, dynamic>? queryParams = {
         "ClientID": ApiConfig.baseQueryParams['clientid'],
         "VehicleID": vehicle.vehicleId,
         "PartID": "",
-        // "appversion": ApiConfig.baseQueryParams['appversion'],
-        // "deviceid": AppConfig.deviceId,
-        // "osversion": ApiConfig.baseQueryParams['osversion'],
+        "appversion": ApiConfig.baseQueryParams['appversion'],
+        "deviceid": ApiConfig.baseQueryParams['deviceid'],
+        "osversion": ApiConfig.baseQueryParams['osversion'],
         "file": filename,
       };
       uri = uri.replace(queryParameters: queryParams);
@@ -77,6 +135,11 @@ class VehicleRepository {
 
       print(response.statusCode);
       print(responseString);
+      msg += "\n$responseString\n";
+      FlutterLogs.logToFile(
+          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+          overwrite: false,
+          logMessage: msg);
     }
   }
 

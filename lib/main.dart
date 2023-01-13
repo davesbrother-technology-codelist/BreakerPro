@@ -5,7 +5,9 @@ import 'package:breaker_pro/my_theme.dart';
 import 'package:breaker_pro/notification_service.dart';
 import 'package:breaker_pro/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -48,6 +50,27 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService().initialize();
   await AppConfig.getDeviceInfo();
+  await FlutterLogs.initLogs(
+      logLevelsEnabled: [
+        LogLevel.INFO,
+        LogLevel.WARNING,
+        LogLevel.ERROR,
+        LogLevel.SEVERE
+      ],
+      timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+      directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
+      logTypesEnabled: [
+        "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+        "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+      ],
+      logFileExtension: LogFileExtension.TXT,
+      logsWriteDirectoryName: "MyLogs",
+      logsExportDirectoryName: "MyLogs/Exported",
+      logsExportZipFileName:
+          "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+      debugFileOperations: true,
+      isDebuggable: true);
+
   // saveFile();
   // await _getStoragePermission();
   runApp(const MyApp());
@@ -62,6 +85,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Breaker pro',
         theme: ThemeData(primarySwatch: MyTheme.materialColor),
-        home: const LoginScreen(noLogin: true,));
+        home: const LoginScreen(
+          noLogin: true,
+        ));
   }
 }

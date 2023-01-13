@@ -1,3 +1,4 @@
+import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:hive/hive.dart';
 
 part 'part.g.dart';
@@ -63,6 +64,9 @@ class Part {
 
   bool forUpload = false;
   bool status = false;
+  bool isEbay = false;
+  bool isFeaturedWeb = false;
+  String featuredWebDate = "";
   String partId = "";
 
   Part(
@@ -108,5 +112,12 @@ class Part {
       "PartComments": comments,
       "status": status.toString()
     };
+  }
+
+  String addLog() {
+    String m =
+        "VehicleId : ${PartsList.vehicleCount}\nPartId : $partId\nPartName : $partName\nPartType : $partType\nSellPrice : $salesPrice\nCostPrice : $costPrice\nQuantity : $costPrice\nCondition : $costPrice\nLocation : $defaultLocation\nDescription : $defaultDescription\nSetDefault : $isDefault\nComment : $comments\nPostageOptions : $postageOptions\n Ebay : $isEbay\nImage Name : $imgList\nmanPartNo : $mnfPartNo\nFeatured Web : $isFeaturedWeb\nFeatured Web Date : $featuredWebDate\n";
+
+    return m;
   }
 }

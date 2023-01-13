@@ -4,6 +4,7 @@ import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/drop_down_screen.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
@@ -560,7 +561,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   }
 
   saveVehicle() async {
-    vehicle.imgList = ImageList.vehicleImgList;
+    vehicle.imgList = List<String>.from(ImageList.vehicleImgList);
     vehicle.registrationNumber = regNoController.text.toString();
     vehicle.stockReference = stockRefController.text.toString();
     vehicle.make = makeController.text.toString();
@@ -874,6 +875,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String response = prefs.getString('selectList').toString();
     responseJson = jsonDecode(response);
+
     print(responseJson);
     if (makeController.text.isNotEmpty) {
       modelMenuItems =

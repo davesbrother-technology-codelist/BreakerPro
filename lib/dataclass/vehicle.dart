@@ -1,3 +1,7 @@
+import 'package:breaker_pro/api/api_config.dart';
+
+import 'image_list.dart';
+
 class Vehicle {
   String uniqueId = "0";
   String vehicleId = "";
@@ -108,5 +112,16 @@ class Vehicle {
     cc = json['VehCC'].toString();
     engineCode = json["engine_code"].toString();
     return this;
+  }
+
+  String addLog() {
+    String files = "";
+    for (String image in ImageList.vehicleImgList) {
+      files += "${image.split("/").last} ,";
+    }
+
+    String m =
+        "username:${ApiConfig.baseQueryParams['username']} \npassword:${ApiConfig.baseQueryParams['password']} \ndeviceid:${ApiConfig.baseQueryParams['deviceid']} \nSyncDeviceLists:${ApiConfig.baseQueryParams['SyncDeviceLists']} \nappversion:${ApiConfig.baseQueryParams['appversion']} \nosversion:${ApiConfig.baseQueryParams['osversion']} \ndevicename:${ApiConfig.baseQueryParams['devicename']} \nVehicleID:$vehicleId \nReg: $registrationNumber \nStockRef: $stockReference \nMake:$make \nModel:$model \nVehCC: $cc \nFuel:$fuel \nBodyStyle:$bodyStyle \nVIN: $vin \nColour:$colour \nManYear: $manufacturingYear \nYearRange: $fromYear-$toYear\nOnsiteDate:$onSiteDate \nMileage: $mileage \nVehLocation: $location \nCost: $costPrice \nDetails: $commentDetails \nImages: ${files} \nRecallID:  \ncollectiondate: $collectiondate \ndepollutiondate: $depollutiondate \ncoddate: $coddate \nweight:$weight\n";
+    return m;
   }
 }
