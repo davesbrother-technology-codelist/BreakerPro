@@ -96,7 +96,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 encoder.create(
                     "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
-                encoder.addDirectory(
+                await encoder.addDirectory(
                     Directory("${externalDirectory.path}/MyLogs/Logs"),
                     includeDirName: false);
                 // }
@@ -111,9 +111,9 @@ class _MainDashboardState extends State<MainDashboard> {
                 //   encoder.addFile(file);
                 // }
                 encoder.close();
-                File f = File(encoder.zipPath);
-                print(f.path);
-                ShareExtend.share(f.path.split('/').last.toString(), "file");
+                // File f = File(encoder.zipPath);
+                // print(f.path);
+                await ShareExtend.share(encoder.zipPath, "file");
               },
               icon: Icon(
                 Icons.share,
