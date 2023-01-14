@@ -1,4 +1,4 @@
-import 'dart:io' as Android;
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
@@ -10,14 +10,14 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 
 class QuickScan extends StatefulWidget {
-QuickScan(){
-  
-}
+
   @override
   State<QuickScan> createState() => _QuickScanState();
 }
 
-class _QuickScanState extends State<QuickScan>  {
+class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  bool _isVisible = true;
   final GlobalKey _gLobalkey = GlobalKey();
   QRViewController? controller;
   Barcode? result;
@@ -27,32 +27,46 @@ class _QuickScanState extends State<QuickScan>  {
       setState(() {
         result = event;
       });
-    }
-    );
+    });
+    controller.pauseCamera();
+    controller.resumeCamera();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(seconds: 6),
+      vsync: this,
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _animationController.forward();
+      }
+    });
+    _animationController.forward();
   }
   @override
   void dispose() {
     controller?.dispose();
+    _animationController.dispose();
+
     super.dispose();
   }
- @override
- void initState() {
-   super.initState();
-   controller?.resumeCamera();
 
-  }
   @override
   void reassemble() async {
     super.reassemble();
-    if(Android.Platform.isAndroid){
-await controller!.pauseCamera();
+    if(Platform.isIOS){
+      await controller!.pauseCamera();
     }
     controller!.resumeCamera();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
 
       body: SingleChildScrollView(
         child: Center(
@@ -64,7 +78,7 @@ await controller!.pauseCamera();
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Image.asset("assets/laser.png",
-                    height: 60,
+                      height: 60,
                       width: 50,
                     )
                   ],
@@ -75,18 +89,42 @@ await controller!.pauseCamera();
 
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10,right: 10),
-                    child: QRView(
+                    child: Stack(
+                        children:[
+                          QRView(
 
-                        key: _gLobalkey,
-                        onQRViewCreated: qr,
-                      cameraFacing: CameraFacing.back,
-                      overlay: QrScannerOverlayShape(
-                        borderLength: 20,
-                        borderWidth: 4,
-                        borderColor: Colors.lightGreenAccent,
-                        cutOutHeight:MediaQuery.of(context).size.height*0.26,
-                        cutOutWidth: MediaQuery.of(context).size.width*0.7,
-                      ),
+                            key: _gLobalkey,
+                            onQRViewCreated: qr,
+                            cameraFacing: CameraFacing.back,
+                            overlay: QrScannerOverlayShape(
+                              borderLength: 35,
+                              borderWidth: 4,
+                              borderColor: Colors.lightGreenAccent,
+                              cutOutHeight:MediaQuery.of(context).size.height*0.26,
+                              cutOutWidth: MediaQuery.of(context).size.width*0.7,
+                            ),
+
+
+                          ),
+                          Positioned(
+                            top: 220,
+                            left: 50,
+                            right: 50,
+                            child: AnimatedBuilder(
+                              animation: _animationController,
+                              builder: (context, child) {
+                                return Opacity(
+                                  opacity: _animationController.value,
+                                  child: Container(
+                                    width: 420,
+                                    height: 1,
+                                    color: Colors.red,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ]
 
                     ),
                   ),
@@ -102,10 +140,10 @@ await controller!.pauseCamera();
                   child: Row(
                     children: [
                       Text('Part ID',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                          color: Colors.grey
-                      ),),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey
+                        ),),
                       SizedBox(
                         width: 5,
                       ),
@@ -155,7 +193,7 @@ await controller!.pauseCamera();
                       Text('Vehicle',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                          color: Colors.grey
+                            color: Colors.grey
                         ),),
                       Text('')
                     ],
@@ -168,15 +206,15 @@ await controller!.pauseCamera();
                   padding: const EdgeInsets.only(left: 14,right: 14),
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: "Location",
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 2
+                        hintText: "Location",
+                        hintStyle: TextStyle(color: Colors.grey),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 2
+                            )
                         )
-                      )
                     ),
                   ),
                 ),
@@ -190,11 +228,11 @@ await controller!.pauseCamera();
                         color: MyTheme.materialColor,
                         child: TextButton(onPressed: (){},
                             child: Text("Set Location",
-                            style: TextStyle(
-                              fontSize:18,
-                              color: MyTheme.white
+                              style: TextStyle(
+                                  fontSize:18,
+                                  color: MyTheme.white
 
-                            ) ,
+                              ) ,
                             )),
                       ),
                       SizedBox(
@@ -237,8 +275,9 @@ await controller!.pauseCamera();
         ),
       ),
     );
+
   }
-  }
+}
   // Future<void> scanBarcode() async{
   //   // var status = await Permission.camera.request();
   //   // if (status.isGranted) {
