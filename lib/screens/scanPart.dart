@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'dart:io';
 
 class ScanPart extends StatefulWidget {
   const ScanPart({Key? key}) : super(key: key);
@@ -12,7 +13,9 @@ class ScanPart extends StatefulWidget {
   State<ScanPart> createState() => _ScanPartState();
 }
 
-class _ScanPartState extends State<ScanPart> {
+class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
+  late AnimationController _animationController;
+  bool _isVisible = true;
   final GlobalKey _gLobalkey = GlobalKey();
   QRViewController? controller;
   Barcode? result;
@@ -24,6 +27,40 @@ class _ScanPartState extends State<ScanPart> {
         ScannedScreen(result!);
       });
     });
+    controller.pauseCamera();
+    controller.resumeCamera();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(seconds: 6),
+      vsync: this,
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _animationController.forward();
+      }
+    });
+    _animationController.forward();
+  }
+  @override
+  void dispose() {
+    controller?.dispose();
+    _animationController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  void reassemble() async {
+    super.reassemble();
+    if(Platform.isIOS){
+      await controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
   }
 
   @override
@@ -46,7 +83,7 @@ class _ScanPartState extends State<ScanPart> {
                       onQRViewCreated: qr,
                       cameraFacing: CameraFacing.back,
                       overlay: QrScannerOverlayShape(
-                        borderLength: 20,
+                        borderLength: 35,
                         borderWidth: 4,
                         borderColor: Colors.lightGreenAccent,
                         cutOutHeight:MediaQuery.of(context).size.height*0.26,
@@ -63,6 +100,24 @@ class _ScanPartState extends State<ScanPart> {
                           height: 60,
                             width: 60,
                           ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 390,
+                        left: 60,
+                        right: 60,
+                        child: AnimatedBuilder(
+                          animation: _animationController,
+                          builder: (context, child) {
+                            return Opacity(
+                              opacity: _animationController.value,
+                              child: Container(
+                                width: 420,
+                                height: 1,
+                                color: Colors.red,
+                              ),
+                            );
+                          },
                         ),
                       )
                     ]

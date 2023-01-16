@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../my_theme.dart';
+import 'dart:io';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -12,7 +13,9 @@ class ScanImaging extends StatefulWidget {
   State<ScanImaging> createState() => _ScanImagingState();
 }
 
-class _ScanImagingState extends State<ScanImaging>  {
+class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin  {
+  late AnimationController _animationController;
+  bool _isVisible = true;
   final GlobalKey _gLobalkey = GlobalKey();
   QRViewController? controller;
   Barcode? result;
@@ -22,8 +25,41 @@ class _ScanImagingState extends State<ScanImaging>  {
       setState(() {
         result = event;
       });
+    });
+    controller.pauseCamera();
+    controller.resumeCamera();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(seconds: 6),
+      vsync: this,
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _animationController.forward();
+      }
+    });
+    _animationController.forward();
+  }
+  @override
+  void dispose() {
+    controller?.dispose();
+    _animationController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  void reassemble() async {
+    super.reassemble();
+    if(Platform.isIOS){
+      await controller!.pauseCamera();
     }
-    );
+    controller!.resumeCamera();
   }
 
   @override
@@ -51,17 +87,40 @@ class _ScanImagingState extends State<ScanImaging>  {
 
                   child: Padding(
                     padding: const EdgeInsets.only(left: 15,right: 15),
-                    child: QRView(
-                      key: _gLobalkey,
-                      onQRViewCreated: qr,
-                      cameraFacing: CameraFacing.back,
-                      overlay: QrScannerOverlayShape(
-                        borderLength: 20,
-                        borderWidth: 4,
-                        borderColor: Colors.lightGreenAccent,
-                        cutOutHeight:MediaQuery.of(context).size.height*0.26,
-                        cutOutWidth: MediaQuery.of(context).size.width*0.7,
-                      ),
+                    child: Stack(
+                      children : [
+                        QRView(
+                          key: _gLobalkey,
+                          onQRViewCreated: qr,
+                          cameraFacing: CameraFacing.back,
+                          overlay: QrScannerOverlayShape(
+                            borderLength: 35,
+                            borderWidth: 4,
+                            borderColor: Colors.lightGreenAccent,
+                            cutOutHeight:MediaQuery.of(context).size.height*0.26,
+                            cutOutWidth: MediaQuery.of(context).size.width*0.7,
+                          ),
+                        ),
+                        Positioned(
+                          top: 280,
+                          left: 50,
+                          right: 50,
+                          child: AnimatedBuilder(
+                            animation: _animationController,
+                            builder: (context, child) {
+                              return Opacity(
+                                opacity: _animationController.value,
+                                child: Container(
+                                  width: 420,
+                                  height: 1,
+                                  color: Colors.red,
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      ]
+
                     ),
                   ),
                 ),
