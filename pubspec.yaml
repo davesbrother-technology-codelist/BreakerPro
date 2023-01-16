@@ -59,6 +59,7 @@ dependencies:
   archive: ^3.3.5
   flutter_local_notifications: ^13.0.0
   flutter_logs: ^2.1.10
+  xml: ^6.1.0
 
 dev_dependencies:
   flutter_test:

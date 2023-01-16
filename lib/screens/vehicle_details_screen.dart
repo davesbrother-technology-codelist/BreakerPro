@@ -17,6 +17,7 @@ import '../dataclass/vehicle.dart';
 import '../my_theme.dart';
 import 'capture_screen.dart';
 import 'main_dashboard.dart';
+import 'package:path/path.dart' as path;
 
 class VehicleDetailsScreen extends StatefulWidget {
   const VehicleDetailsScreen({Key? key}) : super(key: key);
@@ -89,8 +90,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     for (int i = 1980; i <= currentYear; i++) {
       yearsList.add(i.toString());
     }
-    if (PartsList.uploadVehicle != null) {
-      Vehicle v = PartsList.uploadVehicle!;
+    if (PartsList.cachedVehicle != null) {
+      Vehicle v = PartsList.cachedVehicle!;
+      ImageList.vehicleImgList = v.imgList;
 
       regNoController.text = v.registrationNumber ?? "";
       stockRefController.text = v.stockReference ?? "";
@@ -125,6 +127,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   void dispose() {
     if (makeController.text.isNotEmpty) {
       saveVehicle();
+    } else {
+      ImageList.vehicleImgList = [];
     }
     super.dispose();
   }
@@ -422,14 +426,24 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                   color: MyTheme.black, fontSize: 20)),
                           onPressed: () async {
                             // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                            var image = await ImagePicker()
+                            XFile? image = await ImagePicker()
                                 .pickImage(source: ImageSource.gallery);
 
-                            setState(() {
-                              // images.add(image);
-                              // images= pickedGallery.map((e) => File(e.path)).toList();
-                              ImageList.vehicleImgList.add(image!.path);
-                            });
+                            if (image != null) {
+                              File imgFile = File(image.path);
+                              print(imgFile.path);
+                              String dir = path.dirname(imgFile.path);
+                              setState(() {
+                                int count = PartsList.vehicleCount;
+                                String newPath = path.join(dir,
+                                    'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                imgFile = imgFile.renameSync(newPath);
+                                ImageList.vehicleImgList.add(imgFile.path);
+                              });
+                            }
+                            for (String img in ImageList.vehicleImgList) {
+                              print(img);
+                            }
                           },
                         ),
                       ],
@@ -504,6 +518,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                     ),
                     TextButton(
                       onPressed: () {
+                        if (makeController.text.isEmpty) {
+                          return;
+                        }
                         saveVehicle();
                         print("Passed ID" + vehicle.vehicleId);
                         Navigator.of(context).push(MaterialPageRoute(
@@ -594,7 +611,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     vehicle.vehicleId =
         "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.vehicleCount.toString().padLeft(4, '0')}";
 
-    PartsList.uploadVehicle = vehicle;
+    PartsList.cachedVehicle = vehicle;
     String model = modelController.text.isEmpty ? "Model" : vehicle.model;
     MainDashboardUtils.titleList[0] =
         "Resume Work ( ${vehicle.make}-${model} )";
@@ -604,7 +621,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     print(PartsList.prefs!.getString("vehicle"));
 
     print("Save Vehicle ${MainDashboardUtils.titleList[0]}");
-    print("Save Vehicle ${PartsList.uploadVehicle!.imgList}");
+    print("Save Vehicle ${PartsList.cachedVehicle!.imgList}");
+    print("Save Vehicle ${vehicle.imgList}");
   }
 
   Widget datePickerTextField(
@@ -853,10 +871,22 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   }
 
   Future getImage() async {
-    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      ImageList.vehicleImgList.add(image!.path);
-    });
+    XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      File imgFile = File(image.path);
+      print(imgFile.path);
+      String dir = path.dirname(imgFile.path);
+      setState(() {
+        int count = PartsList.vehicleCount;
+        String newPath = path.join(dir,
+            'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+        imgFile = imgFile.renameSync(newPath);
+        ImageList.vehicleImgList.add(imgFile.path);
+      });
+    }
+    for (String img in ImageList.vehicleImgList) {
+      print(img);
+    }
   }
 
   openCamera() async {

@@ -224,7 +224,7 @@ class _MainDashboardState extends State<MainDashboard> {
                     onTap: () {
                       print(index);
                       if (index == 0) {
-                        if (PartsList.uploadVehicle != null) {
+                        if (PartsList.cachedVehicle != null) {
                           Navigator.of(context)
                               .push(MaterialPageRoute(
                             builder: (context) => const VehicleDetailsScreen(),
@@ -246,7 +246,7 @@ class _MainDashboardState extends State<MainDashboard> {
                         MainDashboardUtils.functionList[index]!(context);
                       }
                     },
-                    child: PartsList.uploadVehicle != null && index == 0
+                    child: PartsList.cachedVehicle != null && index == 0
                         ? Column(
                             children: [
                               cardView(index),
@@ -257,11 +257,13 @@ class _MainDashboardState extends State<MainDashboard> {
                                       setState(() {
                                         MainDashboardUtils.titleList[0] =
                                             "Add Breaker";
-                                        PartsList.uploadVehicle = null;
+                                        PartsList.cachedVehicle = null;
                                         PartsList.prefs!.remove('vehicle');
                                         PartsList.recall = false;
                                         ImageList.vehicleImgList = [];
                                         ImageList.partImageList = [];
+                                        PartsList.selectedPartList = [];
+                                        fetchPartsListNetwork();
                                       });
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -469,12 +471,12 @@ class _MainDashboardState extends State<MainDashboard> {
     if (prefs.getString('vehicle') != null) {
       print(prefs.getString('vehicle'));
       Vehicle v = Vehicle();
-      Map<String, String> map = Map<String, String>.from(
-          jsonDecode(prefs.getString('vehicle').toString()));
+      Map<String, dynamic> map = Map<String, dynamic>.from(
+          jsonDecode(prefs.getString('vehicle')!) as Map<dynamic, dynamic>);
       v.fromJson(map);
-      PartsList.uploadVehicle = v;
+      PartsList.cachedVehicle = v;
       String model = v.model == "" ? "Model" : v.model;
-      MainDashboardUtils.titleList[0] = "Resume Work ( ${v.make}-${model} )";
+      MainDashboardUtils.titleList[0] = "Resume Work ( ${v.make}-$model )";
       setState(() {});
     }
   }
@@ -494,12 +496,12 @@ class _MainDashboardState extends State<MainDashboard> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? vUpload = prefs.getBool('uploadVehicle');
     bool? pUpload = prefs.getBool('uploadParts');
-    Vehicle? v = PartsList.uploadVehicle;
-    print("VV: ${PartsList.uploadVehicle!.imgList}");
+    Vehicle? v = PartsList.cachedVehicle;
+    print("VV: ${PartsList.cachedVehicle!.imgList}");
     if (vUpload == true) {
       setState(() {
         MainDashboardUtils.titleList[0] = "Add Breaker";
-        PartsList.uploadVehicle = null;
+        PartsList.cachedVehicle = null;
         PartsList.prefs!.remove('vehicle');
         PartsList.recall = false;
       });
@@ -508,10 +510,10 @@ class _MainDashboardState extends State<MainDashboard> {
       await VehicleRepository.fileUpload(v);
       if (r) {
         setState(() {
-          PartsList.uploadVehicle = null;
+          PartsList.cachedVehicle = null;
           prefs.setBool('uploadVehicle', false);
           MainDashboardUtils.titleList[0] = "Add Breaker";
-          PartsList.uploadVehicle = null;
+          PartsList.cachedVehicle = null;
           PartsList.prefs!.remove('vehicle');
           PartsList.recall = false;
           ImageList.vehicleImgList = [];
@@ -527,6 +529,7 @@ class _MainDashboardState extends State<MainDashboard> {
       await PartRepository.fileUpload(PartsList.uploadPartList!, v!.vehicleId);
       if (r) {
         PartsList.uploadPartList = [];
+        PartsList.selectedPartList = [];
         prefs.setBool('uploadParts', false);
         ImageList.partImageList = [];
         fetchPartsListNetwork();

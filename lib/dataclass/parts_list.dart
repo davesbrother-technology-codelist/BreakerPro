@@ -12,7 +12,7 @@ class PartsList {
   static List<Part> partList = [];
   static List<Part> selectedPartList = [];
   static List<Part> uploadPartList = [];
-  static Vehicle? uploadVehicle;
+  static Vehicle? cachedVehicle;
   static bool recall = false;
   static SharedPreferences? prefs;
   static int vehicleCount = 1;

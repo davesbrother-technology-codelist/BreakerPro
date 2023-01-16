@@ -55,7 +55,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
 
   @override
   void initState() {
-    PartsList.uploadVehicle = widget.vehicle;
+    PartsList.cachedVehicle = widget.vehicle;
     partsList = PartsList.selectedPartList;
     for (Part part in partsList) {
       part.partId =

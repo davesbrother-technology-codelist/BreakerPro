@@ -39,7 +39,7 @@ class Vehicle {
   List<String> imgList = [];
   String engineCode = "";
 
-  Map<String, String> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       "uniqueId": uniqueId.toString(),
       "VehicleID": vehicleId,
@@ -74,11 +74,11 @@ class Vehicle {
       "uploadStatus": uploadStatus.toString(),
       'VehCC': cc.toString(),
       "engine_code": engineCode,
-      "Images": ""
+      "Images": imgList.toString()
     };
   }
 
-  Vehicle fromJson(Map<String, String> json) {
+  Vehicle fromJson(Map<String, dynamic> json) {
     uniqueId = json["uniqueId"].toString();
     vehicleId = json["VehicleID"].toString();
     registrationNumber = json["Reg"].toString();
@@ -111,6 +111,7 @@ class Vehicle {
     uploadStatus = json["uploadStatus"].toString();
     cc = json['VehCC'].toString();
     engineCode = json["engine_code"].toString();
+    // imgList = List<String>.from(json["Images"].toString().split(','));
     return this;
   }
 

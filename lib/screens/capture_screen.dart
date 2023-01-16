@@ -200,6 +200,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     imgFile = imgFile.renameSync(newPath);
                                     imgList.add(imgFile.path);
                                     ImageList.vehicleImgList.add(imgFile.path);
+                                    print(imgFile.path);
                                   } else {
                                     int count = PartsList.partCount;
                                     String newPath = path.join(dir,
@@ -207,6 +208,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     imgFile = imgFile.renameSync(newPath);
                                     imgList.add(imgFile.path);
                                     ImageList.partImageList.add(imgFile.path);
+                                    print(imgFile.path);
                                   }
                                 });
                               } catch (e) {

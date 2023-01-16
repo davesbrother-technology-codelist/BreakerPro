@@ -45,7 +45,7 @@ class VehicleRepository {
     String msg = "\n\n\n--Uploading Vehicle--\n\n\nUrl:$url\nParams:\n\n";
     msg += vehicle.addLog();
     Map m = {...ApiConfig.baseQueryParams, ...vehicle.toJson()};
-    print(vehicle.toJson());
+    print("Body of api call:\n$m\n Body Ends");
     var r = await http.post(
       Uri.parse(url),
       body: m,
@@ -177,7 +177,7 @@ class VehicleRepository {
         vehicle.weight =
             response["Weight"].runtimeType == String ? response["Weight"] : "";
         vehicle.commentDetails = response["description"] ?? "";
-        PartsList.uploadVehicle = vehicle;
+        PartsList.cachedVehicle = vehicle;
         String model = vehicle.model == "" ? "Model" : vehicle.model;
         MainDashboardUtils.titleList[0] =
             "Resume Work ( ${vehicle.make}-${model} )";
@@ -243,7 +243,7 @@ class VehicleRepository {
       vehicle.commentDetails = response["Details"] ?? "";
       vehicle.mileage = response["Mileage"] ?? "";
       vehicle.costPrice = response["VehCost"] ?? "";
-      PartsList.uploadVehicle = vehicle;
+      PartsList.cachedVehicle = vehicle;
       String model = vehicle.model == "" ? "Model" : vehicle.model;
       MainDashboardUtils.titleList[0] =
           "Resume Work ( ${vehicle.make}-${model} )";

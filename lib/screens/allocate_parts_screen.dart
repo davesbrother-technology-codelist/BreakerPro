@@ -87,7 +87,10 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
             color: MyTheme.materialColor,
             width: MediaQuery.of(context).size.width,
             child: TextButton(
-              onPressed: () {
+              onPressed: () async {
+                if (PartsList.selectedPartList.isEmpty) {
+                  return;
+                }
                 String msg =
                     "\n\n\n\n**************** Customize Parts clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \nSelected Part Name: ";
 

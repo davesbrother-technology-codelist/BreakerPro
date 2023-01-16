@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import 'capture_screen.dart';
 import 'drop_down_screen.dart';
+import 'package:path/path.dart' as path;
 
 class Customise extends StatefulWidget {
   const Customise({Key? key, required this.part}) : super(key: key);
@@ -69,9 +70,9 @@ class _CustomiseState extends State<Customise> {
   late List<bool> postageSelected =
       List.generate(postageItems.length, (index) => false);
   late Part part;
-  bool isChecked1 = false;
-  bool isChecked2 = false;
-  bool isChecked3 = false;
+  bool isDefault = false;
+  bool isEbay = false;
+  bool isFeaturedWeb = false;
   DateTime? selectedDate;
   String formattedDate = '';
   List<File> images = [];
@@ -94,19 +95,25 @@ class _CustomiseState extends State<Customise> {
     part = widget.part;
     super.initState();
     ebayTitleEditingController.text =
-        "${PartsList.uploadVehicle!.ebayMake} ${PartsList.uploadVehicle!.ebayModel} ${part.partName}";
+        "${PartsList.cachedVehicle!.ebayMake} ${PartsList.cachedVehicle!.ebayModel} ${part.partName} ${part.mnfPartNo}";
     formattedDate = '';
     partConditionController.text = part.partCondition;
-    // partLocEditingController.text = part.defaultLocation;
-    // warrantyEditingController.text = part.warranty.toString();
-    // salesPriceEditingController.text = part.salesPrice.toString();
+    partLocEditingController.text = part.partLocation;
+    warrantyEditingController.text = part.warranty.toString();
+    salesPriceEditingController.text = part.salesPrice.toString();
     qtyEditingController.text = part.qty.toString();
-    // partDescEditingController.text = part.defaultDescription;
+    partDescEditingController.text = part.description;
     mnfPartNoEditingController.text = part.mnfPartNo;
     partCommentsEditingController.text = part.comments;
     postageOptionsController.text = part.postageOptions;
 
     ImageList.partImageList = part.imgList;
+
+    for (int i = 0; i < postageItems.length; i++) {
+      if (part.postageOptions.contains(postageItems[i])) {
+        postageSelected[i] = true;
+      }
+    }
   }
 
   @override
@@ -139,25 +146,35 @@ class _CustomiseState extends State<Customise> {
               }
 
               part.partCondition = partConditionController.text.toString();
-              part.defaultLocation = partLocEditingController.text.toString();
+              part.partLocation = isDefault
+                  ? part.defaultLocation
+                  : partLocEditingController.text.toString();
               try {
                 part.warranty = double.parse(warrantyEditingController.text);
                 part.salesPrice =
                     double.parse(salesPriceEditingController.text);
                 part.costPrice = double.parse(costPriceEditingController.text);
                 part.qty = int.parse(qtyEditingController.text);
-                part.mnfPartNo = mnfPartNoEditingController.text.toString();
               } catch (e) {
                 print("Failed to convert");
               }
+              part.mnfPartNo = mnfPartNoEditingController.text.toString();
+              print(part.mnfPartNo);
+              part.description = isDefault
+                  ? part.defaultDescription
+                  : partDescEditingController.text.toString();
 
-              part.defaultDescription =
-                  partDescEditingController.text.toString();
+              part.featuredWebDate = isFeaturedWeb ? formattedDate : "";
 
               part.comments = partCommentsEditingController.text.toString();
               part.postageOptions = postageOptionsController.text.toString();
-              part.ebayTitle = ebayTitleEditingController.text.toString();
+              part.ebayTitle =
+                  isEbay ? ebayTitleEditingController.text.toString() : "";
               part.imgList = List.from(ImageList.partImageList);
+
+              part.isEbay = isEbay;
+              part.isFeaturedWeb = isFeaturedWeb;
+              part.isDefault = isDefault;
               print(part.imgList);
               await FlutterLogs.initLogs(
                   logLevelsEnabled: [
@@ -272,10 +289,10 @@ class _CustomiseState extends State<Customise> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Checkbox(
-                        value: isChecked1,
+                        value: isDefault,
                         onChanged: (value) {
                           setState(() {
-                            isChecked1 = value!;
+                            isDefault = value!;
                           });
                         }),
                     const Padding(
@@ -315,10 +332,10 @@ class _CustomiseState extends State<Customise> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Checkbox(
-                        value: isChecked2,
+                        value: isEbay,
                         onChanged: (value) {
                           setState(() {
-                            isChecked2 = value!;
+                            isEbay = value!;
                           });
                         }),
                     const Padding(
@@ -338,11 +355,29 @@ class _CustomiseState extends State<Customise> {
                 Row(
                   children: [
                     Checkbox(
-                        value: isChecked3,
-                        onChanged: (value) {
-                          setState(() {
-                            isChecked3 = value!;
-                          });
+                        value: isFeaturedWeb,
+                        onChanged: (value) async {
+                          isFeaturedWeb = value!;
+                          if (isFeaturedWeb) {
+                            final DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: selectedDate ?? DateTime.now(),
+                              firstDate: DateTime(1980),
+                              lastDate: DateTime.now(),
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                selectedDate = picked;
+                                formattedDate =
+                                    DateFormat('dd/MM/yyyy').format(picked);
+                              });
+                            } else {
+                              isFeaturedWeb = !isFeaturedWeb;
+                            }
+                          } else {
+                            formattedDate = "";
+                          }
+                          setState(() {});
                         }),
                     const Padding(
                       padding: EdgeInsets.all(8.0),
@@ -356,21 +391,6 @@ class _CustomiseState extends State<Customise> {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                             child: TextField(
-                          onTap: () async {
-                            final DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: selectedDate ?? DateTime.now(),
-                              firstDate: DateTime(1980),
-                              lastDate: DateTime.now(),
-                            );
-                            if (picked != null && picked != selectedDate) {
-                              setState(() {
-                                selectedDate = picked;
-                                formattedDate =
-                                    DateFormat('dd/MM/yyyy').format(picked);
-                              });
-                            }
-                          },
                           readOnly: true,
                           decoration: InputDecoration(
                               hintText:
@@ -416,14 +436,24 @@ class _CustomiseState extends State<Customise> {
                                     color: MyTheme.black, fontSize: 20)),
                             onPressed: () async {
                               // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                              var image = await ImagePicker()
+                              XFile? image = await ImagePicker()
                                   .pickImage(source: ImageSource.gallery);
 
-                              setState(() {
-                                // images= pickedGallery.map((e) => File(e.path)).toList();
-                                print(image?.path);
-                                ImageList.partImageList.add(image!.path);
-                              });
+                              if (image != null) {
+                                File imgFile = File(image.path);
+                                print(imgFile.path);
+                                String dir = path.dirname(imgFile.path);
+                                setState(() {
+                                  int count = PartsList.partCount;
+                                  String newPath = path.join(dir,
+                                      'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                  imgFile = imgFile.renameSync(newPath);
+                                  ImageList.partImageList.add(imgFile.path);
+                                });
+                              }
+                              for (String img in ImageList.partImageList) {
+                                print(img);
+                              }
                             },
                           ),
                         ],
@@ -609,6 +639,14 @@ class _CustomiseState extends State<Customise> {
                     ? 5
                     : 1,
                 controller: controller,
+                onSubmitted: (String? s) {
+                  if (title == 'Manufacturer Part no' && s != null) {
+                    setState(() {
+                      // mnfPartNoEditingController.text = "";
+                      ebayTitleEditingController.text += s;
+                    });
+                  }
+                },
                 keyboardType: TType,
                 decoration: InputDecoration(
                     enabledBorder: border, focusedBorder: border))

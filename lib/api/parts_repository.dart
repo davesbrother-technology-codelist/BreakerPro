@@ -38,10 +38,12 @@ class PartRepository {
           debugFileOperations: true,
           isDebuggable: true);
       NotificationService().instantNofitication(
-          "3/5 - Uploading Parts Data ${i + 1}/${partsList.length}");
+          "3/5 - Uploading Parts Data ${partsList[i].partName}");
       Part part = partsList[i];
-      print(part.toJson());
+
       Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
+      m['VehicleID'] = vehicleID;
+      print("Body of api call:\n$m\n Body Ends");
       Uri url = Uri.parse(
           "${ApiConfig.baseUrl}${ApiConfig.apiSubmitParts}?Clientid=${ApiConfig.baseQueryParams['clientid']}");
       String msg = "\n\nUploading Parts:\n\nURL:${url.toString()}\nParams:\n\n";
@@ -52,7 +54,7 @@ class PartRepository {
       msg += "Username:${ApiConfig.baseQueryParams['username']}\n";
       msg += "$vehicleID\n";
       msg += "${partsList[i].addLog()}\n";
-      msg += "Ebay_Tile ${partsList[i].ebayTitle}\n";
+      msg += "Ebay_Title ${partsList[i].ebayTitle}\n";
       var r = await http.post(
         url,
         body: m,
@@ -74,6 +76,72 @@ class PartRepository {
       Fluttertoast.showToast(msg: "Failed to Upload Parts");
       return false;
     }
+  }
+
+  static Future<void> updateParts(
+      List<Part> partsList, String vehicleID) async {
+    Map response = {};
+    for (int i = 0; i < partsList.length; i++) {
+      await FlutterLogs.initLogs(
+          logLevelsEnabled: [
+            LogLevel.INFO,
+            LogLevel.WARNING,
+            LogLevel.ERROR,
+            LogLevel.SEVERE
+          ],
+          timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+          directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
+          logTypesEnabled: [
+            "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+            "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+            "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+          ],
+          logFileExtension: LogFileExtension.TXT,
+          logsWriteDirectoryName: "MyLogs",
+          logsExportDirectoryName: "MyLogs/Exported",
+          logsExportZipFileName:
+              "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+          debugFileOperations: true,
+          isDebuggable: true);
+      NotificationService().instantNofitication(
+          "5/5 - Updating Parts Data ${partsList[i].partName}");
+      Part part = partsList[i];
+
+      Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
+      m['VehicleID'] = vehicleID;
+      print("Body of api call:\n$m\n Body Ends");
+      Uri url = Uri.parse(
+          "${ApiConfig.baseUrl}${ApiConfig.apiUpdatePartsStatus}?ClientID=${ApiConfig.baseQueryParams['clientid']}+VehicleID=$vehicleID");
+      String msg = "\n\nUpdating Parts:\n\nURL:${url.toString()}\nParams:\n\n";
+      msg += "DeviceId:${ApiConfig.baseQueryParams['deviceid']}\n";
+      msg += "App version:${ApiConfig.baseQueryParams['appversion']}\n";
+      msg += "OsVersion:${ApiConfig.baseQueryParams['osversion']}\n";
+      msg += "Clientid:${ApiConfig.baseQueryParams['clientid']}\n";
+      msg += "Username:${ApiConfig.baseQueryParams['username']}\n";
+      msg += "$vehicleID\n";
+      msg += "${partsList[i].addLog()}\n";
+      msg += "Ebay_Title ${partsList[i].ebayTitle}\n";
+      var r = await http.post(
+        url,
+        body: m,
+      );
+      print("Parts Update");
+      print(r.body);
+      // response = jsonDecode(r.body);
+      msg += "\n${r.body}\n";
+      FlutterLogs.logToFile(
+          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+          overwrite: false,
+          logMessage: msg);
+    }
+
+    // if (response['result'] == "Inserted Successfully") {
+    //   Fluttertoast.showToast(msg: "Parts Upload Successful");
+    //   return true;
+    // } else {
+    //   Fluttertoast.showToast(msg: "Failed to Upload Parts");
+    //   return false;
+    // }
   }
 
   static fileUpload(List<Part> partsList, String vehicleID) async {
@@ -98,6 +166,7 @@ class PartRepository {
             "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
         debugFileOperations: true,
         isDebuggable: true);
+    List<Part> updatePartsList = [];
     print("\n\n Uploading Parts Photos\n\n");
     int j = 1;
     int t = 0;
@@ -108,9 +177,12 @@ class PartRepository {
     }
 
     for (Part part in partsList) {
+      if (part.imgList.isNotEmpty) {
+        updatePartsList.add(part);
+      }
       print(part);
-      NotificationService()
-          .instantNofitication("2/5 - Uploading Part Images ${j}/${t}");
+      NotificationService().instantNofitication(
+          "2/5 - Uploading Part Images ${j}/${t} ${part.partName}");
       List<File> imgList = List.generate(
           part.imgList.length, (index) => File(part.imgList[index]));
 
@@ -167,5 +239,7 @@ class PartRepository {
             logMessage: msg);
       }
     }
+
+    await updateParts(updatePartsList, vehicleID);
   }
 }
