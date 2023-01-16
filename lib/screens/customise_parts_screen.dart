@@ -80,6 +80,14 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   }
 
   @override
+  void dispose() {
+    Map<String, List<Part>> m = {"selectedList": partsList};
+    PartsList.prefs?.setString('selectedList', jsonEncode(m));
+    print("saved selectedList");
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(children: [
       GestureDetector(

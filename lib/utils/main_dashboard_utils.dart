@@ -195,7 +195,7 @@ class MainDashboardUtils {
                 children: [
                   Container(
                     width: MediaQuery.of(context).size.width - 80,
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
                     child: TextField(
                       textInputAction: TextInputAction.search,
                       onSubmitted: (String? vrn) async {
@@ -205,11 +205,18 @@ class MainDashboardUtils {
                               await VehicleRepository.findVehicleFromVRN(vrn);
                           Navigator.pop(context);
                           if (b) {
-                            Navigator.pop(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => VehicleDetailsScreen()));
+                            PartsList.recall = true;
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const VehicleDetailsScreen(),
+                            ))
+                                .then((value) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => MainDashboard()),
+                                  (Route r) => false);
+                            });
                           }
                         }
                       },
@@ -241,11 +248,18 @@ class MainDashboardUtils {
                               stockref);
                           Navigator.pop(context);
                           if (b) {
-                            Navigator.pop(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => VehicleDetailsScreen()));
+                            PartsList.recall = true;
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const VehicleDetailsScreen(),
+                            ))
+                                .then((value) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => MainDashboard()),
+                                  (Route r) => false);
+                            });
                           }
                         }
                       },
@@ -266,11 +280,18 @@ class MainDashboardUtils {
                   ),
                   TextButton(
                       onPressed: () => {
-                            Navigator.of(context).pop(),
-                            Navigator.of(context).push(MaterialPageRoute(
+                            // Navigator.of(context).pop(),
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
                               builder: (context) =>
                                   const VehicleDetailsScreen(),
                             ))
+                                .then((value) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => MainDashboard()),
+                                  (Route r) => false);
+                            })
                           },
                       child: const Text(
                         "MANUAL ENTRY",
@@ -416,7 +437,8 @@ class MainDashboardUtils {
   }
 
   static void WorkOrdersFunction(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>WorkOrderScreen()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => WorkOrderScreen()));
   }
 
   static List<String> titleList = [

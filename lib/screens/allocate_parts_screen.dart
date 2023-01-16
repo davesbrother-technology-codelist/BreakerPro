@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/addPart.dart';
 import 'package:breaker_pro/screens/customise_parts_screen.dart';
@@ -69,6 +71,9 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   @override
   void dispose() {
     PartsList.partList = partsList;
+    Map m = {"partList": partsList};
+    PartsList.prefs?.setString('partList', jsonEncode(m));
+    print("saved partList");
     super.dispose();
   }
 

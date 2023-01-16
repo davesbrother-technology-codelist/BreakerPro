@@ -26,6 +26,7 @@ import '../api/api_call.dart';
 import '../api/login_repository.dart';
 import '../api/parts_repository.dart';
 import '../dataclass/image_list.dart';
+import '../dataclass/part.dart';
 import '../dataclass/parts_list.dart';
 import '../dataclass/vehicle.dart';
 
@@ -223,18 +224,18 @@ class _MainDashboardState extends State<MainDashboard> {
                 child: GestureDetector(
                     onTap: () {
                       print(index);
-                      if (index == 0) {
+                      if (index == 0 || index == 1) {
                         if (PartsList.cachedVehicle != null) {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(
+                          Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const VehicleDetailsScreen(),
                           ))
-                              .then((value) {
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (_) => MainDashboard()),
-                                (Route r) => false);
-                          });
+                              //     .then((value) {
+                              //   Navigator.of(context).pushAndRemoveUntil(
+                              //       MaterialPageRoute(
+                              //           builder: (_) => MainDashboard()),
+                              //       (Route r) => false);
+                              // })
+                              ;
                         } else {
                           MainDashboardUtils.functionList[index]!(
                               context, partsList);
@@ -259,6 +260,8 @@ class _MainDashboardState extends State<MainDashboard> {
                                             "Add Breaker";
                                         PartsList.cachedVehicle = null;
                                         PartsList.prefs!.remove('vehicle');
+                                        PartsList.prefs!.remove('partList');
+                                        PartsList.prefs!.remove('selectedList');
                                         PartsList.recall = false;
                                         ImageList.vehicleImgList = [];
                                         ImageList.partImageList = [];
@@ -484,6 +487,16 @@ class _MainDashboardState extends State<MainDashboard> {
   fetchPartsListNetwork() async {
     print("Fetching Parts List");
     Map<String, dynamic> queryParams = ApiConfig.baseQueryParams;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // if (prefs.getString('partList') != null) {
+    //   Map<String, List> map = Map<String, List>.from(
+    //       jsonDecode(prefs.getString('partList')!) as Map<dynamic, dynamic>);
+    //   List<Part> l = List.generate(map['partList']!.length,
+    //       (index) => Part.fromJson(jsonDecode(map['partList']![index])));
+    //   print("Cached ${map['partList']}");
+    //   print("Cached ${l}");
+    // }
+
     queryParams['index'] = "0";
     bool b = await partsList.loadParts(
         ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
