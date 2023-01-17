@@ -39,13 +39,15 @@ class VehicleRepository {
             "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
         debugFileOperations: true,
         isDebuggable: true);
-    NotificationService().instantNofitication("1/5 - Uploading Vehicle Data");
+    NotificationService().instantNofitication(
+        "1/5 - Uploading Vehicle Data ${vehicle.model == "" ? "Model" : vehicle.model}");
     String url =
         "${ApiConfig.baseUrl}${ApiConfig.apiSubmitVehicle}?ClientID=${ApiConfig.baseQueryParams['clientid']}";
     String msg = "\n\n\n--Uploading Vehicle--\n\n\nUrl:$url\nParams:\n\n";
     msg += vehicle.addLog();
     Map m = {...ApiConfig.baseQueryParams, ...vehicle.toJson()};
     print("Body of api call:\n$m\n Body Ends");
+    m['Images'] = m['Images'].toString();
     var r = await http.post(
       Uri.parse(url),
       body: m,
@@ -91,14 +93,14 @@ class VehicleRepository {
         debugFileOperations: true,
         isDebuggable: true);
     print("\n\n Uploading Photos\n\n");
-    List<File> imgList = List.generate(ImageList.vehicleImgList.length,
-        (index) => File(ImageList.vehicleImgList[index]));
+    List<File> imgList = List.generate(ImageList.uploadVehicleImgList.length,
+        (index) => File(ImageList.uploadVehicleImgList[index]));
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
     for (int i = 0; i < imgList.length; i++) {
       File image = imgList[i];
       NotificationService().instantNofitication(
-          "2/5 - Uploading Vehicle Images ${i + 1}/${imgList.length}");
+          "2/5 - Uploading Vehicle Images ${i + 1}/${imgList.length} ${vehicle.model == "" ? "Model" : vehicle.model}");
       print(image.path);
       String filename = image.path.split("/").last.toString();
       print(filename);

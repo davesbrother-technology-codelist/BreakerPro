@@ -6,6 +6,7 @@ import 'package:breaker_pro/screens/customise_parts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../api/api_config.dart';
 import '../app_config.dart';
@@ -68,12 +69,36 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
     }
   }
 
+  savePart() async {
+    try {
+      Box<Part> box = await Hive.openBox('partListBox');
+      Map<dynamic, Part> boxMap = {
+        for (var part in partsList) part.partName: part
+      };
+      if (box.isOpen) {
+        box.putAll(boxMap);
+        print("saved partList");
+        print(PartsList.partList[0].isSelected);
+      }
+
+      Box<Part> box1 = await Hive.openBox('selectPartListBox');
+      Map<dynamic, Part> boxMap1 = {
+        for (var part in PartsList.selectedPartList) part.partName: part
+      };
+      if (box1.isOpen) {
+        box1.putAll(boxMap1);
+        print("saved selectdpartList");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void dispose() {
     PartsList.partList = partsList;
-    Map m = {"partList": partsList};
-    PartsList.prefs?.setString('partList', jsonEncode(m));
-    print("saved partList");
+    savePart();
+
     super.dispose();
   }
 

@@ -26,13 +26,31 @@ class PartAdapter extends TypeAdapter<Part> {
       fields[6] as String,
       fields[7] as String,
       fields[8] as String,
-    )..isSelected = fields[9] as bool;
+    )
+      ..isSelected = fields[9] as bool
+      ..partCondition = fields[10] as String
+      ..warranty = fields[11] as double
+      ..qty = fields[12] as int
+      ..salesPrice = fields[13] as double
+      ..costPrice = fields[14] as double
+      ..isDefault = fields[15] as bool
+      ..mnfPartNo = fields[16] as String
+      ..comments = fields[17] as String
+      ..imgList = (fields[18] as List).cast<String>()
+      ..partLocation = fields[19] as String
+      ..description = fields[20] as String
+      ..forUpload = fields[21] as bool
+      ..status = fields[22] as String
+      ..isEbay = fields[23] as bool
+      ..isFeaturedWeb = fields[24] as bool
+      ..featuredWebDate = fields[25] as String
+      ..partId = fields[26] as String;
   }
 
   @override
   void write(BinaryWriter writer, Part obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(27)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -52,7 +70,41 @@ class PartAdapter extends TypeAdapter<Part> {
       ..writeByte(8)
       ..write(obj.ebayTitle)
       ..writeByte(9)
-      ..write(obj.isSelected);
+      ..write(obj.isSelected)
+      ..writeByte(10)
+      ..write(obj.partCondition)
+      ..writeByte(11)
+      ..write(obj.warranty)
+      ..writeByte(12)
+      ..write(obj.qty)
+      ..writeByte(13)
+      ..write(obj.salesPrice)
+      ..writeByte(14)
+      ..write(obj.costPrice)
+      ..writeByte(15)
+      ..write(obj.isDefault)
+      ..writeByte(16)
+      ..write(obj.mnfPartNo)
+      ..writeByte(17)
+      ..write(obj.comments)
+      ..writeByte(18)
+      ..write(obj.imgList)
+      ..writeByte(19)
+      ..write(obj.partLocation)
+      ..writeByte(20)
+      ..write(obj.description)
+      ..writeByte(21)
+      ..write(obj.forUpload)
+      ..writeByte(22)
+      ..write(obj.status)
+      ..writeByte(23)
+      ..write(obj.isEbay)
+      ..writeByte(24)
+      ..write(obj.isFeaturedWeb)
+      ..writeByte(25)
+      ..write(obj.featuredWebDate)
+      ..writeByte(26)
+      ..write(obj.partId);
   }
 
   @override

@@ -42,11 +42,12 @@ class _MainDashboardState extends State<MainDashboard> {
   late Timer timer;
   @override
   void initState() {
+    // upload();
     initialiseLog();
     partsList = PartsList();
     fetchSelectListNetwork();
     fetchPartsListNetwork();
-    upload();
+
     super.initState();
     timer =
         Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
@@ -54,6 +55,8 @@ class _MainDashboardState extends State<MainDashboard> {
 
   @override
   void dispose() {
+    PartsList.prefs!.setInt('partCount', PartsList.partCount);
+    PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
     super.dispose();
@@ -254,7 +257,13 @@ class _MainDashboardState extends State<MainDashboard> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
+                                      Box<Part> box =
+                                          await Hive.openBox('partListBox');
+                                      Box<Part> box1 = await Hive.openBox(
+                                          'selectPartListBox');
+                                      await box.clear();
+                                      await box1.clear();
                                       setState(() {
                                         MainDashboardUtils.titleList[0] =
                                             "Add Breaker";
@@ -266,6 +275,7 @@ class _MainDashboardState extends State<MainDashboard> {
                                         ImageList.vehicleImgList = [];
                                         ImageList.partImageList = [];
                                         PartsList.selectedPartList = [];
+
                                         fetchPartsListNetwork();
                                       });
                                     },
@@ -431,6 +441,12 @@ class _MainDashboardState extends State<MainDashboard> {
   fetchSelectListNetwork() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     PartsList.prefs = prefs;
+    if (prefs.getInt('partCount') != null) {
+      PartsList.partCount = prefs.getInt('partCount')! + 1;
+    }
+    if (prefs.getInt('vehicleCount') != null) {
+      PartsList.vehicleCount = prefs.getInt('vehicleCount')! + 1;
+    }
     Map response;
 
     if (prefs.getString('selectList') == null) {
@@ -471,84 +487,179 @@ class _MainDashboardState extends State<MainDashboard> {
       Navigator.pop(context);
     }
 
+    await upload();
+
     if (prefs.getString('vehicle') != null) {
-      print(prefs.getString('vehicle'));
+      print("From cache ${prefs.getString('vehicle')}");
       Vehicle v = Vehicle();
       Map<String, dynamic> map = Map<String, dynamic>.from(
           jsonDecode(prefs.getString('vehicle')!) as Map<dynamic, dynamic>);
       v.fromJson(map);
+      List a = map['Images'];
       PartsList.cachedVehicle = v;
+      ImageList.vehicleImgList =
+          List<String>.generate(a.length, (index) => a[index]);
       String model = v.model == "" ? "Model" : v.model;
       MainDashboardUtils.titleList[0] = "Resume Work ( ${v.make}-$model )";
+
       setState(() {});
     }
   }
 
   fetchPartsListNetwork() async {
+    PartsList.selectedPartList = [];
+    PartsList.partList = [];
+    PartsList.uploadPartList = [];
     print("Fetching Parts List");
+    Box<Part> box = await Hive.openBox('partListBox');
+    if (box.isNotEmpty) {
+      PartsList.partList = box.values.toList();
+      print(PartsList.partList[0].isSelected);
+    } else {
+      print(" empyt");
+    }
+
+    Box<Part> box1 = await Hive.openBox('selectPartListBox');
+    if (box1.isNotEmpty) {
+      PartsList.selectedPartList = box1.values.toList();
+    } else {
+      print(" empyt");
+    }
     Map<String, dynamic> queryParams = ApiConfig.baseQueryParams;
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // if (prefs.getString('partList') != null) {
     //   Map<String, List> map = Map<String, List>.from(
     //       jsonDecode(prefs.getString('partList')!) as Map<dynamic, dynamic>);
-    //   List<Part> l = List.generate(map['partList']!.length,
-    //       (index) => Part.fromJson(jsonDecode(map['partList']![index])));
-    //   print("Cached ${map['partList']}");
-    //   print("Cached ${l}");
+    //   print("Cached ${map}");
+    //   // print("Cached ${l}");
     // }
 
     queryParams['index'] = "0";
-    bool b = await partsList.loadParts(
-        ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
-    if (b) {
-      setState(() {});
+    if (PartsList.partList.isEmpty) {
+      bool b = await partsList.loadParts(
+          ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
+      if (b) {
+        setState(() {});
+      }
     }
   }
 
   Future<void> upload() async {
+    print("Uploadinggg");
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? vUpload = prefs.getBool('uploadVehicle');
-    bool? pUpload = prefs.getBool('uploadParts');
-    Vehicle? v = PartsList.cachedVehicle;
-    print("VV: ${PartsList.cachedVehicle!.imgList}");
-    if (vUpload == true) {
-      setState(() {
-        MainDashboardUtils.titleList[0] = "Add Breaker";
-        PartsList.cachedVehicle = null;
-        PartsList.prefs!.remove('vehicle');
-        PartsList.recall = false;
-      });
-      bool r = await VehicleRepository.uploadVehicle(v!);
+    Map<String, dynamic> map = Map<String, dynamic>.from(
+        jsonDecode(prefs.getString('uploadQueue')!) as Map<dynamic, dynamic>);
+    List t = List.generate(
+        map['uploadQueue'].length, (index) => map['uploadQueue'][index]);
+    PartsList.uploadQueue = List.generate(
+        map['uploadQueue'].length, (index) => map['uploadQueue'][index]);
+    print(PartsList.uploadQueue);
 
-      await VehicleRepository.fileUpload(v);
-      if (r) {
-        setState(() {
+    for (String vehicleString in PartsList.uploadQueue) {
+      print(prefs.getString(vehicleString));
+      Vehicle v = Vehicle();
+      if (prefs.getString(vehicleString) != null) {
+        Map<String, dynamic> map = Map<String, dynamic>.from(
+            jsonDecode(prefs.getString(vehicleString)!)
+                as Map<dynamic, dynamic>);
+        v.fromJson(map);
+        List a = map['Images'];
+        print("Images ss $a");
+        ImageList.uploadVehicleImgList =
+            List<String>.generate(a.length, (index) => a[index]);
+        // v.imgList = List.from(ImageList.uploadVehicleImgList);
+        bool r = await VehicleRepository.uploadVehicle(v);
+
+        await VehicleRepository.fileUpload(v);
+        Box<Part> box1 = await Hive.openBox('uploadPartListBox');
+        if (box1.isNotEmpty) {
+          PartsList.uploadPartList = [];
+          PartsList.selectedPartList = box1.values.toList();
+          for (Part part in PartsList.selectedPartList) {
+            if (part.forUpload) {
+              PartsList.uploadPartList.add(part);
+            }
+          }
+        } else {
+          print(" empyt");
+        }
+
+        print("Uplaof Part List ${PartsList.uploadPartList}");
+
+        await PartRepository.uploadParts(
+            PartsList.uploadPartList, v.vehicleId, v.model);
+        await PartRepository.fileUpload(
+            PartsList.uploadPartList, v.vehicleId, v.model);
+        if (r) {
+          PartsList.uploadPartList = [];
+          PartsList.selectedPartList = [];
           PartsList.cachedVehicle = null;
-          prefs.setBool('uploadVehicle', false);
+          prefs.setBool('uploadParts', false);
+          ImageList.partImageList = [];
+          fetchPartsListNetwork();
+          NotificationService().instantNofitication("Upload Complete");
           MainDashboardUtils.titleList[0] = "Add Breaker";
-          PartsList.cachedVehicle = null;
-          PartsList.prefs!.remove('vehicle');
-          PartsList.recall = false;
-          ImageList.vehicleImgList = [];
-        });
-      }
-      if (pUpload == false || pUpload == null) {
-        NotificationService().instantNofitication("Upload Complete");
-      }
-    }
-    if (pUpload == true) {
-      bool r = await PartRepository.uploadParts(
-          PartsList.uploadPartList!, v!.vehicleId);
-      await PartRepository.fileUpload(PartsList.uploadPartList!, v!.vehicleId);
-      if (r) {
-        PartsList.uploadPartList = [];
-        PartsList.selectedPartList = [];
-        prefs.setBool('uploadParts', false);
-        ImageList.partImageList = [];
-        fetchPartsListNetwork();
-        NotificationService().instantNofitication("Upload Complete");
+        }
+
+        t.remove(vehicleString);
+        prefs.setString('uploadQueue', jsonEncode({'uploadQueue': t}));
+
+        if (r) {
+          await PartsList.prefs!.remove(vehicleString);
+          await prefs.remove('vehicle');
+          Box<Part> box = await Hive.openBox('partListBox');
+          Box<Part> box1 = await Hive.openBox('selectPartListBox');
+          Box<Part> box2 = await Hive.openBox('uploadPartListBox');
+          MainDashboardUtils.titleList[0] = "Add Breaker";
+          await box.clear();
+          await box1.clear();
+          await box2.clear();
+          setState(() {});
+        }
       }
     }
+
+    // bool? vUpload = prefs.getBool('uploadVehicle');
+    // bool? pUpload = prefs.getBool('uploadParts');
+    // Vehicle? v = PartsList.cachedVehicle;
+    // print("VV: ${PartsList.cachedVehicle!.imgList}");
+    // if (vUpload == true) {
+    //   setState(() {
+    //     MainDashboardUtils.titleList[0] = "Add Breaker";
+    //     PartsList.cachedVehicle = null;
+    //     PartsList.recall = false;
+    //   });
+    //   bool r = await VehicleRepository.uploadVehicle(v!);
+    //
+    //   await VehicleRepository.fileUpload(v);
+    //   if (r) {
+    //     setState(() {
+    //       PartsList.cachedVehicle = null;
+    //       prefs.setBool('uploadVehicle', false);
+    //       MainDashboardUtils.titleList[0] = "Add Breaker";
+    //       PartsList.cachedVehicle = null;
+    //       PartsList.prefs!.remove('vehicle');
+    //       PartsList.recall = false;
+    //       ImageList.vehicleImgList = [];
+    //     });
+    //   }
+    //   if (pUpload == false || pUpload == null) {
+    //     NotificationService().instantNofitication("Upload Complete");
+    //   }
+    // }
+    // if (pUpload == true) {
+    //   bool r = await PartRepository.uploadParts(
+    //       PartsList.uploadPartList!, v!.vehicleId);
+    //   await PartRepository.fileUpload(PartsList.uploadPartList!, v!.vehicleId);
+    //   if (r) {
+    //     PartsList.uploadPartList = [];
+    //     PartsList.selectedPartList = [];
+    //     prefs.setBool('uploadParts', false);
+    //     ImageList.partImageList = [];
+    //     fetchPartsListNetwork();
+    //     NotificationService().instantNofitication("Upload Complete");
+    //   }
+    // }
   }
 
   login(Map<String, dynamic> queryParams) async {

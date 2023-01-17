@@ -74,7 +74,7 @@ class Vehicle {
       "uploadStatus": uploadStatus.toString(),
       'VehCC': cc.toString(),
       "engine_code": engineCode,
-      "Images": imgList.toString()
+      "Images": imgList
     };
   }
 
@@ -117,7 +117,7 @@ class Vehicle {
 
   String addLog() {
     String files = "";
-    for (String image in ImageList.vehicleImgList) {
+    for (String image in ImageList.uploadVehicleImgList) {
       files += "${image.split("/").last} ,";
     }
 

@@ -8,13 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:breaker_pro/screens/customise_parts_screen2.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../dataclass/image_list.dart';
 import '../dataclass/part.dart';
 import '../my_theme.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../utils/main_dashboard_utils.dart';
 import 'addPart.dart';
 
 class CustomisePartsScreen extends StatefulWidget {
@@ -79,11 +82,25 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     }
   }
 
+  savePart() async {
+    try {
+      Box<Part> box = await Hive.openBox('selectPartListBox');
+      Map<dynamic, Part> boxMap = {
+        for (var part in partsList) part.partName: part
+      };
+      if (box.isOpen) {
+        box.putAll(boxMap);
+        print("saved selectpartList");
+        print(PartsList.partList[0].isSelected);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void dispose() {
-    Map<String, List<Part>> m = {"selectedList": partsList};
-    PartsList.prefs?.setString('selectedList', jsonEncode(m));
-    print("saved selectedList");
+    savePart();
     super.dispose();
   }
 
@@ -290,13 +307,38 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
       onPressed: () async {
         for (Part p in partsList) {
           if (p.forUpload) {
-            PartsList.uploadPartList!.add(p);
+            PartsList.uploadPartList.add(p);
             print(p.imgList);
           }
         }
+        Box<Part> box = await Hive.openBox('uploadPartListBox');
+        Map<dynamic, Part> boxMap = {
+          for (var part in PartsList.uploadPartList) part.partName: part
+        };
+        if (box.isOpen) {
+          box.putAll(boxMap);
+          print("saved uploadpartList");
+        }
+        PartsList.uploadQueue.add(widget.vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('uploadVehicle', true);
-        prefs.setBool('uploadParts', true);
+        prefs.remove('vehicle');
+        MainDashboardUtils.titleList[0] = "Add Breaker";
+        ImageList.vehicleImgList = [];
+        PartsList.cachedVehicle = null;
+        PartsList.recall = false;
+        // Box<Part> box = await Hive.openBox('partListBox');
+        // Box<Part> box1 = await Hive.openBox('selectPartListBox');
+        // await box.clear();
+        // await box1.clear();
+        PartsList.selectedPartList = [];
+        PartsList.partList = [];
+        PartsList.uploadPartList = [];
+        prefs.setString(
+            'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
+        prefs.setString(
+            widget.vehicle.vehicleId, jsonEncode(widget.vehicle.toJson()));
+        // prefs.setBool('uploadVehicle', true);
+        // prefs.setBool('uploadParts', true);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (builder) => MainDashboard()),

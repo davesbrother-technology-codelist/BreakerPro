@@ -59,17 +59,31 @@ class Part {
   @HiveField(17)
   late String comments = "";
 
-  @HiveField(17)
+  @HiveField(18)
   late List<String> imgList = [];
 
+  @HiveField(19)
   late String partLocation = "";
+
+  @HiveField(20)
   late String description = "";
 
+  @HiveField(21)
   bool forUpload = false;
-  bool status = false;
+
+  @HiveField(22)
+  String status = "Uploading";
+
+  @HiveField(23)
   bool isEbay = false;
+
+  @HiveField(24)
   bool isFeaturedWeb = false;
+
+  @HiveField(25)
   String featuredWebDate = "";
+
+  @HiveField(26)
   String partId = "";
 
   Part(
@@ -119,7 +133,7 @@ class Part {
 
   String addLog() {
     String m =
-        "VehicleId : ${PartsList.vehicleCount}\nPartId : $partId\nPartName : $partName\nPartType : $partType\nSellPrice : $salesPrice\nCostPrice : $costPrice\nQuantity : $costPrice\nCondition : $costPrice\nLocation : ${isDefault ? defaultLocation : partLocation}\nDescription : ${isDefault ? defaultDescription : description}\nSetDefault : $isDefault\nComment : $comments\nPostageOptions : $postageOptions\n Ebay : $isEbay\nImage Name : $imgList\nmanPartNo : $mnfPartNo\nFeatured Web : $isFeaturedWeb\nFeatured Web Date : $featuredWebDate\n";
+        "PartID : $partId\nPartName : $partName\nPartType : $partType\nSellPrice : $salesPrice\nCostPrice : $costPrice\nQuantity : $costPrice\nCondition : $costPrice\nLocation : ${isDefault ? defaultLocation : partLocation}\nDescription : ${isDefault ? defaultDescription : description}\nSetDefault : $isDefault\nComment : $comments\nPostageOptions : $postageOptions\nPostageCode: $postageOptionsCode\nEbay : $isEbay\nImage Name : $imgList\nmanPartNo : $mnfPartNo\nFeatured Web : $isFeaturedWeb\nFeatured Web Date : $featuredWebDate\n";
 
     return m;
   }

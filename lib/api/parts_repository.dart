@@ -13,7 +13,7 @@ import 'api_config.dart';
 
 class PartRepository {
   static Future<bool> uploadParts(
-      List<Part> partsList, String vehicleID) async {
+      List<Part> partsList, String vehicleID, String model) async {
     Map response = {};
     for (int i = 0; i < partsList.length; i++) {
       await FlutterLogs.initLogs(
@@ -38,23 +38,34 @@ class PartRepository {
           debugFileOperations: true,
           isDebuggable: true);
       NotificationService().instantNofitication(
-          "3/5 - Uploading Parts Data ${partsList[i].partName}");
+          "3/5 - Uploading Parts Data $model ${partsList[i].partName}");
       Part part = partsList[i];
 
-      Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
+      // Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
+      Map m = {...part.toJson()};
+      m['appversion'] = ApiConfig.baseQueryParams['appversion'];
+      m['osversion'] = ApiConfig.baseQueryParams['osversion'];
+      m['deviceid'] = ApiConfig.baseQueryParams['deviceid'];
+      m['Clientid'] = ApiConfig.baseQueryParams['clientid'];
+      m['Username'] = ApiConfig.baseQueryParams['username'];
       m['VehicleID'] = vehicleID;
+      if (part.imgList.isEmpty) {
+        m['status'] = "Pending";
+      } else {
+        m['status'] = "Uploading";
+      }
       print("Body of api call:\n$m\n Body Ends");
-      Uri url = Uri.parse(
-          "${ApiConfig.baseUrl}${ApiConfig.apiSubmitParts}?Clientid=${ApiConfig.baseQueryParams['clientid']}");
+      Uri url = Uri.parse("${ApiConfig.baseUrl}${ApiConfig.apiSubmitParts}");
       String msg = "\n\nUploading Parts:\n\nURL:${url.toString()}\nParams:\n\n";
       msg += "DeviceId:${ApiConfig.baseQueryParams['deviceid']}\n";
       msg += "App version:${ApiConfig.baseQueryParams['appversion']}\n";
       msg += "OsVersion:${ApiConfig.baseQueryParams['osversion']}\n";
       msg += "Clientid:${ApiConfig.baseQueryParams['clientid']}\n";
       msg += "Username:${ApiConfig.baseQueryParams['username']}\n";
-      msg += "$vehicleID\n";
+      msg += "VehicleID:$vehicleID\n";
       msg += "${partsList[i].addLog()}\n";
       msg += "Ebay_Title ${partsList[i].ebayTitle}\n";
+      msg += "status: ${m['status']}\n";
       var r = await http.post(
         url,
         body: m,
@@ -79,7 +90,7 @@ class PartRepository {
   }
 
   static Future<void> updateParts(
-      List<Part> partsList, String vehicleID) async {
+      List<Part> partsList, String vehicleID, String model) async {
     Map response = {};
     for (int i = 0; i < partsList.length; i++) {
       await FlutterLogs.initLogs(
@@ -104,23 +115,31 @@ class PartRepository {
           debugFileOperations: true,
           isDebuggable: true);
       NotificationService().instantNofitication(
-          "5/5 - Updating Parts Data ${partsList[i].partName}");
+          "5/5 - Updating Parts Data $model ${partsList[i].partName}");
       Part part = partsList[i];
 
-      Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
+      // Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
+      Map m = {};
+      m['appversion'] = ApiConfig.baseQueryParams['appversion'];
+      m['osversion'] = ApiConfig.baseQueryParams['osversion'];
+      m['deviceid'] = ApiConfig.baseQueryParams['deviceid'];
+      m['ClientID'] = ApiConfig.baseQueryParams['clientid'];
       m['VehicleID'] = vehicleID;
+      m['PartID'] = part.partId;
+      m['devicename'] = ApiConfig.baseQueryParams['devicename'];
       print("Body of api call:\n$m\n Body Ends");
       Uri url = Uri.parse(
           "${ApiConfig.baseUrl}${ApiConfig.apiUpdatePartsStatus}?ClientID=${ApiConfig.baseQueryParams['clientid']}+VehicleID=$vehicleID");
       String msg = "\n\nUpdating Parts:\n\nURL:${url.toString()}\nParams:\n\n";
-      msg += "DeviceId:${ApiConfig.baseQueryParams['deviceid']}\n";
-      msg += "App version:${ApiConfig.baseQueryParams['appversion']}\n";
-      msg += "OsVersion:${ApiConfig.baseQueryParams['osversion']}\n";
-      msg += "Clientid:${ApiConfig.baseQueryParams['clientid']}\n";
-      msg += "Username:${ApiConfig.baseQueryParams['username']}\n";
-      msg += "$vehicleID\n";
-      msg += "${partsList[i].addLog()}\n";
-      msg += "Ebay_Title ${partsList[i].ebayTitle}\n";
+      msg += "deviceId:${ApiConfig.baseQueryParams['deviceid']}\n";
+      msg += "appversion:${ApiConfig.baseQueryParams['appversion']}\n";
+      msg += "osversion:${ApiConfig.baseQueryParams['osversion']}\n";
+      msg += "ClientID:${ApiConfig.baseQueryParams['clientid']}\n";
+      msg += "VehicleID:$vehicleID\n";
+      msg += "PartID:${part.partId}\n";
+      msg += "devicename:${ApiConfig.baseQueryParams['devicename']}\n";
+      // msg += "${partsList[i].addLog()}\n";
+      // msg += "Ebay_Title ${partsList[i].ebayTitle}\n";
       var r = await http.post(
         url,
         body: m,
@@ -144,7 +163,8 @@ class PartRepository {
     // }
   }
 
-  static fileUpload(List<Part> partsList, String vehicleID) async {
+  static fileUpload(
+      List<Part> partsList, String vehicleID, String model) async {
     await FlutterLogs.initLogs(
         logLevelsEnabled: [
           LogLevel.INFO,
@@ -168,21 +188,20 @@ class PartRepository {
         isDebuggable: true);
     List<Part> updatePartsList = [];
     print("\n\n Uploading Parts Photos\n\n");
-    int j = 1;
+    int j = 0;
     int t = 0;
     for (Part part in partsList) {
-      for (int i = 0; i < part.imgList.length; i++) {
-        t += 1;
-      }
+      t += part.imgList.length;
     }
 
     for (Part part in partsList) {
       if (part.imgList.isNotEmpty) {
         updatePartsList.add(part);
       }
+      j += 1;
       print(part);
       NotificationService().instantNofitication(
-          "2/5 - Uploading Part Images ${j}/${t} ${part.partName}");
+          "4/5 - Uploading Part Images $j/$t $model ${part.partName}");
       List<File> imgList = List.generate(
           part.imgList.length, (index) => File(part.imgList[index]));
 
@@ -193,8 +212,8 @@ class PartRepository {
             "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
         msg += "URL: $uri";
         File image = imgList[i];
-        NotificationService().instantNofitication(
-            "2/5 - Uploading Part Images ${i + 1}/${imgList.length}");
+        // NotificationService().instantNofitication(
+        //     "4/5 - Uploading Part Images ${i + 1}/${imgList.length}");
         print(image.path);
         String filename = image.path.split("/").last.toString();
         print(filename);
@@ -240,6 +259,6 @@ class PartRepository {
       }
     }
 
-    await updateParts(updatePartsList, vehicleID);
+    await updateParts(updatePartsList, vehicleID, model);
   }
 }

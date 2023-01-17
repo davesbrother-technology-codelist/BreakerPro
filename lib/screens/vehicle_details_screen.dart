@@ -5,6 +5,7 @@ import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/drop_down_screen.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/screens/allocate_parts_screen.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app_config.dart';
+import '../dataclass/part.dart';
 import '../dataclass/vehicle.dart';
 import '../my_theme.dart';
 import 'capture_screen.dart';
@@ -92,7 +94,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     }
     if (PartsList.cachedVehicle != null) {
       Vehicle v = PartsList.cachedVehicle!;
-      ImageList.vehicleImgList = v.imgList;
+      // ImageList.vehicleImgList = v.imgList;
 
       regNoController.text = v.registrationNumber ?? "";
       stockRefController.text = v.stockReference ?? "";
@@ -439,6 +441,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                     'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                                 imgFile = imgFile.renameSync(newPath);
                                 ImageList.vehicleImgList.add(imgFile.path);
+                                saveVehicle();
                               });
                             }
                             for (String img in ImageList.vehicleImgList) {
@@ -553,10 +556,28 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     Widget okButton = TextButton(
       onPressed: () async {
         saveVehicle();
+        PartsList.uploadQueue.add(vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        PartsList.vehicleCount += 1;
         prefs.setBool('uploadVehicle', true);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (builder) => MainDashboard()));
+        await prefs.remove('vehicle');
+        MainDashboardUtils.titleList[0] = "Add Breaker";
+        ImageList.vehicleImgList = [];
+        PartsList.cachedVehicle = null;
+        PartsList.recall = false;
+        Box<Part> box = await Hive.openBox('partListBox');
+        Box<Part> box1 = await Hive.openBox('selectPartListBox');
+        await box.clear();
+        await box1.clear();
+        PartsList.selectedPartList = [];
+        PartsList.partList = [];
+        PartsList.uploadPartList = [];
+        prefs.setString(
+            'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (builder) => MainDashboard()),
+            (Route route) => false);
       },
       child: const Text("OK"),
     );
@@ -577,7 +598,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
   }
 
-  saveVehicle() async {
+  saveVehicle() {
     vehicle.imgList = List<String>.from(ImageList.vehicleImgList);
     vehicle.registrationNumber = regNoController.text.toString();
     vehicle.stockReference = stockRefController.text.toString();
@@ -613,12 +634,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
     PartsList.cachedVehicle = vehicle;
     String model = modelController.text.isEmpty ? "Model" : vehicle.model;
-    MainDashboardUtils.titleList[0] =
-        "Resume Work ( ${vehicle.make}-${model} )";
+    MainDashboardUtils.titleList[0] = "Resume Work ( ${vehicle.make}-$model )";
 
     String vehicleString = jsonEncode(vehicle.toJson());
-    PartsList.prefs!.setString("vehicle", vehicleString);
-    print(PartsList.prefs!.getString("vehicle"));
+    PartsList.prefs!.setString(vehicle.vehicleId, vehicleString);
+    PartsList.prefs!.setString('vehicle', vehicleString);
+    print(PartsList.prefs!.getString(vehicle.vehicleId));
 
     print("Save Vehicle ${MainDashboardUtils.titleList[0]}");
     print("Save Vehicle ${PartsList.cachedVehicle!.imgList}");
@@ -898,7 +919,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                   cameras: cameras,
                   type: 'Vehicle',
                 )))
-        .then((value) => setState(() {}));
+        .then((value) => setState(() {
+              saveVehicle();
+            }));
   }
 
   fetchSelectList() async {

@@ -106,8 +106,7 @@ class _CustomiseState extends State<Customise> {
     mnfPartNoEditingController.text = part.mnfPartNo;
     partCommentsEditingController.text = part.comments;
     postageOptionsController.text = part.postageOptions;
-
-    ImageList.partImageList = part.imgList;
+    ImageList.partImageList = List.from(part.imgList);
 
     for (int i = 0; i < postageItems.length; i++) {
       if (part.postageOptions.contains(postageItems[i])) {
