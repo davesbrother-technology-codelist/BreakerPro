@@ -89,20 +89,30 @@ class _MainDashboardState extends State<MainDashboard> {
           IconButton(
               onPressed: () async {
                 Directory? externalDirectory;
+                var encoder = ZipFileEncoder();
 
                 if (Platform.isIOS) {
                   externalDirectory = await getApplicationDocumentsDirectory();
+                  externalDirectory = Directory("${externalDirectory.parent.path}/Library/Application Support/Logs");
+                  encoder.create(
+                      "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+
+                  await encoder.addDirectory(
+                      Directory("${externalDirectory.path}"),
+                      includeDirName: false);
+
                 } else {
                   externalDirectory = await getExternalStorageDirectory();
-                }
-                print(externalDirectory);
-                var encoder = ZipFileEncoder();
-                encoder.create(
-                    "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+                  encoder.create(
+                      "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
-                await encoder.addDirectory(
-                    Directory("${externalDirectory.path}/MyLogs/Logs"),
-                    includeDirName: false);
+                  await encoder.addDirectory(
+                      Directory("${externalDirectory.path}/MyLogs/Logs"),
+                      includeDirName: false);
+                }
+                print(externalDirectory?.listSync(recursive: true));
+
+
                 // }
 
                 // for (var path in files) {

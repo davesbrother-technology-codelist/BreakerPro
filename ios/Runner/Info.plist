@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>App needs access to photo lib for profile images</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Please grant microphone access</string>
     <key>NSCameraUsageDescription</key>
     <string>Need Camera Permission for Scanning QR</string>
 	<key>CFBundleDevelopmentRegion</key>
