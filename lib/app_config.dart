@@ -19,6 +19,8 @@ class AppConfig {
   static String imageAspectRatio = 'Default';
   static String barcode = 'Qr code';
 
+  static Directory? externalDirectory;
+
   static Map aspectMap = {
     'Default': 9 / 16,
     '1:1': 1 / 1,

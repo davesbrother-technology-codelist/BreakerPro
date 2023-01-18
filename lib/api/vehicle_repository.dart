@@ -18,27 +18,22 @@ import 'package:async/async.dart';
 
 class VehicleRepository {
   static Future<bool> uploadVehicle(Vehicle vehicle) async {
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-        logTypesEnabled: [
-          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-        ],
-        logFileExtension: LogFileExtension.TXT,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        logsExportZipFileName:
-            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-        debugFileOperations: true,
-        isDebuggable: true);
+    // await FlutterLogs.initLogs(
+    //     logLevelsEnabled: [
+    //       LogLevel.INFO,
+    //       LogLevel.WARNING,
+    //       LogLevel.ERROR,
+    //       LogLevel.SEVERE
+    //     ],
+    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+    //     directoryStructure: DirectoryStructure.FOR_DATE,
+    //     logTypesEnabled: [
+    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+    //     ],
+    //     logFileExtension: LogFileExtension.TXT,
+    //     logsWriteDirectoryName: "MyLogs",
+    //     debugFileOperations: true,
+    //     isDebuggable: true);
     NotificationService().instantNofitication(
         "1/5 - Uploading Vehicle Data ${vehicle.model == "" ? "Model" : vehicle.model}");
     String url =
@@ -59,10 +54,14 @@ class VehicleRepository {
 
     if (response['Result'] == "Inserted Successfully") {
       Fluttertoast.showToast(msg: "Vehicle Upload Successful");
-      FlutterLogs.logToFile(
-          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          overwrite: false,
-          logMessage: msg);
+
+      final File file = File(
+          '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+      await file.writeAsString(msg, mode: FileMode.append);
+      // FlutterLogs.logToFile(
+      //     logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+      //     overwrite: false,
+      //     logMessage: msg);
       return true;
     } else {
       Fluttertoast.showToast(msg: "Failed to Upload Vehicle");
@@ -71,27 +70,22 @@ class VehicleRepository {
   }
 
   static fileUpload(Vehicle vehicle) async {
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-        logTypesEnabled: [
-          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-        ],
-        logFileExtension: LogFileExtension.TXT,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        logsExportZipFileName:
-            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-        debugFileOperations: true,
-        isDebuggable: true);
+    // await FlutterLogs.initLogs(
+    //     logLevelsEnabled: [
+    //       LogLevel.INFO,
+    //       LogLevel.WARNING,
+    //       LogLevel.ERROR,
+    //       LogLevel.SEVERE
+    //     ],
+    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+    //     directoryStructure: DirectoryStructure.FOR_DATE,
+    //     logTypesEnabled: [
+    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+    //     ],
+    //     logFileExtension: LogFileExtension.TXT,
+    //     logsWriteDirectoryName: "MyLogs",
+    //     debugFileOperations: true,
+    //     isDebuggable: true);
     print("\n\n Uploading Photos\n\n");
     List<File> imgList = List.generate(ImageList.uploadVehicleImgList.length,
         (index) => File(ImageList.uploadVehicleImgList[index]));
@@ -138,10 +132,13 @@ class VehicleRepository {
       print(response.statusCode);
       print(responseString);
       msg += "\n$responseString\n";
-      FlutterLogs.logToFile(
-          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          overwrite: false,
-          logMessage: msg);
+      final File file = File(
+          '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+      await file.writeAsString(msg, mode: FileMode.append);
+      // FlutterLogs.logToFile(
+      //     logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+      //     overwrite: false,
+      //     logMessage: msg);
     }
   }
 

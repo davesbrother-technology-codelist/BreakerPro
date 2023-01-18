@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:breaker_pro/api/api_call.dart';
+import 'package:breaker_pro/app_config.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:intl/intl.dart';
 
@@ -29,15 +30,17 @@ class AuthRepository {
     //     //     "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
     //     debugFileOperations: true,
     //     isDebuggable: true);
-    FlutterLogs.logToFile(
-        logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-        overwrite: false,
-        logMessage:
-            "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} LOGIN $url SUCCESS $responseJson\n");
+    // FlutterLogs.logToFile(
+    //     logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+    //     overwrite: false,
+    //     logMessage:
+    //         "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} LOGIN $url SUCCESS $responseJson\n");
 
-    // FlutterLogs.exportFileLogForName(
-    //     logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}");
-    print("Hello");
+    final File file = File(
+        '${AppConfig.externalDirectory!.path}/LOGGER${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+    await file.writeAsString(
+        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} LOGIN $url SUCCESS $responseJson\n",
+        mode: FileMode.append);
     return responseJson['result'];
   }
 

@@ -50,26 +50,43 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService().initialize();
   await AppConfig.getDeviceInfo();
-  await FlutterLogs.initLogs(
-      logLevelsEnabled: [
-        LogLevel.INFO,
-        LogLevel.WARNING,
-        LogLevel.ERROR,
-        LogLevel.SEVERE
-      ],
-      timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-      directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-      logTypesEnabled: [
-        "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-        "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-      ],
-      logFileExtension: LogFileExtension.TXT,
-      logsWriteDirectoryName: "MyLogs",
-      logsExportDirectoryName: "MyLogs/Exported",
-      logsExportZipFileName:
-          "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-      debugFileOperations: true,
-      isDebuggable: true);
+  if (Platform.isIOS) {
+    Directory externalDirectory = await getApplicationDocumentsDirectory();
+    externalDirectory = Directory("${externalDirectory.path}/Logs");
+    if (!externalDirectory.existsSync()) {
+      externalDirectory = await Directory(externalDirectory.path).create();
+    }
+    AppConfig.externalDirectory = externalDirectory;
+  } else {
+    Directory? externalDirectory = await getExternalStorageDirectory();
+    externalDirectory = Directory("${externalDirectory!.path}/Logs");
+    if (!externalDirectory.existsSync()) {
+      externalDirectory = await Directory(externalDirectory.path).create();
+    }
+    AppConfig.externalDirectory = externalDirectory;
+  }
+
+  print("External Directory ${AppConfig.externalDirectory}");
+  // await FlutterLogs.initLogs(
+  //     logLevelsEnabled: [
+  //       LogLevel.INFO,
+  //       LogLevel.WARNING,
+  //       LogLevel.ERROR,
+  //       LogLevel.SEVERE
+  //     ],
+  //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+  //     directoryStructure: DirectoryStructure.FOR_DATE,
+  //     logTypesEnabled: [
+  //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+  //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+  //     ],
+  //     logFileExtension: LogFileExtension.TXT,
+  //     logsWriteDirectoryName: "MyLogs",
+  //     logsExportDirectoryName: "MyLogs/Exported",
+  //     logsExportZipFileName:
+  //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+  //     debugFileOperations: true,
+  //     isDebuggable: true);
 
   // saveFile();
   // await _getStoragePermission();

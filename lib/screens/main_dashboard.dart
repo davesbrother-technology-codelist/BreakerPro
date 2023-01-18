@@ -88,45 +88,34 @@ class _MainDashboardState extends State<MainDashboard> {
               )),
           IconButton(
               onPressed: () async {
-                Directory? externalDirectory;
+                Directory externalDirectory = AppConfig.externalDirectory!;
                 var encoder = ZipFileEncoder();
+                encoder.create(
+                    "${externalDirectory.parent.path}/ExportedLogs/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
-                if (Platform.isIOS) {
-                  externalDirectory = await getApplicationDocumentsDirectory();
-                  externalDirectory = Directory("${externalDirectory.parent.path}/Library/Application Support/Logs");
-                  encoder.create(
-                      "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
-
-                  await encoder.addDirectory(
-                      Directory("${externalDirectory.path}"),
-                      includeDirName: false);
-
-                } else {
-                  externalDirectory = await getExternalStorageDirectory();
-                  encoder.create(
-                      "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
-
-                  await encoder.addDirectory(
-                      Directory("${externalDirectory.path}/MyLogs/Logs"),
-                      includeDirName: false);
-                }
-                print(externalDirectory?.listSync(recursive: true));
-
-
+                // if (Platform.isIOS) {
+                //   externalDirectory = await getApplicationDocumentsDirectory();
+                //   externalDirectory = Directory(
+                //       "${externalDirectory.parent.path}/Library/Application Support/Logs");
+                //   encoder.create(
+                //       "${externalDirectory.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+                //
+                //   await encoder.addDirectory(
+                //       Directory("${externalDirectory.path}"),
+                //       includeDirName: false);
+                // } else {
+                //   externalDirectory = await getExternalStorageDirectory();
+                //   encoder.create(
+                //       "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+                //
+                //   await encoder.addDirectory(
+                //       Directory("${externalDirectory.path}/MyLogs/Logs"),
+                //       includeDirName: false);
                 // }
-
-                // for (var path in files) {
-                //   final byteData = await rootBundle.load('$path');
-                //   final file =
-                //       File('${(await getTemporaryDirectory()).path}/$path');
-                //   file.createSync(recursive: true);
-                //   await file.writeAsBytes(byteData.buffer.asUint8List(
-                //       byteData.offsetInBytes, byteData.lengthInBytes));
-                //   encoder.addFile(file);
-                // }
+                // print(externalDirectory.listSync(recursive: true));
+                await encoder.addDirectory(Directory(externalDirectory.path),
+                    includeDirName: false);
                 encoder.close();
-                // File f = File(encoder.zipPath);
-                // print(f.path);
                 await ShareExtend.share(encoder.zipPath, "file");
               },
               icon: Icon(
@@ -467,11 +456,17 @@ class _MainDashboardState extends State<MainDashboard> {
       response =
           await ApiCall.get(ApiConfig.baseUrl + ApiConfig.apiSelectList, q);
 
-      FlutterLogs.logToFile(
-          logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-          overwrite: false,
-          logMessage:
-              "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} SELECT LIST $ApiConfig.baseUrl + ApiConfig.apiSelectList Success $response\n");
+      final File file = File(
+          '${AppConfig.externalDirectory!.path}/LOGGER${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+      await file.writeAsString(
+          "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} SELECT LIST ${ApiConfig.baseUrl + ApiConfig.apiSelectList} Success $response\n",
+          mode: FileMode.append);
+
+      // FlutterLogs.logToFile(
+      //     logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+      //     overwrite: false,
+      //     logMessage:
+      //         "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} SELECT LIST ${ApiConfig.baseUrl + ApiConfig.apiSelectList} Success $response\n");
 
       List responseList = response['selects'] as List;
       Map<String, dynamic> m = {};
@@ -790,26 +785,26 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> initialiseLog() async {
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-        logTypesEnabled: [
-          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-        ],
-        logFileExtension: LogFileExtension.TXT,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        logsExportZipFileName:
-            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-        debugFileOperations: true,
-        isDebuggable: true);
+    // await FlutterLogs.initLogs(
+    //     logLevelsEnabled: [
+    //       LogLevel.INFO,
+    //       LogLevel.WARNING,
+    //       LogLevel.ERROR,
+    //       LogLevel.SEVERE
+    //     ],
+    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+    //     directoryStructure: DirectoryStructure.FOR_DATE,
+    //     logTypesEnabled: [
+    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+    //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+    //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+    //     ],
+    //     logFileExtension: LogFileExtension.TXT,
+    //     logsWriteDirectoryName: "MyLogs",
+    //     logsExportDirectoryName: "MyLogs/Exported",
+    //     logsExportZipFileName:
+    //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+    //     debugFileOperations: true,
+    //     isDebuggable: true);
   }
 }

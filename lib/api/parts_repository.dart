@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
+import '../app_config.dart';
 import '../dataclass/part.dart';
 import '../notification_service.dart';
 import 'api_config.dart';
@@ -16,27 +17,24 @@ class PartRepository {
       List<Part> partsList, String vehicleID, String model) async {
     Map response = {};
     for (int i = 0; i < partsList.length; i++) {
-      await FlutterLogs.initLogs(
-          logLevelsEnabled: [
-            LogLevel.INFO,
-            LogLevel.WARNING,
-            LogLevel.ERROR,
-            LogLevel.SEVERE
-          ],
-          timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-          directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-          logTypesEnabled: [
-            "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-            "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-            "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-          ],
-          logFileExtension: LogFileExtension.TXT,
-          logsWriteDirectoryName: "MyLogs",
-          logsExportDirectoryName: "MyLogs/Exported",
-          logsExportZipFileName:
-              "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-          debugFileOperations: true,
-          isDebuggable: true);
+      // await FlutterLogs.initLogs(
+      //     logLevelsEnabled: [
+      //       LogLevel.INFO,
+      //       LogLevel.WARNING,
+      //       LogLevel.ERROR,
+      //       LogLevel.SEVERE
+      //     ],
+      //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+      //     directoryStructure: DirectoryStructure.FOR_DATE,
+      //     logTypesEnabled: [
+      //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+      //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+      //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+      //     ],
+      //     logFileExtension: LogFileExtension.TXT,
+      //     logsWriteDirectoryName: "MyLogs",
+      //     debugFileOperations: true,
+      //     isDebuggable: true);
       NotificationService().instantNofitication(
           "3/5 - Uploading Parts Data $model ${partsList[i].partName}");
       Part part = partsList[i];
@@ -74,10 +72,13 @@ class PartRepository {
       print(r.body);
       response = jsonDecode(r.body);
       msg += "\n${r.body}\n";
-      FlutterLogs.logToFile(
-          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          overwrite: false,
-          logMessage: msg);
+      final File file = File(
+          '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+      await file.writeAsString(msg, mode: FileMode.append);
+      // FlutterLogs.logToFile(
+      //     logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+      //     overwrite: false,
+      //     logMessage: msg);
     }
 
     if (response['result'] == "Inserted Successfully") {
@@ -93,27 +94,27 @@ class PartRepository {
       List<Part> partsList, String vehicleID, String model) async {
     Map response = {};
     for (int i = 0; i < partsList.length; i++) {
-      await FlutterLogs.initLogs(
-          logLevelsEnabled: [
-            LogLevel.INFO,
-            LogLevel.WARNING,
-            LogLevel.ERROR,
-            LogLevel.SEVERE
-          ],
-          timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-          directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-          logTypesEnabled: [
-            "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-            "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-            "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-          ],
-          logFileExtension: LogFileExtension.TXT,
-          logsWriteDirectoryName: "MyLogs",
-          logsExportDirectoryName: "MyLogs/Exported",
-          logsExportZipFileName:
-              "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-          debugFileOperations: true,
-          isDebuggable: true);
+      // await FlutterLogs.initLogs(
+      //     logLevelsEnabled: [
+      //       LogLevel.INFO,
+      //       LogLevel.WARNING,
+      //       LogLevel.ERROR,
+      //       LogLevel.SEVERE
+      //     ],
+      //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+      //     directoryStructure: DirectoryStructure.FOR_DATE,
+      //     logTypesEnabled: [
+      //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+      //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+      //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+      //     ],
+      //     logFileExtension: LogFileExtension.TXT,
+      //     logsWriteDirectoryName: "MyLogs",
+      //     logsExportDirectoryName: "MyLogs/Exported",
+      //     logsExportZipFileName:
+      //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+      //     debugFileOperations: true,
+      //     isDebuggable: true);
       NotificationService().instantNofitication(
           "5/5 - Updating Parts Data $model ${partsList[i].partName}");
       Part part = partsList[i];
@@ -148,10 +149,14 @@ class PartRepository {
       print(r.body);
       // response = jsonDecode(r.body);
       msg += "\n${r.body}\n";
-      FlutterLogs.logToFile(
-          logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          overwrite: false,
-          logMessage: msg);
+      final File file = File(
+          '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+      await file.writeAsString(msg, mode: FileMode.append);
+
+      //   FlutterLogs.logToFile(
+      //       logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+      //       overwrite: false,
+      //       logMessage: msg);
     }
 
     // if (response['result'] == "Inserted Successfully") {
@@ -165,27 +170,27 @@ class PartRepository {
 
   static fileUpload(
       List<Part> partsList, String vehicleID, String model) async {
-    await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
-        logTypesEnabled: [
-          "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-          "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-          "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-        ],
-        logFileExtension: LogFileExtension.TXT,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        logsExportZipFileName:
-            "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-        debugFileOperations: true,
-        isDebuggable: true);
+    // await FlutterLogs.initLogs(
+    //     logLevelsEnabled: [
+    //       LogLevel.INFO,
+    //       LogLevel.WARNING,
+    //       LogLevel.ERROR,
+    //       LogLevel.SEVERE
+    //     ],
+    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+    //     directoryStructure: DirectoryStructure.FOR_DATE,
+    //     logTypesEnabled: [
+    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+    //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+    //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+    //     ],
+    //     logFileExtension: LogFileExtension.TXT,
+    //     logsWriteDirectoryName: "MyLogs",
+    //     logsExportDirectoryName: "MyLogs/Exported",
+    //     logsExportZipFileName:
+    //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+    //     debugFileOperations: true,
+    //     isDebuggable: true);
     List<Part> updatePartsList = [];
     print("\n\n Uploading Parts Photos\n\n");
     int j = 0;
@@ -251,11 +256,14 @@ class PartRepository {
         print(responseString);
 
         msg += "\n$responseString\n";
-        FlutterLogs.logToFile(
-            logFileName:
-                "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-            overwrite: false,
-            logMessage: msg);
+        final File file = File(
+            '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+        await file.writeAsString(msg, mode: FileMode.append);
+        // FlutterLogs.logToFile(
+        //     logFileName:
+        //         "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+        //     overwrite: false,
+        //     logMessage: msg);
       }
     }
 

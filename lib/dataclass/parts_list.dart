@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_call.dart';
+import '../app_config.dart';
+import 'dart:io';
 
 class PartsList {
   static List<Part> partList = [];
@@ -25,11 +27,17 @@ class PartsList {
       final Map<String, dynamic> responseJson =
           await ApiCall.get(url, queryParams);
 
-      FlutterLogs.logToFile(
-          logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-          overwrite: false,
-          logMessage:
-              "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} PART LIST $url Success $responseJson\n");
+      final File file = File(
+          '${AppConfig.externalDirectory!.path}/LOGGER${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+      await file.writeAsString(
+          "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} PART LIST $url Success $responseJson\n",
+          mode: FileMode.append);
+
+      // FlutterLogs.logToFile(
+      //     logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+      //     overwrite: false,
+      //     logMessage:
+      //         "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} PART LIST $url Success $responseJson\n");
       List l = responseJson['Partslist'] as List;
       partList =
           List<Part>.generate(l.length, (index) => Part.fromJson(l[index]));

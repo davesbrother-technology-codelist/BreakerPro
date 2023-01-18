@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/addPart.dart';
 import 'package:breaker_pro/screens/customise_parts_screen.dart';
@@ -127,11 +127,15 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                 for (Part part in PartsList.selectedPartList) {
                   msg += "${part.partName.toString()} ,";
                 }
-                FlutterLogs.logToFile(
-                    logFileName:
-                        "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
-                    overwrite: false,
-                    logMessage: msg);
+
+                final File file = File(
+                    '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+                await file.writeAsString(msg, mode: FileMode.append);
+                // FlutterLogs.logToFile(
+                //     logFileName:
+                //         "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
+                //     overwrite: false,
+                //     logMessage: msg);
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) =>
                       CustomisePartsScreen(vehicle: widget.vehicle),
