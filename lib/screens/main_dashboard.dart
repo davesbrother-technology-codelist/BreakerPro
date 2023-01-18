@@ -88,6 +88,8 @@ class _MainDashboardState extends State<MainDashboard> {
               )),
           IconButton(
               onPressed: () async {
+                Fluttertoast.showToast(
+                    msg: "Please wait while creating zip...");
                 Directory externalDirectory = AppConfig.externalDirectory!;
                 var encoder = ZipFileEncoder();
                 encoder.create(
