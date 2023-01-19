@@ -1,25 +1,7 @@
 import 'package:bottom_drawer/bottom_drawer.dart';
 import 'package:breaker_pro/my_theme.dart';
 import 'package:flutter/material.dart';
-class Item {
-  final String column1;
-  final String column2;
-  final String column3;
-  final String column4;
-
-  Item({
-    required this.column1,
-    required this.column2,
-    required this.column3,
-    required this.column4,
-  });
-// other methods
-}
-List<Item> myList = [
-  Item(column1: "value1", column2: "value2", column3: "value3", column4: "value4"),
-  Item(column1: "value5", column2: "value6", column3: "value7", column4: "value8"),
-  //add more items as needed
-];
+import 'package:breaker_pro/screens/workOrderScreen2.dart';
 
 class WorkOrderScreen extends StatefulWidget {
   const WorkOrderScreen({Key? key}) : super(key: key);
@@ -28,22 +10,24 @@ class WorkOrderScreen extends StatefulWidget {
   State<WorkOrderScreen> createState() => _WorkOrderScreenState();
 }
 
-class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProviderStateMixin {
+class _WorkOrderScreenState extends State<WorkOrderScreen>
+    with SingleTickerProviderStateMixin {
   String? _selectedValue;
-  TextStyle customTextStyle=TextStyle(fontWeight: FontWeight.bold,color: MyTheme.materialColor);
+  TextStyle customTextStyle =
+      TextStyle(fontWeight: FontWeight.bold, color: MyTheme.materialColor);
   late AnimationController _controller;
   final BottomDrawerController _controller1 = BottomDrawerController();
   EdgeInsetsGeometry textEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(0, 10, 10, 10);
+      const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
-  const EdgeInsets.fromLTRB(10, 5, 10, 5);
+      const EdgeInsets.fromLTRB(10, 5, 10, 5);
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
-  OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   String? predefinedValue;
   String? partTypeValue;
 
-  late List<String> columnList=['first','second'];
+  late List<String> columnList = ['WO NUMBER', 'WO TYPE', 'WO DATETIME', 'WO DETAILS', 'WO CUSTOMERDETAILS', 'WO DELIVERYDETAILS', 'WO SHIPPINGDETAILS','WO VEHICLEDETAILS','WO PARTID', 'WO PARTNAME', 'WO PARTLOCATION', 'WO TRACKING'];
 
   List<DropdownMenuItem<String>> preDefinedDropDownItems = [];
 
@@ -54,7 +38,8 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
   final double _headerHeight = 60.0;
   final double _bodyHeight = 300.0;
   String search = "";
-  double endValue=0;
+  double endValue = 0;
+  bool isEdit=true;
   @override
   void initState() {
     super.initState();
@@ -76,305 +61,397 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Stack(
-        children:[
-          GestureDetector(
-            onTap: () {
-              _controller1.close();
-            },
-            child: Scaffold(
-              // appBar: PreferredSize(
-              //   preferredSize: Size.fromHeight(100),
-              //   child:
-              //   AppBar(
-              //
-              //     backgroundColor: MyTheme.materialColor,
-              //     elevation: 0,
-              //     leading: IconButton(
-              //       icon: Icon(Icons.arrow_back, color: MyTheme.white),
-              //       onPressed: () {
-              //         Navigator.pop(context);
-              //       },
-              //     ),
-              //     actions: <Widget>[
-              //       Expanded(
-              //         child: Padding(
-              //           padding: EdgeInsets.only(left: 60, top: 15),
-              //           child: Text(
-              //             'Work Orders',
-              //             style: TextStyle(
-              //                 color: Colors.white,
-              //                 fontSize: 20,
-              //                 fontWeight: FontWeight.w700),
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         child: Row(
-              //           children: [
-              //             Expanded(
-              //               child: IconButton(
-              //                   onPressed: () {},
-              //                   icon: Icon(
-              //                     Icons.refresh_sharp,
-              //                     color: MyTheme.white,
-              //                   )),
-              //             ),
-              //             Expanded(
-              //               flex: 2,
-              //               child: DropdownButtonFormField(
-              //                 value: _selectedValue,
-              //                 hint: Text(
-              //                   'Picking',
-              //                   style: TextStyle(color: MyTheme.white,
-              //                       fontSize: 18
-              //                   ),
-              //
-              //                 ),
-              //                 dropdownColor: MyTheme.materialColor,
-              //                 alignment: Alignment.centerRight,
-              //                 icon: Icon(
-              //                   Icons.keyboard_arrow_down,
-              //                   color: MyTheme.white,
-              //                 ),
-              //                 items: [
-              //                   DropdownMenuItem(
-              //                     value: 'Picking',
-              //                     child: Text('Picking',
-              //                     style: TextStyle(
-              //                       color: MyTheme.white
-              //                     ),
-              //                     ),
-              //                   ),
-              //                   DropdownMenuItem(
-              //                     value: 'Packing',
-              //                     child: Text('Packing',
-              //                       style: TextStyle(
-              //                           color: MyTheme.white
-              //                       ),),
-              //                   ),
-              //                   DropdownMenuItem(
-              //                     value: 'Dispatch',
-              //                     child: Text('Dispatch',
-              //                       style: TextStyle(
-              //                           color: MyTheme.white
-              //                       ),),
-              //                   ),
-              //                   // Additional options...
-              //                 ],
-              //                 onChanged: (value) {
-              //                   setState(() {
-              //                     _selectedValue = value;
-              //                   });
-              //                 },
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       )
-              //     ],
-              //   ) ,
-              // ),
-              body: CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    backgroundColor: MyTheme.materialColor,
-                    floating: false,
-                    pinned: true,
-                    snap: false,
-                    centerTitle: false,
-                    leading: IconButton(
-                      icon: Icon(Icons.arrow_back, color: MyTheme.white),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+      home: Stack(children: [
+        GestureDetector(
+          onTap: () {
+            _controller1.close();
+          },
+          child: Scaffold(
+            // appBar: PreferredSize(
+            //   preferredSize: Size.fromHeight(100),
+            //   child:
+            //   AppBar(
+            //
+            //     backgroundColor: MyTheme.materialColor,
+            //     elevation: 0,
+            //     leading: IconButton(
+            //       icon: Icon(Icons.arrow_back, color: MyTheme.white),
+            //       onPressed: () {
+            //         Navigator.pop(context);
+            //       },
+            //     ),
+            //     actions: <Widget>[
+            //       Expanded(
+            //         child: Padding(
+            //           padding: EdgeInsets.only(left: 60, top: 15),
+            //           child: Text(
+            //             'Work Orders',
+            //             style: TextStyle(
+            //                 color: Colors.white,
+            //                 fontSize: 20,
+            //                 fontWeight: FontWeight.w700),
+            //           ),
+            //         ),
+            //       ),
+            //       Expanded(
+            //         child: Row(
+            //           children: [
+            //             Expanded(
+            //               child: IconButton(
+            //                   onPressed: () {},
+            //                   icon: Icon(
+            //                     Icons.refresh_sharp,
+            //                     color: MyTheme.white,
+            //                   )),
+            //             ),
+            //             Expanded(
+            //               flex: 2,
+            //               child: DropdownButtonFormField(
+            //                 value: _selectedValue,
+            //                 hint: Text(
+            //                   'Picking',
+            //                   style: TextStyle(color: MyTheme.white,
+            //                       fontSize: 18
+            //                   ),
+            //
+            //                 ),
+            //                 dropdownColor: MyTheme.materialColor,
+            //                 alignment: Alignment.centerRight,
+            //                 icon: Icon(
+            //                   Icons.keyboard_arrow_down,
+            //                   color: MyTheme.white,
+            //                 ),
+            //                 items: [
+            //                   DropdownMenuItem(
+            //                     value: 'Picking',
+            //                     child: Text('Picking',
+            //                     style: TextStyle(
+            //                       color: MyTheme.white
+            //                     ),
+            //                     ),
+            //                   ),
+            //                   DropdownMenuItem(
+            //                     value: 'Packing',
+            //                     child: Text('Packing',
+            //                       style: TextStyle(
+            //                           color: MyTheme.white
+            //                       ),),
+            //                   ),
+            //                   DropdownMenuItem(
+            //                     value: 'Dispatch',
+            //                     child: Text('Dispatch',
+            //                       style: TextStyle(
+            //                           color: MyTheme.white
+            //                       ),),
+            //                   ),
+            //                   // Additional options...
+            //                 ],
+            //                 onChanged: (value) {
+            //                   setState(() {
+            //                     _selectedValue = value;
+            //                   });
+            //                 },
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       )
+            //     ],
+            //   ) ,
+            // ),
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: MyTheme.materialColor,
+                  floating: false,
+                  pinned: true,
+                  snap: false,
+                  centerTitle: false,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: MyTheme.white),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  title: Text('Work Orders'),
+                  actions: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 60, top: 15),
+                        child: Text(
+                          'Work Orders',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ),
                     ),
-                    title: Text('Work Orders'),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: RotationTransition(
+                              turns: Tween(begin: 0.0, end: endValue)
+                                  .animate(_controller),
+                              child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      endValue = 1;
+                                    });
+                                    Future.delayed(Duration(seconds: 1), () {
+                                      setState(() {
+                                        endValue = 0;
+                                      });
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.refresh_sharp,
+                                    color: MyTheme.white,
+                                  )),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: MyTheme.materialColor)),
+                                  focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: MyTheme.materialColor))),
+                              value: _selectedValue,
+                              hint: Text(
+                                'Picking',
+                                style: TextStyle(
+                                    color: MyTheme.white, fontSize: 18),
+                              ),
+                              dropdownColor: MyTheme.materialColor,
+                              alignment: Alignment.centerRight,
+                              icon: Icon(
+                                Icons.keyboard_arrow_down,
+                                color: MyTheme.white,
+                              ),
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'Picking',
+                                  child: Text(
+                                    'Picking',
+                                    style: TextStyle(color: MyTheme.white),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Packing',
+                                  child: Text(
+                                    'Packing',
+                                    style: TextStyle(color: MyTheme.white),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Dispatch',
+                                  child: Text(
+                                    'Dispatch',
+                                    style: TextStyle(color: MyTheme.white),
+                                  ),
+                                ),
+                                // Additional options...
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedValue = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                  bottom: AppBar(
+                    backgroundColor: MyTheme.materialColor,
                     actions: [
                       Expanded(
+                        flex: 6,
                         child: Padding(
-                          padding: EdgeInsets.only(left: 60, top: 15),
-                          child: Text(
-                            'Work Orders',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700),
+                          padding: const EdgeInsets.only(left: 10,bottom: 5),
+                          child: TextField(
+                            decoration: InputDecoration(
+                                focusColor: Colors.white,
+                                fillColor: Colors.white,
+                                filled: true,
+                                hintText: 'Type Keyword here',
+                                hintStyle: TextStyle(),
+                                prefixIcon: Icon(Icons.search),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 4, color: MyTheme.white)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 4, color: MyTheme.white))),
                           ),
                         ),
                       ),
                       Expanded(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: RotationTransition(
-                                turns: Tween(begin: 0.0, end:endValue).animate(_controller),
-
-                                child: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        endValue =1;
-                                      });
-                                      Future.delayed(Duration(seconds: 1),() {
-                                        setState(() {
-                                          endValue=0;
-                                        });
-                                      });
-                                    },
-                                    icon: Icon(
-                                      Icons.refresh_sharp,
-                                      color: MyTheme.white,
-                                    )),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: DropdownButtonFormField(
-                                decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: MyTheme.materialColor)
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(color: MyTheme.materialColor)
-                                    )
-                                ),
-                                value: _selectedValue,
-                                hint: Text(
-                                  'Picking',
-                                  style: TextStyle(color: MyTheme.white,
-                                      fontSize: 18
-                                  ),
-
-                                ),
-                                dropdownColor: MyTheme.materialColor,
-                                alignment: Alignment.centerRight,
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: MyTheme.white,
-                                ),
-                                items: [
-                                  DropdownMenuItem(
-                                    value: 'Picking',
-                                    child: Text('Picking',
-                                      style: TextStyle(
-                                          color: MyTheme.white
-                                      ),
-                                    ),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Packing',
-                                    child: Text('Packing',
-                                      style: TextStyle(
-                                          color: MyTheme.white
-                                      ),),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Dispatch',
-                                    child: Text('Dispatch',
-                                      style: TextStyle(
-                                          color: MyTheme.white
-                                      ),),
-                                  ),
-                                  // Additional options...
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedValue = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
+                          child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isEdit=!isEdit;
+                                });
+                              },
+                              icon: isEdit ? Icon(Icons.edit,size: 35,) : Icon(Icons.clear,size: 35,),
+                          )),
+                      Expanded(
+                          child: GestureDetector(
+                              onTap: () {
+                                _controller1.open();
+                              },
+                              child: Transform.scale(
+                                child: Image.asset(
+                                    'assets/compareArrowsUpDown.png'),
+                                scale: 0.8,
+                              )))
                     ],
-                    bottom: AppBar(
-                      backgroundColor: MyTheme.materialColor,
-                      actions: [
-                        Expanded(
-                          flex: 6,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: TextField(
-
-                              decoration: InputDecoration(
-                                  focusColor: Colors.white,
-                                  fillColor:Colors.white ,
-                                  filled: true,
-                                  hintText: 'Type Keyword here',
-                                  hintStyle: TextStyle(
-
-                                  ),
-                                  prefixIcon: Icon(Icons.search),
-                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(width: 4, color: MyTheme.white)),
-                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(width: 4, color: MyTheme.white))
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(child: IconButton(onPressed: (){}, icon:Icon(Icons.edit,size:35,))),
-                        Expanded(child: GestureDetector(
-                            onTap: (){
-                            _controller1.open();
-                            },
-                            child: Transform.scale(
-                              child: Image.asset('assets/compareArrowsUpDown.png'),
-                              scale: 0.8,
-                            )))
-                      ],
-                    ),
-
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
                     Table(
-
-                    border: TableBorder.all(width:1, color:Colors.black45), //table border
-                    children: [
-
-                      TableRow(
-
-                          children: [
-                            TableCell(child: Text("Invoice Details",style:customTextStyle)),
-                            TableCell(child: Text("Date",style: customTextStyle,)),
-                            TableCell(child: Text("Order Details",style: customTextStyle,)),
-                            TableCell(child: Text("Location",style: customTextStyle,))
-                          ],
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(238, 180, 22, .1)
-                        )
-                      ),
-
-                      TableRow(
-                          children: [
-                            TableCell(child: Text("1.")),
-                            TableCell(child: Text("Krishna Karki")),
-                            TableCell(child: Text("Nepal, Kathmandu")),
-                            TableCell(child: Text("Nepal"))
-                          ]
-                      ),
-
-
-                    ],
-            )
-
-
-                    ]),
-                  ),
-                ],
-
-              ),
-
+                      border: TableBorder.all(
+                          width: 1, color: Colors.black45), //table border
+                      children:createTable()
+                      // [
+                      //   TableRow(
+                      //       children: [
+                      //         TableCell(
+                      //             child: Text("Invoice Details",
+                      //                 style: customTextStyle)),
+                      //         TableCell(
+                      //             child: Text(
+                      //           "Date",
+                      //           style: customTextStyle,
+                      //         )),
+                      //         TableCell(
+                      //             child: Text(
+                      //           "Order Details",
+                      //           style: customTextStyle,
+                      //         )),
+                      //         TableCell(
+                      //             child: Text(
+                      //           "Location",
+                      //           style: customTextStyle,
+                      //         ))
+                      //       ],
+                      //       decoration: BoxDecoration(
+                      //           color: Color.fromRGBO(238, 180, 22, .1))),
+                      //   TableRow(
+                      //       children: [
+                      //         TableCell(child: Text("1.")),
+                      //         TableCell(child: Text("Krishna Karki")),
+                      //         TableCell(child: Text("Nepal, Kathmandu")),
+                      //         TableCell(child: Text("Nepal"))
+                      //       ],
+                      //       decoration: BoxDecoration(
+                      //           color: Color.fromRGBO(238, 180, 22, .1))),
+                      // ],
+                    )
+                  ]),
+                ),
+              ],
             ),
           ),
-          _buildBottomDrawer(context),
-
-        ]
-      ),
+        ),
+        _buildBottomDrawer(context),
+      ]),
     );
+  }
+
+  List<TableRow> createTable() {
+    List<TableRow> rows = [];
+    rows.add(
+      TableRow(
+        children: [
+          TableCell(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text("Invoice Details",
+                    style: customTextStyle),
+              )),
+          TableCell(
+              child: Text(
+                "Date",
+                style: customTextStyle,
+              )),
+          TableCell(
+              child: Text(
+                "Order Details",
+                style: customTextStyle,
+              )),
+          TableCell(
+              child: Text(
+                "Location",
+                style: customTextStyle,
+              ))
+        ],
+        decoration: BoxDecoration(
+            color: Color.fromRGBO(238, 180, 22, .1))),
+    );
+    for (int i = 0; i < 100; ++i) {
+      rows.add(
+          TableRow(children: [
+        GestureDetector(
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+          },
+          child: !isEdit? Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex:1,
+                child: Checkbox(
+                  value: isEdit,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isEdit = value!;
+                    });
+                  },
+                ),
+              ),
+
+              Expanded(flex:2,child: Text("Invoice Details ",)),
+
+            ],
+          ): Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text('Invoice Details'),
+          )
+        ),
+        GestureDetector(
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+          },
+            child: Text("Date ")),
+        GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+            },
+            child: Text("Order Details")),
+        GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+            },
+            child: Text("Location"))
+      ],
+              decoration: BoxDecoration(
+                  color: Color.fromRGBO(238, 180, 22, .1)) )
+      );
+    }
+    return rows;
   }
 
   Widget _buildBottomDrawer(BuildContext context) {
@@ -406,8 +483,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
             color: MyTheme.materialColor,
             width: MediaQuery.of(context).size.width / 3,
             child: TextButton(
-              onPressed: () {
-              },
+              onPressed: () {},
               child: Text(
                 "",
                 style: TextStyle(color: MyTheme.white),
@@ -465,13 +541,13 @@ class _WorkOrderScreenState extends State<WorkOrderScreen> with SingleTickerProv
               ),
               customTextField(
                   "Column List", preDefinedDropDownItems, predefinedValue),
-
             ],
           ),
         ),
       ),
     );
   }
+
   Widget customTextField(String title,
       List<DropdownMenuItem<String>> dropdownItems, String? selectedItem1) {
     return Container(
