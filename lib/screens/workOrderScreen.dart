@@ -17,6 +17,8 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
       TextStyle(fontWeight: FontWeight.bold, color: MyTheme.materialColor);
   late AnimationController _controller;
   final BottomDrawerController _controller1 = BottomDrawerController();
+  final BottomDrawerController _controller2 = BottomDrawerController();
+
   EdgeInsetsGeometry textEdgeInsetsGeometry =
       const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
@@ -40,6 +42,10 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
   String search = "";
   double endValue = 0;
   bool isEdit=true;
+  int? selectedRadio;
+  int index=0;
+
+
   @override
   void initState() {
     super.initState();
@@ -163,6 +169,21 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
             //     ],
             //   ) ,
             // ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
+            floatingActionButton: !isEdit ?Container(
+              color: MyTheme.materialColor,
+              width: MediaQuery.of(context).size.width,
+              child: TextButton(
+                onPressed: (){
+                  customAlertField('Change Work Order Status');
+                },
+                child: Text(
+                  "Batch Mark Status",
+                  style: TextStyle(color: MyTheme.white),
+                ),
+              )
+            ):Container(),
             body: CustomScrollView(
               slivers: [
                 SliverAppBar(
@@ -302,6 +323,10 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                                 setState(() {
                                   isEdit=!isEdit;
                                 });
+                                // if(isEdit==false){
+
+                                //   _controller2.open();
+                                // }
                               },
                               icon: isEdit ? Icon(Icons.edit,size: 35,) : Icon(Icons.clear,size: 35,),
                           )),
@@ -408,8 +433,6 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
             Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
           },
           child: !isEdit? Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 flex:1,
@@ -452,6 +475,139 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
       );
     }
     return rows;
+  }
+
+
+  Future<dynamic> customAlertField(String title){
+    return showDialog(context: context, builder: (context)=>AlertDialog(
+      scrollable: true,
+      title: Center(
+        child: Text(title,
+          style: TextStyle(
+              color: MyTheme.materialColor
+          ),
+        ),
+      ),
+      content:SizedBox(
+        width: double.infinity,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+
+            RadioListTile<int>(
+              value: 0,
+              groupValue: selectedRadio,
+              onChanged: (val) =>setState(() {
+                selectedRadio=val!;
+              }),
+              title: Text('Mark as Picked'),
+            ),
+            RadioListTile<int>(
+              value: 1,
+              groupValue: selectedRadio,
+              onChanged: (val) =>setState(() {
+                selectedRadio=val!;
+              }),
+              title: Text('Mark as Packed'),
+            ),
+            RadioListTile<int>(
+              value: 2,
+              groupValue: selectedRadio,
+              onChanged: (val) =>setState(() {
+                selectedRadio=val!;
+              }),
+              title: Text('Mark as Dispatched'),
+            ),
+            SizedBox(height: 10,),
+            if(selectedRadio==0) TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    width: 2.0,
+                    color: Colors.grey
+                  )
+                ),
+                labelText: 'Enter Comments'
+              ) ,
+            )
+            else if(selectedRadio==1) TextField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          width: 2.0,
+                          color: Colors.grey
+                      )
+                  ),
+                  labelText: 'Enter Comments'
+              ) ,
+            )
+            else SingleChildScrollView(
+              child: Wrap(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 2.0,
+                                  color: Colors.grey
+                              )
+                          ),
+                          labelText: 'Enter Comments'
+                      ) ,
+                    ),
+                    Container(
+                      height: 10,
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 2.0,
+                                  color: Colors.grey
+                              )
+                          ),
+                          labelText: 'Enter Courier'
+                      ) ,
+                    ),
+                    Container(
+                      height:10 ,
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 2.0,
+                                  color: Colors.grey
+                              )
+                          ),
+                          labelText: 'Enter Tracking'
+                      ) ,
+                    )
+                  ],
+                ),
+            )
+      ],
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.center,
+
+      actions: <Widget>[
+
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Container(
+            width: 100,
+            color: MyTheme.materialColor,
+            padding: const EdgeInsets.all(14),
+            child: Center(child: Text("OK",style: TextStyle(color: Colors.white,fontSize: 16))),
+          ),
+        ),
+
+      ],
+    ),
+    );
   }
 
   Widget _buildBottomDrawer(BuildContext context) {
