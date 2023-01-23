@@ -346,6 +346,12 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                 SliverList(
                   delegate: SliverChildListDelegate([
                     Table(
+                      columnWidths:  {
+                  0: FlexColumnWidth(3),
+                  1: FlexColumnWidth(2),
+                  2: FlexColumnWidth(3),
+                  3:FlexColumnWidth(2)
+                  },
                       border: TableBorder.all(
                           width: 1, color: Colors.black45), //table border
                       children:createTable()
@@ -433,6 +439,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
             Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
           },
           child: !isEdit? Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
                 flex:1,
@@ -446,7 +453,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                 ),
               ),
 
-              Expanded(flex:2,child: Text("Invoice Details ",)),
+              Expanded(flex:1,child: Text("Invoice Details ",)),
 
             ],
           ): Padding(
@@ -494,7 +501,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
           shrinkWrap: true,
           children: [
 
-            RadioListTile<int>(
+            RadioListTile(
               value: 0,
               groupValue: selectedRadio,
               onChanged: (val) =>setState(() {
@@ -502,7 +509,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
               }),
               title: Text('Mark as Picked'),
             ),
-            RadioListTile<int>(
+            RadioListTile(
               value: 1,
               groupValue: selectedRadio,
               onChanged: (val) =>setState(() {
@@ -510,7 +517,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
               }),
               title: Text('Mark as Packed'),
             ),
-            RadioListTile<int>(
+            RadioListTile(
               value: 2,
               groupValue: selectedRadio,
               onChanged: (val) =>setState(() {

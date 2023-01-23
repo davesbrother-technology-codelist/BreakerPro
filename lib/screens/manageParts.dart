@@ -1,7 +1,7 @@
 import 'package:breaker_pro/my_theme.dart';
 import 'package:breaker_pro/screens/scanPart.dart';
 import 'package:flutter/material.dart';
-
+import 'package:breaker_pro/screens/stocksScreen.dart';
 import '../dataclass/parts_list.dart';
 
 class ManagePart extends StatefulWidget {
@@ -263,7 +263,9 @@ class _ManagePartState extends State<ManagePart> {
                     width: 150,
                     color: MyTheme.materialColor,
                     child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>StockScreen()));
+                        },
                         child: Text(
                           "Find",
                           style: TextStyle(fontSize: 18, color: MyTheme.white),
