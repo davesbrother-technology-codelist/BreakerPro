@@ -1,3 +1,4 @@
+import 'package:breaker_pro/screens/manageParts2.dart';
 import 'package:flutter/material.dart';
 
 import '../my_theme.dart';
@@ -37,154 +38,159 @@ class _StockScreenState extends State<StockScreen> {
         shrinkWrap: true,
           itemCount: 1,
           itemBuilder: (context,index){
-        return Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 15,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        return GestureDetector(
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>ManageParts2()));
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset('assets/laser.png',scale: 3.5,),
+                      SizedBox(width: 70,),
+                      Text('BLACK BOX',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: MyTheme.materialColor),),
+                    ],
+
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
                   children: [
-                    Image.asset('assets/laser.png',scale: 3.5,),
-                    SizedBox(width: 70,),
-                    Text('BLACK BOX',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: MyTheme.materialColor),),
+                    Text('Part Id',style: customTextStyle,),
+                    SizedBox(width: 95,),
+                    Expanded(child: Text('a',style: customTextStyle2,)),
                   ],
 
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                children: [
-                  Text('Part Id',style: customTextStyle,),
-                  SizedBox(width: 95,),
-                  Expanded(child: Text('a',style: customTextStyle2,)),
-                ],
+                  children: [
+                    Text('Make',style: customTextStyle),
+                    SizedBox(width: 102,),
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                children: [
-                  Text('Make',style: customTextStyle),
-                  SizedBox(width: 102,),
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                  children: [
+                    Text('Model',style: customTextStyle),
+                    SizedBox(width: 96,),
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-                children: [
-                  Text('Model',style: customTextStyle),
-                  SizedBox(width: 96,),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                  children: [
+                    Text('Year',style: customTextStyle),
+                    SizedBox(width: 108,),
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-                children: [
-                  Text('Year',style: customTextStyle),
-                  SizedBox(width: 108,),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                  children: [
+                    Text('Location',style: customTextStyle),
+                    SizedBox(width: 80,),
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-                children: [
-                  Text('Location',style: customTextStyle),
-                  SizedBox(width: 80,),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                  children: [
+                    Text('Registration No',style: customTextStyle),
+                    SizedBox(width: 32,),
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-                children: [
-                  Text('Registration No',style: customTextStyle),
-                  SizedBox(width: 32,),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                  children: [
+                    Text('Price',style: customTextStyle),
+                    SizedBox(width: 102,),
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-                children: [
-                  Text('Price',style: customTextStyle),
-                  SizedBox(width: 102,),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                  children: [
+                    Text('Stock Reference',style: customTextStyle),
+                    SizedBox(width: 28,),
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-                children: [
-                  Text('Stock Reference',style: customTextStyle),
-                  SizedBox(width: 28,),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Manufacture Year',style: customTextStyle),
+                    SizedBox(width: 18,),
 
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
+                    Expanded(child: Text('a',style: customTextStyle2)),
+                  ],
 
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Manufacture Year',style: customTextStyle),
-                  SizedBox(width: 18,),
-
-                  Expanded(child: Text('a',style: customTextStyle2)),
-                ],
-
-              ),
-              SizedBox(height: 10,),
-              Divider(thickness: 1,color: MyTheme.materialColor,)
+                ),
+                SizedBox(height: 10,),
+                Divider(thickness: 1,color: MyTheme.materialColor,)
 
 
-            ],
+              ],
+            ),
+
           ),
-
         );
       }),
     );

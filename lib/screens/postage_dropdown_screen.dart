@@ -49,6 +49,7 @@ class _PostageDropDownScreenState extends State<PostageDropDownScreen> {
                 itemCount: dropDownItems.length,
                 itemBuilder: (context, index) {
                   return CheckboxListTile(
+                    activeColor: MyTheme.materialColor,
                     title: Text(dropDownItems[index]),
                     controlAffinity: ListTileControlAffinity.leading,
                     value: widget.selectedItems[index],
