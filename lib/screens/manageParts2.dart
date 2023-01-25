@@ -71,7 +71,11 @@ class _ManageParts2State extends State<ManageParts2> {
   OutlineInputBorder border =
   OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   String? selectedItem;
-  List<String> items = [
+  TextEditingController partConditionController = TextEditingController();
+  TextEditingController fuelController = TextEditingController();
+  List<String> fuelItems=['Diesel','LPG','Petrol'];
+
+  List<String> partConditionItems = [
     'BRAND NEW',
     'GOOD',
     'PERFECT',
@@ -92,7 +96,7 @@ class _ManageParts2State extends State<ManageParts2> {
   @override
   void initState() {
     super.initState();
-    for (String item in items) {
+    for (String item in partConditionItems) {
       dropdownItems.add(DropdownMenuItem(
         child: Text(item),
         value: item,
@@ -164,7 +168,10 @@ class _ManageParts2State extends State<ManageParts2> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: [customTextField("Part Condition")],
+                    children: [
+                      customDropDownField("Part Condition", partConditionItems,
+                          partConditionController)
+                    ],
                   ),
                   Row(
                     children: [
@@ -210,6 +217,7 @@ class _ManageParts2State extends State<ManageParts2> {
                   // customTextField("Postage Option"),
                   customDropDownField(
                       "Postage Option", postageItems, postageOptionsController),
+                  customDropDownField('Fuel', fuelItems, fuelController),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [

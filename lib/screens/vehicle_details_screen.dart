@@ -764,7 +764,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           ),
           SizedBox(
               height: 60,
-              child: TextField(
+              child:
+              TextField(
                 onChanged: (String? s) {
                   if (title == "CC" && s != null) {
                     setState(() {
@@ -806,7 +807,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
           ),
           SizedBox(
               height: 60,
-              child: TextField(
+              child:
+              TextField(
                 readOnly: true,
                 onTap: () async {
                   await Navigator.of(context)
