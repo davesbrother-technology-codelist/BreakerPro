@@ -16,6 +16,7 @@ class ScanImaging extends StatefulWidget {
 class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin  {
   late AnimationController _animationController;
   bool _isVisible = true;
+  bool Mode=false;
   final GlobalKey _gLobalkey = GlobalKey();
   QRViewController? controller;
   Barcode? result;
@@ -127,9 +128,12 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
                 // Center(
                 //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
                 // ),
+                Mode?Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):Container(),
+
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
+
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Row(
@@ -185,10 +189,30 @@ mainAxisAlignment: MainAxisAlignment.center,
                       SizedBox(
                         width: 10,
                       ),
-                      Expanded(
+                      Mode?Expanded(
                         child: Container(
                           color: MyTheme.materialColor,
-                          child: TextButton(onPressed: (){},
+                          child: TextButton(onPressed: (){
+                            setState(() {
+                              Mode=!Mode;
+                            });
+                          },
+                              child: Text("Online Mode",
+                                style: TextStyle(
+                                    fontSize:13,
+                                    color: MyTheme.white
+
+                                ) ,
+                              )),
+                        ),
+                      ):Expanded(
+                        child: Container(
+                          color: MyTheme.materialColor,
+                          child: TextButton(onPressed: (){
+                            setState(() {
+                              Mode=!Mode;
+                            });
+                          },
                               child: Text("Offline Mode",
                                 style: TextStyle(
                                     fontSize:13,

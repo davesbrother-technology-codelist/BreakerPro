@@ -21,6 +21,7 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
   final GlobalKey _gLobalkey = GlobalKey();
   QRViewController? controller;
   Barcode? result;
+  bool Mode=false;
   void qr(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((event) {
@@ -132,8 +133,9 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
                 // Center(
                 //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
                 // ),
+                Mode?Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):Container(),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
@@ -238,9 +240,27 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
                       SizedBox(
                         width: 15,
                       ),
-                      Container(
+                      Mode?Container(
                         color: MyTheme.materialColor,
-                        child: TextButton(onPressed: (){},
+                        child: TextButton(onPressed: (){
+                          setState(() {
+                            Mode=!Mode;
+                          });
+                        },
+                            child: Text("Online Mode",
+                              style: TextStyle(
+                                  fontSize:18,
+                                  color: MyTheme.white
+
+                              ) ,
+                            )),
+                      ):Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(onPressed: (){
+                          setState(() {
+                            Mode=!Mode;
+                          });
+                        },
                             child: Text("Offline Mode",
                               style: TextStyle(
                                   fontSize:18,
