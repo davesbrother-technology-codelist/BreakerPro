@@ -47,8 +47,8 @@ class MainDashboardUtils {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
                   child: Text(
-                    titleList[0],
-                    style: const TextStyle(fontSize: 20),
+                    'Add a Breaker',
+                    style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                   ),
                 )
               ],
@@ -61,6 +61,7 @@ class MainDashboardUtils {
                     width: MediaQuery.of(context).size.width - 80,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
                     child: TextField(
+                      textCapitalization: TextCapitalization.characters,
                       textInputAction: TextInputAction.search,
                       onSubmitted: (String? vrn) async {
                         if (vrn != null) {
@@ -103,6 +104,7 @@ class MainDashboardUtils {
                     width: MediaQuery.of(context).size.width - 80,
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: TextField(
+                      textCapitalization: TextCapitalization.characters,
                       cursorColor: MyTheme.black,
                       textInputAction: TextInputAction.search,
                       onSubmitted: (String? stockref) async {
@@ -197,6 +199,7 @@ class MainDashboardUtils {
                     width: MediaQuery.of(context).size.width - 80,
                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
                     child: TextField(
+                      textCapitalization: TextCapitalization.characters,
                       textInputAction: TextInputAction.search,
                       onSubmitted: (String? vrn) async {
                         if (vrn != null) {
@@ -442,7 +445,7 @@ class MainDashboardUtils {
   }
 
   static List<String> titleList = [
-    "Add Breaker",
+    "Add & Manage Breaker",
     "Add Part",
     "Scan Location",
     "Scan Stock Reconcile",

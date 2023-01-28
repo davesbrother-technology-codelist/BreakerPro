@@ -119,6 +119,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             return Container(
                 height: MediaQuery.of(context).size.height,
+                width:MediaQuery.of(context).size.width,
                 child: CameraPreview(
                   _controller,
                   child: Padding(
@@ -158,7 +159,11 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                           .remove(image.path);
                                       ImageList.vehicleImgList
                                           .add(croppedImage.path);
-                                    } else {
+                                    }else if(widget.type=='ScanImaging') {
+                                      ImageList.scanImagingList.remove(image.path);
+                                      ImageList.scanImagingList.add(croppedImage.path);
+                                    }
+                                      else {
                                       ImageList.partImageList
                                           .remove(image.path);
                                       ImageList.partImageList
@@ -201,7 +206,16 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     imgList.add(imgFile.path);
                                     ImageList.vehicleImgList.add(imgFile.path);
                                     print(imgFile.path);
-                                  } else {
+                                  } else if(widget.type=='ScanImaging'){
+                                    int count = PartsList.vehicleCount;
+
+                                    String newPath = path.join(dir,
+                                        'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                    imgFile = imgFile.renameSync(newPath);
+                                    imgList.add(imgFile.path);
+                                    ImageList.scanImagingList.add(imgFile.path);
+                                    print(imgFile.path);
+                                  }else {
                                     int count = PartsList.partCount;
                                     String newPath = path.join(dir,
                                         'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
@@ -219,6 +233,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                             icon: Icon(
                               Icons.camera,
                               size: 40,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -241,6 +256,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                               icon: Icon(
                                 map[isFlashed],
                                 size: 35,
+                                color: Colors.white,
                               )),
                         ),
                         Expanded(
@@ -259,6 +275,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                             icon: const Icon(
                               Icons.flashlight_on,
                               size: 30,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -268,6 +285,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                             icon: const Icon(
                               Icons.flip_camera_android,
                               size: 40,
+                              color: Colors.white,
                             ),
                           ),
                         ),

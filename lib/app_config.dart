@@ -2,15 +2,16 @@ import 'package:device_info/device_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'dart:io';
+Map<int,String> Month={1:"January",2:"February",3:"March",4:"April",5:"May",6:"June",7:"July",8:"August",9:"September",10:"October",11:"November",12:"December"};
 
 class AppConfig {
   static String clientId = "";
   static String username = "";
   static String password = "";
   static String appName = "Breaker Pro";
-  static String appVersion = "version 128(4.1.22)";
-  static String updateDate = "Updated on 19 December 2022";
-  static String rightsInfo = "2021 All Right Reserved by Lyons System Ltd.";
+  static String appVersion = "version 135(4.1.29)";
+  static String updateDate = "Updated on ${DateTime.now().day.toString()} ${Month[DateTime.now().month.toInt()]} ${DateTime.now().year.toString()}";
+  static String rightsInfo = "${DateTime.now().year.toString()} All Right Reserved by Lyons System Ltd.";
 
   static String deviceId = "";
   static String deviceName = "";

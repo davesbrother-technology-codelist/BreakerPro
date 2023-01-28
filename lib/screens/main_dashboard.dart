@@ -179,8 +179,8 @@ class _MainDashboardState extends State<MainDashboard> {
                                 MainDashboardUtils.openUrl(
                                     "https://breakerpro.co.uk/livechat");
                               },
-                              icon: const Icon(Icons.chat),
-                              label: const Text("Live Chat"),
+                              icon: const Icon(Icons.chat,color: Colors.white,),
+                              label: const Text("LIVE CHAT",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: MyTheme.redLiveChat,
                                 textStyle: const TextStyle(fontSize: 15),
@@ -198,11 +198,11 @@ class _MainDashboardState extends State<MainDashboard> {
                                 MainDashboardUtils.openUrl(
                                     "https://breakerpro.co.uk/whatsapp");
                               },
-                              icon: const Icon(Icons.whatsapp),
-                              label: const Text("Whatsapp Chat"),
+                              icon: const Icon(Icons.whatsapp,color: Colors.white,),
+                              label: const Text("WhatsApp Chat",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: MyTheme.greenWhatsapp,
-                                textStyle: const TextStyle(fontSize: 15),
+                                textStyle: const TextStyle(fontSize: 14),
                               ),
                             ),
                           ),
@@ -215,8 +215,7 @@ class _MainDashboardState extends State<MainDashboard> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(AppConfig.rightsInfo),
-                          Text("version $AppConfig.appVersion"),
-                        ],
+                          Text(AppConfig.appVersion,style: TextStyle(fontWeight: FontWeight.bold),),                        ],
                       ),
                     )
                   ],
@@ -267,7 +266,7 @@ class _MainDashboardState extends State<MainDashboard> {
                                       await box1.clear();
                                       setState(() {
                                         MainDashboardUtils.titleList[0] =
-                                            "Add Breaker";
+                                            "Add & Manage Breaker";
                                         PartsList.cachedVehicle = null;
                                         PartsList.prefs!.remove('vehicle');
                                         PartsList.prefs!.remove('partList');
@@ -605,7 +604,7 @@ class _MainDashboardState extends State<MainDashboard> {
           ImageList.partImageList = [];
           fetchPartsListNetwork();
           NotificationService().instantNofitication("Upload Complete");
-          MainDashboardUtils.titleList[0] = "Add Breaker";
+          MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
         }
 
         t.remove(vehicleString);
@@ -617,7 +616,7 @@ class _MainDashboardState extends State<MainDashboard> {
           Box<Part> box = await Hive.openBox('partListBox');
           Box<Part> box1 = await Hive.openBox('selectPartListBox');
           Box<Part> box2 = await Hive.openBox('uploadPartListBox');
-          MainDashboardUtils.titleList[0] = "Add Breaker";
+          MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
           await box.clear();
           await box1.clear();
           await box2.clear();

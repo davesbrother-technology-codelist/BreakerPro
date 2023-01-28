@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: MyTheme.white,
                         ),
                         label: Text(
-                          "Whatsapp Chat",
+                          "WhatsApp Chat",
                           style: TextStyle(
                             color: MyTheme.white,
                           ),
@@ -217,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(AppConfig.rightsInfo),
-                  Text(AppConfig.appVersion),
+                  Text(AppConfig.appVersion,style: TextStyle(fontWeight: FontWeight.bold),),
                   Text(AppConfig.updateDate),
                 ],
               ),

@@ -322,7 +322,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         PartsList.uploadQueue.add(widget.vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.remove('vehicle');
-        MainDashboardUtils.titleList[0] = "Add Breaker";
+        MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;

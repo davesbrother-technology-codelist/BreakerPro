@@ -326,21 +326,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       isDigit: true)
                 ],
               ),
-              // Row(
-              //   children: [
-              //     datePickerTextField("Collection Date",
-              //         collectionDateController, collectionDate),
-              //     datePickerTextField("Depollution Date",
-              //         dePollutionDateController, dePollutionDate)
-              //   ],
-              // ),
-              // Row(
-              //   children: [
-              //     datePickerTextField("Destruction Date",
-              //         destructionDateController, destructionDate),
-              //     customTextField("Weight", weightController, isDigit: true)
-              //   ],
-              // ),
+              Row(
+                children: [
+                  datePickerTextField("Collection Date",
+                      collectionDateController, collectionDate),
+                  datePickerTextField("Depollution Date",
+                      dePollutionDateController, dePollutionDate)
+                ],
+              ),
+              Row(
+                children: [
+                  datePickerTextField("Destruction Date",
+                      destructionDateController, destructionDate),
+                  customTextField("Weight", weightController, isDigit: true)
+                ],
+              ),
               Container(
                 padding: containerEdgeInsetsGeometry,
                 child: Column(
@@ -428,22 +428,36 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                   color: MyTheme.black, fontSize: 20)),
                           onPressed: () async {
                             // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                            XFile? image = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
-
-                            if (image != null) {
-                              File imgFile = File(image.path);
-                              print(imgFile.path);
-                              String dir = path.dirname(imgFile.path);
-                              setState(() {
-                                int count = PartsList.vehicleCount;
-                                String newPath = path.join(dir,
-                                    'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                imgFile = imgFile.renameSync(newPath);
-                                ImageList.vehicleImgList.add(imgFile.path);
-                                saveVehicle();
-                              });
+                            final ImagePicker imagePicker = ImagePicker();
+                            List<XFile> imageFileList=[];
+                            List<XFile>? selectedImages = await imagePicker.pickMultiImage();
+                            if(selectedImages.isNotEmpty){
+                              imageFileList.addAll(selectedImages);
                             }
+                            setState(() {
+                              for(XFile image in imageFileList){
+                                ImageList.vehicleImgList.add(image.path);
+                              }
+                              saveVehicle();
+                            });
+
+
+                            // XFile? image = await ImagePicker()
+                            //     .pickImage(source: ImageSource.gallery);
+
+                            // if (image != null) {
+                            //   File imgFile = File(image.path);
+                            //   print(imgFile.path);
+                            //   String dir = path.dirname(imgFile.path);
+                            //   setState(() {
+                            //     int count = PartsList.vehicleCount;
+                            //     String newPath = path.join(dir,
+                            //         'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                            //     imgFile = imgFile.renameSync(newPath);
+                            //     ImageList.vehicleImgList.add(imgFile.path);
+                            //     saveVehicle();
+                            //   });
+                            // }
                             for (String img in ImageList.vehicleImgList) {
                               print(img);
                             }

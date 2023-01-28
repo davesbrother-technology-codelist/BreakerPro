@@ -125,98 +125,6 @@ class _CustomiseState extends State<Customise> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Container(
-          color: MyTheme.materialColor,
-          width: MediaQuery.of(context).size.width,
-          child: TextButton(
-            onPressed: () async {
-              if (partLocEditingController.text.isNotEmpty ||
-                  warrantyEditingController.text.isNotEmpty ||
-                  salesPriceEditingController.text.isNotEmpty ||
-                  costPriceEditingController.text.isNotEmpty ||
-                  partDescEditingController.text.isNotEmpty ||
-                  mnfPartNoEditingController.text.isNotEmpty ||
-                  partCommentsEditingController.text.isNotEmpty ||
-                  formattedDate != "" ||
-                  partConditionController.text.isNotEmpty ||
-                  postageOptionsController.text.isNotEmpty) {
-                part.forUpload = true;
-              }
-
-              part.partCondition = partConditionController.text.toString();
-              part.partLocation = isDefault
-                  ? part.defaultLocation
-                  : partLocEditingController.text.toString();
-              try {
-                part.warranty = double.parse(warrantyEditingController.text);
-                part.salesPrice =
-                    double.parse(salesPriceEditingController.text);
-                part.costPrice = double.parse(costPriceEditingController.text);
-                part.qty = int.parse(qtyEditingController.text);
-              } catch (e) {
-                print("Failed to convert");
-              }
-              part.mnfPartNo = mnfPartNoEditingController.text.toString();
-              print(part.mnfPartNo);
-              part.description = isDefault
-                  ? part.defaultDescription
-                  : partDescEditingController.text.toString();
-
-              part.featuredWebDate = isFeaturedWeb ? formattedDate : "";
-
-              part.comments = partCommentsEditingController.text.toString();
-              part.postageOptions = postageOptionsController.text.toString();
-              part.ebayTitle =
-                  isEbay ? ebayTitleEditingController.text.toString() : "";
-              part.imgList = List.from(ImageList.partImageList);
-
-              part.isEbay = isEbay;
-              part.isFeaturedWeb = isFeaturedWeb;
-              part.isDefault = isDefault;
-              print(part.imgList);
-              // await FlutterLogs.initLogs(
-              //     logLevelsEnabled: [
-              //       LogLevel.INFO,
-              //       LogLevel.WARNING,
-              //       LogLevel.ERROR,
-              //       LogLevel.SEVERE
-              //     ],
-              //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-              //     directoryStructure: DirectoryStructure.FOR_DATE,
-              //     logTypesEnabled: [
-              //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-              //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-              //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-              //     ],
-              //     logFileExtension: LogFileExtension.TXT,
-              //     logsWriteDirectoryName: "MyLogs",
-              //     logsExportDirectoryName: "MyLogs/Exported",
-              //     logsExportZipFileName:
-              //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-              //     debugFileOperations: true,
-              //     isDebuggable: true);
-
-              String msg =
-                  "\n\n\n\n**************** Inserting Part Details clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \n\n";
-              msg += part.addLog();
-
-              final File file = File(
-                  '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
-              await file.writeAsString(msg, mode: FileMode.append);
-              // FlutterLogs.logToFile(
-              //     logFileName:
-              //         "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
-              //     overwrite: false,
-              //     logMessage: msg);
-              Navigator.pop(context, part);
-            },
-            child: Text(
-              "Save",
-              style: TextStyle(color: MyTheme.white),
-            ),
-          ),
-        ),
         appBar: AppBar(
           backgroundColor: MyTheme.materialColor,
           title: Text(
@@ -262,7 +170,7 @@ class _CustomiseState extends State<Customise> {
                   children: [
                     custom2TextField("Part Location", 3 / 4, TextInputType.text,
                         partLocEditingController),
-                    custom2TextField("Warranty", 1 / 4, TextInputType.number,
+                    custom2TextField("Warranty", 1 / 4, TextInputType.numberWithOptions(decimal: true),
                         warrantyEditingController)
                   ],
                 ),
@@ -280,11 +188,11 @@ class _CustomiseState extends State<Customise> {
                 ),
                 Row(
                   children: [
-                    custom2TextField("Sales Price", 2 / 5, TextInputType.number,
+                    custom2TextField("Sales Price", 2 / 5, TextInputType.numberWithOptions(decimal: true),
                         salesPriceEditingController),
-                    custom2TextField("Cost Price", 2 / 5, TextInputType.number,
+                    custom2TextField("Cost Price", 2 / 5, TextInputType.numberWithOptions(decimal: true),
                         costPriceEditingController),
-                    custom2TextField("Qty", 1 / 5, TextInputType.number,
+                    custom2TextField("Qty", 1 / 5, TextInputType.numberWithOptions(decimal: true),
                         qtyEditingController)
                   ],
                 ),
@@ -516,6 +424,97 @@ class _CustomiseState extends State<Customise> {
                 ),
                 SizedBox(
                   height: 25,
+                ),
+                Container(
+                  color: MyTheme.materialColor,
+                  width: MediaQuery.of(context).size.width,
+                  child: TextButton(
+                    onPressed: () async {
+                      if (partLocEditingController.text.isNotEmpty ||
+                          warrantyEditingController.text.isNotEmpty ||
+                          salesPriceEditingController.text.isNotEmpty ||
+                          costPriceEditingController.text.isNotEmpty ||
+                          partDescEditingController.text.isNotEmpty ||
+                          mnfPartNoEditingController.text.isNotEmpty ||
+                          partCommentsEditingController.text.isNotEmpty ||
+                          formattedDate != "" ||
+                          partConditionController.text.isNotEmpty ||
+                          postageOptionsController.text.isNotEmpty) {
+                        part.forUpload = true;
+                      }
+
+                      part.partCondition = partConditionController.text.toString();
+                      part.partLocation = isDefault
+                          ? part.defaultLocation
+                          : partLocEditingController.text.toString();
+                      try {
+                        part.warranty = double.parse(warrantyEditingController.text);
+                        part.salesPrice =
+                            double.parse(salesPriceEditingController.text);
+                        part.costPrice = double.parse(costPriceEditingController.text);
+                        part.qty = int.parse(qtyEditingController.text);
+                      } catch (e) {
+                        print("Failed to convert");
+                      }
+                      part.mnfPartNo = mnfPartNoEditingController.text.toString();
+                      print(part.mnfPartNo);
+                      part.description = isDefault
+                          ? part.defaultDescription
+                          : partDescEditingController.text.toString();
+
+                      part.featuredWebDate = isFeaturedWeb ? formattedDate : "";
+
+                      part.comments = partCommentsEditingController.text.toString();
+                      part.postageOptions = postageOptionsController.text.toString();
+                      part.ebayTitle =
+                      isEbay ? ebayTitleEditingController.text.toString() : "";
+                      part.imgList = List.from(ImageList.partImageList);
+
+                      part.isEbay = isEbay;
+                      part.isFeaturedWeb = isFeaturedWeb;
+                      part.isDefault = isDefault;
+                      print(part.imgList);
+                      // await FlutterLogs.initLogs(
+                      //     logLevelsEnabled: [
+                      //       LogLevel.INFO,
+                      //       LogLevel.WARNING,
+                      //       LogLevel.ERROR,
+                      //       LogLevel.SEVERE
+                      //     ],
+                      //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+                      //     directoryStructure: DirectoryStructure.FOR_DATE,
+                      //     logTypesEnabled: [
+                      //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
+                      //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
+                      //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
+                      //     ],
+                      //     logFileExtension: LogFileExtension.TXT,
+                      //     logsWriteDirectoryName: "MyLogs",
+                      //     logsExportDirectoryName: "MyLogs/Exported",
+                      //     logsExportZipFileName:
+                      //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
+                      //     debugFileOperations: true,
+                      //     isDebuggable: true);
+
+                      String msg =
+                          "\n\n\n\n**************** Inserting Part Details clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \n\n";
+                      msg += part.addLog();
+
+                      final File file = File(
+                          '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+                      await file.writeAsString(msg, mode: FileMode.append);
+                      // FlutterLogs.logToFile(
+                      //     logFileName:
+                      //         "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
+                      //     overwrite: false,
+                      //     logMessage: msg);
+                      Navigator.pop(context, part);
+                    },
+                    child: Text(
+                      "Save",
+                      style: TextStyle(color: MyTheme.white),
+                    ),
+                  ),
                 )
               ],
             ),

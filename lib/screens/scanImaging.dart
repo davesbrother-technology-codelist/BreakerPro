@@ -1,10 +1,12 @@
+import 'package:breaker_pro/screens/capture_screen.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../my_theme.dart';
 import 'dart:io';
-
+import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-
+import 'package:breaker_pro/app_config.dart';
 
 class ScanImaging extends StatefulWidget {
   const ScanImaging({Key? key}) : super(key: key);
@@ -25,6 +27,7 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
     controller.scannedDataStream.listen((event) {
       setState(() {
         result = event;
+        openCamera();
       });
     });
     controller.pauseCamera();
@@ -125,10 +128,57 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
                     ),
                   ),
                 ),
-                // Center(
-                //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
-                // ),
-                Mode?Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):Container(),
+                Mode?Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):SizedBox(),
+
+                ImageList.scanImagingList.isNotEmpty
+                    ? Align(
+                  alignment: Alignment.bottomLeft,
+                  child: SizedBox(
+                    height: 140,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: ImageList.scanImagingList.length,
+                        itemBuilder:
+                            (BuildContext context, int index) {
+                          return Stack(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AspectRatio(
+                                  aspectRatio: AppConfig.aspectMap[
+                                  AppConfig.imageAspectRatio],
+                                  child: SizedBox(
+                                    width: 9,
+                                    height: 16,
+                                    child: Image.file(File(ImageList
+                                        .scanImagingList[index])),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: -5,
+                                right: -13,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    color:
+                                    Colors.black.withOpacity(0.7),
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      ImageList.scanImagingList
+                                          .removeAt(index);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                  ),
+                )
+                    : SizedBox(),
 
                 SizedBox(
                   height: 10,
@@ -252,6 +302,11 @@ mainAxisAlignment: MainAxisAlignment.center,
         ),
       ),
     );
+  }
+  openCamera() async{
+    final cameras = await availableCameras();
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CaptureScreen(cameras: cameras, type: 'ScanImaging')));
+
   }
   }
   // Future<void> scanBarcode() async{
