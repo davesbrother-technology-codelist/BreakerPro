@@ -92,14 +92,13 @@ class _ManageParts2State extends State<ManageParts2> {
   DateTime? selectedDate;
   String formattedDate = '';
   List<File> images = [];
-  final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
     super.initState();
     for (String item in partConditionItems) {
       dropdownItems.add(DropdownMenuItem(
-        child: Text(item),
         value: item,
+        child: Text(item),
       ));
     }
     formattedDate = '';

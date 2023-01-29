@@ -436,7 +436,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             }
                             setState(() {
                               for(XFile image in imageFileList){
-                                ImageList.vehicleImgList.add(image.path);
+                                File imgFile = File(image.path);
+                                  String dir = path.dirname(imgFile.path);
+                                    int count = PartsList.vehicleCount;
+                                    String newPath = path.join(dir,
+                                        'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                    imgFile = imgFile.renameSync(newPath);
+                                    ImageList.vehicleImgList.add(imgFile.path);
                               }
                               saveVehicle();
                             });
@@ -504,6 +510,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               setState(() {
                                                 ImageList.vehicleImgList
                                                     .removeAt(index);
+                                                saveVehicle();
                                               });
                                             },
                                           ),

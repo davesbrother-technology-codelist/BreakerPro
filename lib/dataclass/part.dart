@@ -1,4 +1,5 @@
 import 'package:breaker_pro/dataclass/parts_list.dart';
+import 'package:breaker_pro/dataclass/stock.dart';
 import 'package:hive/hive.dart';
 
 part 'part.g.dart';
@@ -42,7 +43,7 @@ class Part {
   double warranty = 0;
 
   @HiveField(12)
-  int qty = 1;
+  int qty = 0;
 
   @HiveField(13)
   late double salesPrice = 0;
@@ -85,6 +86,9 @@ class Part {
 
   @HiveField(26)
   String partId = "";
+
+  bool hasPrintLabel = false;
+  bool isDelete = false;
 
   Part(
       this.id,
@@ -131,9 +135,54 @@ class Part {
     };
   }
 
+  Map<String, dynamic> toStockJson(Stock stock) {
+    return {
+      "PartID": partId,
+      "BPPartID": stock.stockID,
+      "PartName": partName,
+      "PartType": partType,
+      "PartSellPrice": salesPrice.toString(),
+      "PartCondition": partCondition,
+      "PartLocation": isDefault ? defaultLocation : partLocation,
+      "PartDescription": isDefault ? defaultDescription : description,
+      "PartComments": comments,
+      "Marketing": isEbay ? "Ebay," : "",
+      "PartImageFiles": imgList.toString(),
+      "PostageRate": postageOptions,
+      "PostageCode": postageOptionsCode,
+      "Qty": qty.toString(),
+      "ManPartNo": mnfPartNo,
+      "Images": imgList.toString(),
+      "PrintLabel": hasPrintLabel ? "1" : "0",
+      "warranty": warranty.toString(),
+      "Ebay_Title": ebayTitle,
+      "status": status.toString(),
+      "DeletePart": isDelete ? "1" : "0"
+    };
+  }
+
+  static Part fromStock(Stock stock) {
+    Part part = Part(0, stock.partName, "", "", "", "", stock.details,
+        stock.postageCode, stock.ebayTitle);
+    part.partCondition = stock.condition;
+    part.warranty = stock.warranty != "" ? double.parse(stock.warranty) : 0;
+    part.salesPrice = stock.price != "" ? double.parse(stock.price) : 0;
+    part.comments = stock.partComments;
+    part.mnfPartNo = stock.thatchamPartManufacturerNumber;
+
+    return part;
+  }
+
   String addLog() {
     String m =
         "PartID : $partId\nPartName : $partName\nPartType : $partType\nSellPrice : $salesPrice\nCostPrice : $costPrice\nQuantity : $costPrice\nCondition : $costPrice\nLocation : ${isDefault ? defaultLocation : partLocation}\nDescription : ${isDefault ? defaultDescription : description}\nSetDefault : $isDefault\nComment : $comments\nPostageOptions : $postageOptions\nPostageCode: $postageOptionsCode\nEbay : $isEbay\nImage Name : $imgList\nmanPartNo : $mnfPartNo\nFeatured Web : $isFeaturedWeb\nFeatured Web Date : $featuredWebDate\n";
+
+    return m;
+  }
+
+  String addStockLog(Stock stock) {
+    String m =
+        "PartID : $partId\nBPPartID: ${stock.stockID}\nPartName : $partName\nPartType : $partType\nPartSellPrice : $salesPrice\nPartCondition : $costPrice\nPartLocation : ${isDefault ? defaultLocation : partLocation}\nPartDescription : ${isDefault ? defaultDescription : description}\nPartComments : $comments\nMarketing: ${isEbay ? "Ebay," : ""}\nPartImageFiles: $imgList\nPostageRate : $postageOptions\nPostageCode: $postageOptionsCode\nQty : $costPrice\nManPartNo : $mnfPartNo\nPrintLabel: ${hasPrintLabel ? "1" : "0"}\nDeletePart: ${isDelete ? "1" : "0"}\n";
 
     return m;
   }

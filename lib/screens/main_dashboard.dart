@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive_io.dart';
+import 'package:breaker_pro/dataclass/notification_utils.dart';
 import 'package:breaker_pro/notification_service.dart';
+import 'package:breaker_pro/screens/qr_screen.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_logs/flutter_logs.dart';
@@ -40,6 +42,7 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
+  late String temp;
   @override
   void initState() {
     // upload();
@@ -146,12 +149,14 @@ class _MainDashboardState extends State<MainDashboard> {
                 color: MyTheme.white,
               )),
           IconButton(
-              onPressed: () async => {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => super.widget))
-                  },
+              onPressed: () async {
+                // Navigator.pushReplacement(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (BuildContext context) => super.widget));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => QrScreen()));
+              },
               icon: Icon(
                 Icons.refresh,
                 color: MyTheme.white,
@@ -520,7 +525,6 @@ class _MainDashboardState extends State<MainDashboard> {
     Box<Part> box = await Hive.openBox('partListBox');
     if (box.isNotEmpty) {
       PartsList.partList = box.values.toList();
-      print(PartsList.partList[0].isSelected);
     } else {
       print(" empyt");
     }
@@ -697,15 +701,10 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> checkLogin() async {
-    // Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiLogin);
-    // uri = uri.replace(queryParameters: ApiConfig.baseQueryParams);
-    // final response = await http.get(uri, headers: ApiConfig.headers);
-    // String responseBody = utf8.decoder.convert(response.bodyBytes);
-    // final Map<String, dynamic> responseJson = json.decode(responseBody);
-    // String result = responseJson['result'];
     String result = await AuthRepository.login(
         ApiConfig.baseUrl + ApiConfig.apiLogin, ApiConfig.baseQueryParams);
-
+    temp = result;
+    NotificationUtils().notifyListeners();
     if (result == 'User Active on Another Device') {
       print(result);
       timer.cancel();

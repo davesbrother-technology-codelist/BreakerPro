@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:breaker_pro/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
@@ -32,6 +33,9 @@ class ApiConfig {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('userData') != null) {
       baseQueryParams = jsonDecode(prefs.getString('userData').toString());
+      AppConfig.username = baseQueryParams['username'];
+      AppConfig.clientId = baseQueryParams['clientid'];
+      AppConfig.password = baseQueryParams['password'];
       print("Query Params from storage $baseQueryParams");
       return true;
     }
@@ -43,5 +47,8 @@ class ApiConfig {
     String user = jsonEncode(queryParams);
     prefs.setString('userData', user);
     baseQueryParams = queryParams;
+    AppConfig.username = baseQueryParams['username'];
+    AppConfig.clientId = baseQueryParams['clientid'];
+    AppConfig.password = baseQueryParams['password'];
   }
 }

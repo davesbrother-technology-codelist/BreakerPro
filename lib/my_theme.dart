@@ -24,4 +24,5 @@ class MyTheme {
   static Color grey = Colors.grey;
   static Color greenWhatsapp = const Color(0xFF3EA42E);
   static Color redLiveChat = const Color(0xFFFC6602);
+  static Color red = Colors.red;
 }

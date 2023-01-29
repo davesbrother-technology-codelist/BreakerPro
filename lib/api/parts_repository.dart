@@ -17,24 +17,6 @@ class PartRepository {
       List<Part> partsList, String vehicleID, String model) async {
     Map response = {};
     for (int i = 0; i < partsList.length; i++) {
-      // await FlutterLogs.initLogs(
-      //     logLevelsEnabled: [
-      //       LogLevel.INFO,
-      //       LogLevel.WARNING,
-      //       LogLevel.ERROR,
-      //       LogLevel.SEVERE
-      //     ],
-      //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-      //     directoryStructure: DirectoryStructure.FOR_DATE,
-      //     logTypesEnabled: [
-      //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-      //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-      //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-      //     ],
-      //     logFileExtension: LogFileExtension.TXT,
-      //     logsWriteDirectoryName: "MyLogs",
-      //     debugFileOperations: true,
-      //     isDebuggable: true);
       NotificationService().instantNofitication(
           "3/5 - Uploading Parts Data $model ${partsList[i].partName}");
       Part part = partsList[i];
@@ -170,27 +152,7 @@ class PartRepository {
 
   static fileUpload(
       List<Part> partsList, String vehicleID, String model) async {
-    // await FlutterLogs.initLogs(
-    //     logLevelsEnabled: [
-    //       LogLevel.INFO,
-    //       LogLevel.WARNING,
-    //       LogLevel.ERROR,
-    //       LogLevel.SEVERE
-    //     ],
-    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-    //     directoryStructure: DirectoryStructure.FOR_DATE,
-    //     logTypesEnabled: [
-    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-    //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-    //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-    //     ],
-    //     logFileExtension: LogFileExtension.TXT,
-    //     logsWriteDirectoryName: "MyLogs",
-    //     logsExportDirectoryName: "MyLogs/Exported",
-    //     logsExportZipFileName:
-    //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-    //     debugFileOperations: true,
-    //     isDebuggable: true);
+
     List<Part> updatePartsList = [];
     print("\n\n Uploading Parts Photos\n\n");
     int j = 0;
@@ -217,8 +179,6 @@ class PartRepository {
             "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
         msg += "URL: $uri";
         File image = imgList[i];
-        // NotificationService().instantNofitication(
-        //     "4/5 - Uploading Part Images ${i + 1}/${imgList.length}");
         print(image.path);
         String filename = image.path.split("/").last.toString();
         print(filename);

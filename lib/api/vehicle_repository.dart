@@ -18,22 +18,6 @@ import 'package:async/async.dart';
 
 class VehicleRepository {
   static Future<bool> uploadVehicle(Vehicle vehicle) async {
-    // await FlutterLogs.initLogs(
-    //     logLevelsEnabled: [
-    //       LogLevel.INFO,
-    //       LogLevel.WARNING,
-    //       LogLevel.ERROR,
-    //       LogLevel.SEVERE
-    //     ],
-    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-    //     directoryStructure: DirectoryStructure.FOR_DATE,
-    //     logTypesEnabled: [
-    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-    //     ],
-    //     logFileExtension: LogFileExtension.TXT,
-    //     logsWriteDirectoryName: "MyLogs",
-    //     debugFileOperations: true,
-    //     isDebuggable: true);
     NotificationService().instantNofitication(
         "1/5 - Uploading Vehicle Data ${vehicle.model == "" ? "Model" : vehicle.model}");
     String url =

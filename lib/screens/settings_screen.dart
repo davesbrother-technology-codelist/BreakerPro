@@ -1,7 +1,7 @@
-import 'package:breaker_pro/screens/barcode_screen.dart';
+import 'package:breaker_pro/screens/barcode_settings_screen.dart';
 import 'package:flutter/material.dart';
 import '../my_theme.dart';
-import 'aspect_ratio_screen.dart';
+import 'aspect_ratio_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);

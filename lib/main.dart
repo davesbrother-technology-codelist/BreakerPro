@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/part.dart';
@@ -9,47 +10,28 @@ import 'package:flutter_logs/flutter_logs.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-// Future<String> getFilePath() async {
-//   Directory appDocumentsDirectory = await getApplicationDocumentsDirectory();
-//   String appDocumentsPath = appDocumentsDirectory.path;
-//   String filePath = '$appDocumentsPath/demoTextFile.txt';
-//   print(filePath);
-//   return filePath;
-// }
-//
-// Future _getStoragePermission() async {
-//   if (await Permission.storage.request().isGranted) {
-//     saveFile();
-//   } else if (await Permission.storage.request().isPermanentlyDenied) {
-//     await openAppSettings();
-//   } else if (await Permission.storage.request().isDenied) {
-//     print("Denied");
-//   }
-// }
-//
-// void saveFile() async {
-//   File file = File(await getFilePath());
-//   print(file.path); //
-//   String s = await file.readAsString();
-//   print(s);
-//   // file.writeAsString(
-//   //     "This is my demo text that will be saved to : demoTextFile.txt"); // 2
-// }
+import 'package:workmanager/workmanager.dart';
 
 Future<void> main() async {
-  // Initialize hive
-  await Hive.initFlutter();
-  try {
-    Hive.registerAdapter(PartAdapter());
-  } catch (e) {
-    print("OPEnned");
-  }
+  await initialiseHive();
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  Workmanager().initialize(
+      callbackDispatcher, // The top level function, aka callbackDispatcher
+      isInDebugMode:
+          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+      );
+
   NotificationService().initialize();
+
   await AppConfig.getDeviceInfo();
+
+  await getExternalDirectory();
+  runApp(const MyApp());
+}
+
+Future<void> getExternalDirectory() async {
   if (Platform.isIOS) {
     Directory externalDirectory = await getApplicationDocumentsDirectory();
     externalDirectory = Directory("${externalDirectory.path}/Logs");
@@ -67,30 +49,27 @@ Future<void> main() async {
   }
 
   print("External Directory ${AppConfig.externalDirectory}");
-  // await FlutterLogs.initLogs(
-  //     logLevelsEnabled: [
-  //       LogLevel.INFO,
-  //       LogLevel.WARNING,
-  //       LogLevel.ERROR,
-  //       LogLevel.SEVERE
-  //     ],
-  //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-  //     directoryStructure: DirectoryStructure.FOR_DATE,
-  //     logTypesEnabled: [
-  //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-  //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-  //     ],
-  //     logFileExtension: LogFileExtension.TXT,
-  //     logsWriteDirectoryName: "MyLogs",
-  //     logsExportDirectoryName: "MyLogs/Exported",
-  //     logsExportZipFileName:
-  //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-  //     debugFileOperations: true,
-  //     isDebuggable: true);
+}
 
-  // saveFile();
-  // await _getStoragePermission();
-  runApp(const MyApp());
+Future<void> initialiseHive() async {
+  await Hive.initFlutter();
+  try {
+    Hive.registerAdapter(PartAdapter());
+  } catch (e) {
+    print("OPEnned");
+  }
+}
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    switch (task) {
+      case "1":
+        NotificationService().instantNofitication("Hello");
+        break;
+    }
+
+    return Future.value(true);
+  });
 }
 
 class MyApp extends StatelessWidget {

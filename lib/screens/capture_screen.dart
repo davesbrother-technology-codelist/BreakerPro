@@ -215,7 +215,15 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     imgList.add(imgFile.path);
                                     ImageList.scanImagingList.add(imgFile.path);
                                     print(imgFile.path);
-                                  }else {
+                                  }else if(widget.type=='ManagePart'){
+                                    String newPath = path.join(dir,
+                                        'IMG${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                    imgFile = imgFile.renameSync(newPath);
+                                    imgList.add(imgFile.path);
+                                    ImageList.partImageList.add(imgFile.path);
+                                    print(imgFile.path);
+                                  }
+                                  else {
                                     int count = PartsList.partCount;
                                     String newPath = path.join(dir,
                                         'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');

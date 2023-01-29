@@ -1,5 +1,7 @@
 import 'package:breaker_pro/my_theme.dart';
 import 'package:breaker_pro/screens/main_dashboard.dart';
+import 'package:breaker_pro/screens/qr_screen.dart';
+import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,123 +15,64 @@ class ScanPart extends StatefulWidget {
   State<ScanPart> createState() => _ScanPartState();
 }
 
-class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
-  late AnimationController _animationController;
-  bool _isVisible = true;
-  final GlobalKey _gLobalkey = GlobalKey();
-  QRViewController? controller;
+class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin {
+  late AnimationController animationController;
+  final GlobalKey globalKey = GlobalKey();
+  late QRViewController qrController;
   Barcode? result;
-  void qr(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((event) {
-      setState(() {
-        result = event;
-        ScannedScreen(result!);
-      });
+  void onQRViewCreated(QRViewController controller) {
+    setState(() {
+      qrController = controller;
+      controller.resumeCamera();
     });
-    controller.pauseCamera();
-    controller.resumeCamera();
+    controller.scannedDataStream.listen((event) async {
+      await controller.stopCamera();
+      Navigator.pop(context, event.code);
+    });
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      qrController.pauseCamera();
+    }
+    qrController.resumeCamera();
   }
 
   @override
   void initState() {
+    initialiseRedLineAnimation();
     super.initState();
-    _animationController = AnimationController(
-      duration: Duration(seconds: 6),
+  }
+
+  void initialiseRedLineAnimation() {
+    animationController = AnimationController(
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _animationController.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        _animationController.forward();
-      }
-    });
-    _animationController.forward();
+        if (status == AnimationStatus.completed) {
+          animationController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          animationController.forward();
+        }
+      });
+    animationController.forward();
   }
+
   @override
   void dispose() {
-    controller?.dispose();
-    _animationController.dispose();
-
+    animationController.dispose();
+    qrController.dispose();
     super.dispose();
-  }
-
-  @override
-  void reassemble() async {
-    super.reassemble();
-    if(Platform.isIOS){
-      await controller!.pauseCamera();
-    }
-    controller!.resumeCamera();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: Stack(
-                    alignment: AlignmentDirectional.topEnd,
-                    children:[
-                      QRView(
-                      key: _gLobalkey,
-                      onQRViewCreated: qr,
-                      cameraFacing: CameraFacing.back,
-                      overlay: QrScannerOverlayShape(
-                        borderLength: 35,
-                        borderWidth: 4,
-                        borderColor: Colors.lightGreenAccent,
-                        cutOutHeight:MediaQuery.of(context).size.height*0.26,
-                        cutOutWidth: MediaQuery.of(context).size.width*0.7,
-                      )
-                      ),
-                      Container(
-                        color: Colors.white54,
-                        height: 60,
-                        width: 60,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.asset("assets/laser.png",
-                          height: 60,
-                            width: 60,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 390,
-                        left: 60,
-                        right: 60,
-                        child: AnimatedBuilder(
-                          animation: _animationController,
-                          builder: (context, child) {
-                            return Opacity(
-                              opacity: _animationController.value,
-                              child: Container(
-                                width: 420,
-                                height: 1,
-                                color: Colors.red,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    ]
-                  ),
-                ),
-                // Center(
-                //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
-                // )
-              ],
-            ),
-          ),
-        ),
+      body: SafeArea(
+        child: MainDashboardUtils.qrWidget(
+            context, globalKey, onQRViewCreated, animationController),
       ),
     );
   }
@@ -144,7 +87,7 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               content: Container(
                 width: double.infinity,
-                height: 4*MediaQuery.of(context).size.height/5,
+                height: 4 * MediaQuery.of(context).size.height / 5,
                 child: Builder(
                   builder: (context) {
                     return SingleChildScrollView(
@@ -157,7 +100,8 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
                           Text(
                             "Part ID",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.grey),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
                           ),
                           SizedBox(
                             height: 5,
@@ -172,7 +116,8 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
                           Text(
                             'Part Name',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.grey),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
                           ),
                           SizedBox(
                             height: 5,
@@ -187,7 +132,8 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
                           Text(
                             'Current Location',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.grey),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
                           ),
                           SizedBox(
                             height: 5,
@@ -202,7 +148,8 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
                           Text(
                             'Vehicle',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.grey),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey),
                           ),
                           SizedBox(
                             height: 5,
@@ -217,12 +164,13 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
-                              decoration: InputDecoration(hintText: "Location",
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 2, color: Colors.grey), //<-- SEE HERE
-                              ),
-
+                              decoration: InputDecoration(
+                                hintText: "Location",
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2,
+                                      color: Colors.grey), //<-- SEE HERE
+                                ),
                               ),
                             ),
                           ),
@@ -307,15 +255,14 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin  {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MainDashboard()));
+                                          builder: (context) =>
+                                              MainDashboard()));
                                 },
                               ),
                             ),
                           )
                         ],
-
                       ),
-
                     );
                   },
                 ),

@@ -6,6 +6,7 @@ import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:breaker_pro/screens/workOrderScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import '../dataclass/parts_list.dart';
@@ -307,6 +308,62 @@ class MainDashboardUtils {
         });
   }
 
+  static Widget qrWidget(
+      BuildContext context,
+      Key key,
+      Function(QRViewController) onQRViewCreated,
+      AnimationController animationController) {
+    return Stack(
+      alignment: AlignmentDirectional.center,
+      children: [
+        QRView(
+          key: key,
+          onQRViewCreated: onQRViewCreated,
+          overlay: QrScannerOverlayShape(
+            borderLength: 35,
+            borderWidth: 4,
+            borderColor: Colors.lightGreenAccent,
+            cutOutHeight: MediaQuery.of(context).size.height * 0.26,
+            cutOutWidth: MediaQuery.of(context).size.width * 0.7,
+          ),
+        ),
+        AnimatedBuilder(
+          animation: animationController,
+          builder: (context, child) {
+            return Opacity(
+              opacity: animationController.value,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: 1,
+                color: Colors.red,
+              ),
+            );
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Container(
+              alignment: AlignmentDirectional.topEnd,
+              color: Colors.white54,
+              height: 60,
+              width: 60,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  "assets/laser.png",
+                  height: 60,
+                  width: 60,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   static void scanLocationDialogue(BuildContext context) {
     showDialog(
         context: context,
@@ -436,7 +493,7 @@ class MainDashboardUtils {
 
   static void ManagePartsFunction(BuildContext context) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ManagePart()));
+        .push(MaterialPageRoute(builder: (context) => const ManagePart()));
   }
 
   static void WorkOrdersFunction(BuildContext context) {
