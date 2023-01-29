@@ -58,8 +58,7 @@ class _ManagePartState extends State<ManagePart> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return  Scaffold(
         appBar: AppBar(
           backgroundColor: MyTheme.materialColor,
           leading: Container(
@@ -206,8 +205,7 @@ class _ManagePartState extends State<ManagePart> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   void advanceSearch(BuildContext context) {

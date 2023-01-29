@@ -131,8 +131,7 @@ class _ManageParts2State extends State<ManageParts2> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return  Scaffold(
         appBar: AppBar(
           backgroundColor: MyTheme.materialColor,
           title: Text(
@@ -151,336 +150,332 @@ class _ManageParts2State extends State<ManageParts2> {
           ),
         ),
         body: SingleChildScrollView(
-          child: Container(
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Center(
-                    child: Text(
-                      part.partName,
-                      style: const TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-                Center(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Center(
                   child: Text(
-                    "${stock.make} ${stock.model}",
-                    style: const TextStyle(fontSize: 15, color: Colors.black54),
+                    part.partName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // customTextField("Part Condition", partConditionValue)
-                    customDropDownField("Part Condition", partConditionItems,
-                        partConditionController)
-                  ],
+              ),
+              Center(
+                child: Text(
+                  "${stock.make} ${stock.model}",
+                  style: const TextStyle(fontSize: 15, color: Colors.black54),
                 ),
-                Row(
-                  children: [
-                    custom2TextField("Part Location", 3 / 4, TextInputType.text,
-                        partLocEditingController),
-                    custom2TextField("Warranty", 1 / 4, TextInputType.number,
-                        warrantyEditingController)
-                  ],
-                ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.start,
-                //   children: const [
-                //     Padding(
-                //       padding: EdgeInsets.all(8.0),
-                //       child: Text(
-                //         'Quantity In Stock',
-                //         style: TextStyle(color: Colors.grey, fontSize: 20),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                Row(
-                  children: [
-                    custom2TextField("Sales Price", 2 / 5, TextInputType.number,
-                        salesPriceEditingController),
-                    custom2TextField("Cost Price", 2 / 5, TextInputType.number,
-                        costPriceEditingController),
-                    custom2TextField("Qty", 1 / 5, TextInputType.number,
-                        qtyEditingController)
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Checkbox(
-                        value: isDefault,
-                        onChanged: (value) {
-                          setState(() {
-                            isDefault = value!;
-                          });
-                        }),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        "Set Defaults",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                      ),
-                    )
-                  ],
-                ),
-                custom2TextField("Part Description", 1, TextInputType.text,
-                    partDescEditingController),
-                custom2TextField("Manufacturer Part no", 1, TextInputType.text,
-                    mnfPartNoEditingController),
-                custom2TextField("Part Comments", 1, TextInputType.text,
-                    partCommentsEditingController),
-                // customTextField("Postage Option", postageOptionsValue),
-                customDropDownField(
-                    "Postage Option", postageItems, postageOptionsController),
-                customDropDownField("Fuel", fuelItems, fuelController),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Marketing',
-                        style: TextStyle(color: Colors.grey, fontSize: 20),
-                      ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  customDropDownField("Part Condition", partConditionItems,
+                      partConditionController)
+                ],
+              ),
+              Row(
+                children: [
+                  custom2TextField("Part Location", 3 / 4, TextInputType.text,
+                      partLocEditingController),
+                  custom2TextField("Warranty", 1 / 4, TextInputType.number,
+                      warrantyEditingController)
+                ],
+              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.start,
+              //   children: const [
+              //     Padding(
+              //       padding: EdgeInsets.all(8.0),
+              //       child: Text(
+              //         'Quantity In Stock',
+              //         style: TextStyle(color: Colors.grey, fontSize: 20),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              Row(
+                children: [
+                  custom2TextField("Sales Price", 2 / 5, TextInputType.number,
+                      salesPriceEditingController),
+                  custom2TextField("Cost Price", 2 / 5, TextInputType.number,
+                      costPriceEditingController),
+                  custom2TextField("Qty", 1 / 5, TextInputType.number,
+                      qtyEditingController)
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Checkbox(
+                      value: isDefault,
+                      onChanged: (value) {
+                        setState(() {
+                          isDefault = value!;
+                        });
+                      }),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      "Set Defaults",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey),
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                        value: isEbay,
-                        onChanged: (value) {
-                          setState(() {
-                            isEbay = value!;
-                          });
-                        }),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        "Ebay",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                      ),
-                    )
-                  ],
-                ),
-                custom2TextField("Ebay Title", 1, TextInputType.text,
-                    ebayTitleEditingController),
-                Row(
-                  children: [
-                    Checkbox(
-                        value: hasPrintLabel,
-                        onChanged: (value) async {
-                          hasPrintLabel = value!;
-                          setState(() {});
-                        }),
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(0, 8, 8, 8),
-                      child: Text(
-                        "Print Label",
-                        style: TextStyle(fontSize: 18),
-                      ),
+                  )
+                ],
+              ),
+              custom2TextField("Part Description", 1, TextInputType.text,
+                  partDescEditingController),
+              custom2TextField("Manufacturer Part no", 1, TextInputType.text,
+                  mnfPartNoEditingController),
+              custom2TextField("Part Comments", 1, TextInputType.text,
+                  partCommentsEditingController),
+              // customTextField("Postage Option", postageOptionsValue),
+              customDropDownField(
+                  "Postage Option", postageItems, postageOptionsController),
+              customDropDownField("Fuel", fuelItems, fuelController),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Marketing',
+                      style: TextStyle(color: Colors.grey, fontSize: 20),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  height: ImageList.partImageList.isNotEmpty ? 210 : 80,
-                  color: MyTheme.black12,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TextButton.icon(
-                            icon: Icon(
-                              Icons.camera_alt_outlined,
-                              color: MyTheme.black,
-                              size: 30,
-                            ),
-                            label: Text(
-                              'Capture',
-                              style:
-                                  TextStyle(color: MyTheme.black, fontSize: 20),
-                            ),
-                            onPressed: openCamera,
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Checkbox(
+                      value: isEbay,
+                      onChanged: (value) {
+                        setState(() {
+                          isEbay = value!;
+                        });
+                      }),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      "Ebay",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey),
+                    ),
+                  )
+                ],
+              ),
+              custom2TextField("Ebay Title", 1, TextInputType.text,
+                  ebayTitleEditingController),
+              Row(
+                children: [
+                  Checkbox(
+                      value: hasPrintLabel,
+                      onChanged: (value) async {
+                        hasPrintLabel = value!;
+                        setState(() {});
+                      }),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 8, 8),
+                    child: Text(
+                      "Print Label",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(10),
+                height: ImageList.partImageList.isNotEmpty ? 210 : 80,
+                color: MyTheme.black12,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton.icon(
+                          icon: Icon(
+                            Icons.camera_alt_outlined,
+                            color: MyTheme.black,
+                            size: 30,
                           ),
-                          TextButton.icon(
-                            icon: Icon(
-                              Icons.photo,
-                              color: MyTheme.black,
-                              size: 30,
-                            ),
-                            label: Text('Gallery',
-                                style: TextStyle(
-                                    color: MyTheme.black, fontSize: 20)),
-                            onPressed: () async {
-                              // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                              XFile? image = await ImagePicker()
-                                  .pickImage(source: ImageSource.gallery);
+                          label: Text(
+                            'Capture',
+                            style:
+                                TextStyle(color: MyTheme.black, fontSize: 20),
+                          ),
+                          onPressed: openCamera,
+                        ),
+                        TextButton.icon(
+                          icon: Icon(
+                            Icons.photo,
+                            color: MyTheme.black,
+                            size: 30,
+                          ),
+                          label: Text('Gallery',
+                              style: TextStyle(
+                                  color: MyTheme.black, fontSize: 20)),
+                          onPressed: () async {
+                            // List<XFile> pickedGallery= (await _picker.pickMultiImage());
+                            XFile? image = await ImagePicker()
+                                .pickImage(source: ImageSource.gallery);
 
-                              if (image != null) {
-                                File imgFile = File(image.path);
-                                print(imgFile.path);
-                                String dir = path.dirname(imgFile.path);
-                                setState(() {
-                                  int count = PartsList.partCount;
-                                  String newPath = path.join(dir,
-                                      'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                  imgFile = imgFile.renameSync(newPath);
-                                  ImageList.partImageList.add(imgFile.path);
-                                });
-                              }
-                              for (String img in ImageList.partImageList) {
-                                print(img);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      ImageList.partImageList.isNotEmpty
-                          ? Align(
-                              alignment: Alignment.bottomLeft,
-                              child: SizedBox(
-                                height: 140,
-                                child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: ImageList.partImageList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return Stack(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: AspectRatio(
-                                              aspectRatio: AppConfig.aspectMap[
-                                                  AppConfig.imageAspectRatio],
-                                              child: SizedBox(
-                                                width: 9,
-                                                height: 16,
-                                                child: Image.file(File(ImageList
-                                                    .partImageList[index])),
-                                              ),
+                            if (image != null) {
+                              File imgFile = File(image.path);
+                              print(imgFile.path);
+                              String dir = path.dirname(imgFile.path);
+                              setState(() {
+                                int count = PartsList.partCount;
+                                String newPath = path.join(dir,
+                                    'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                imgFile = imgFile.renameSync(newPath);
+                                ImageList.partImageList.add(imgFile.path);
+                              });
+                            }
+                            for (String img in ImageList.partImageList) {
+                              print(img);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    ImageList.partImageList.isNotEmpty
+                        ? Align(
+                            alignment: Alignment.bottomLeft,
+                            child: SizedBox(
+                              height: 140,
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: ImageList.partImageList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Stack(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: AspectRatio(
+                                            aspectRatio: AppConfig.aspectMap[
+                                                AppConfig.imageAspectRatio],
+                                            child: SizedBox(
+                                              width: 9,
+                                              height: 16,
+                                              child: Image.file(File(ImageList
+                                                  .partImageList[index])),
                                             ),
                                           ),
-                                          Positioned(
-                                            top: -5,
-                                            right: -13,
-                                            child: IconButton(
-                                              icon: Icon(
-                                                Icons.cancel,
-                                                color: Colors.black
-                                                    .withOpacity(0.7),
-                                                size: 20,
-                                              ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  ImageList.partImageList
-                                                      .removeAt(index);
-                                                  // part.imgList.removeAt(index);
-                                                });
-                                              },
+                                        ),
+                                        Positioned(
+                                          top: -5,
+                                          right: -13,
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.cancel,
+                                              color: Colors.black
+                                                  .withOpacity(0.7),
+                                              size: 20,
                                             ),
+                                            onPressed: () {
+                                              setState(() {
+                                                ImageList.partImageList
+                                                    .removeAt(index);
+                                                // part.imgList.removeAt(index);
+                                              });
+                                            },
                                           ),
-                                        ],
-                                      );
-                                    }),
-                              ),
-                            )
-                          : const SizedBox()
-                    ],
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                            ),
+                          )
+                        : const SizedBox()
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 2,
+                    child: SizedBox(),
                   ),
-                ),
-                Row(
-                  children: [
-                    const Expanded(
-                      flex: 2,
-                      child: SizedBox(),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 10.0, 15, 10),
-                        child: Container(
-                          color: MyTheme.materialColor,
-                          child: TextButton(
-                            onPressed: () {
-                              openDeleteDialog(context);
-                            },
-                            child: Text(
-                              "Delete",
-                              style:
-                                  TextStyle(color: MyTheme.red, fontSize: 17),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 5, 5, 10),
-                        child: Container(
-                          color: MyTheme.grey,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              "Re-Search",
-                              style:
-                                  TextStyle(color: MyTheme.white, fontSize: 17),
-                            ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 10.0, 15, 10),
+                      child: Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(
+                          onPressed: () {
+                            openDeleteDialog(context);
+                          },
+                          child: Text(
+                            "Delete",
+                            style:
+                                TextStyle(color: MyTheme.red, fontSize: 17),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 5.0, 15, 10),
-                        child: Container(
-                          color: MyTheme.materialColor,
-                          child: TextButton(
-                            onPressed: () {
-                              upload();
-                            },
-                            child: Text(
-                              "Upload",
-                              style:
-                                  TextStyle(color: MyTheme.white, fontSize: 17),
-                            ),
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 5, 5, 10),
+                      child: Container(
+                        color: MyTheme.grey,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            "Re-Search",
+                            style:
+                                TextStyle(color: MyTheme.white, fontSize: 17),
                           ),
                         ),
                       ),
-                    )
-                  ],
-                )
-              ],
-            ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 5.0, 15, 10),
+                      child: Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(
+                          onPressed: () {
+                            upload();
+                          },
+                          child: Text(
+                            "Upload",
+                            style:
+                                TextStyle(color: MyTheme.white, fontSize: 17),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   openDeleteDialog(BuildContext context) {

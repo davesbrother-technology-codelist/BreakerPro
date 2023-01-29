@@ -1,5 +1,5 @@
+import 'package:breaker_pro/screens/manage_parts2.dart';
 import 'package:flutter/material.dart';
-
 import '../dataclass/part.dart';
 import '../dataclass/stock.dart';
 import '../my_theme.dart';
@@ -28,8 +28,7 @@ class _StocksScreenState extends State<StocksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return  Scaffold(
         appBar: AppBar(
           backgroundColor: MyTheme.materialColor,
           leading: Container(
@@ -51,7 +50,12 @@ class _StocksScreenState extends State<StocksScreen> {
           itemBuilder: (context, index) {
             Part part = partList[index];
             Stock stock = stockList[index];
-            return Container(
+            List imgList = stock.imageThumbnailURLList.split(',');
+            String img = imgList.isNotEmpty ? imgList.first :"";
+            return GestureDetector(
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => ManageParts2(part: part, stock: stock)));
+              },
               child: Column(
                 children: [
                   Row(
@@ -63,16 +67,23 @@ class _StocksScreenState extends State<StocksScreen> {
                           padding: const EdgeInsets.fromLTRB(8.0, 5, 8, 5),
                           child: Container(
                             height: 80,
-                            color: Colors.red,
+                            child: Image.network(
+                              img,
+                              errorBuilder:
+                                  (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                return const SizedBox();
+                              },
+                            ),
                           ),
                         ),
                       ),
                       Expanded(
-                        flex: 6,
+                        flex: 7,
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(8.0, 5, 8, 5),
                           child: Text(
                             part.partName,
+                            style: TextStyle(color: MyTheme.materialColor,fontSize: 17.5),
                           ),
                         ),
                       ),
@@ -86,7 +97,7 @@ class _StocksScreenState extends State<StocksScreen> {
                   infoLine("Registration No", stock.reg),
                   infoLine("Price", stock.price),
                   infoLine("Stock Reference", stock.stockRef),
-                  infoLine("Manufacture Year", stock.year),
+                  infoLine("Manufacture Year", stock.manufacturingYear),
                   infoLine("Marketing", stock.marketing),
                 ],
               ),
@@ -99,8 +110,8 @@ class _StocksScreenState extends State<StocksScreen> {
             );
           },
         ),
-      ),
-    );
+      );
+
   }
 
   Widget infoLine(String label, String value) {
