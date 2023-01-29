@@ -1,8 +1,13 @@
 import 'package:breaker_pro/screens/manage_parts2.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+import '../api/stock_repository.dart';
+import '../app_config.dart';
 import '../dataclass/part.dart';
 import '../dataclass/stock.dart';
 import '../my_theme.dart';
+import '../utils/auth_utils.dart';
 
 class StocksScreen extends StatefulWidget {
   const StocksScreen(
@@ -53,8 +58,9 @@ class _StocksScreenState extends State<StocksScreen> {
             List imgList = stock.imageThumbnailURLList.split(',');
             String img = imgList.isNotEmpty ? imgList.first :"";
             return GestureDetector(
-              onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => ManageParts2(part: part, stock: stock)));
+              onTap: () async {
+                print(part.toStockJson(stock));
+                await findStockFromID(stock.stockID);
               },
               child: Column(
                 children: [
@@ -112,6 +118,31 @@ class _StocksScreenState extends State<StocksScreen> {
         ),
       );
 
+  }
+
+
+  Future<void> findStockFromID(String stockID) async {
+    AuthUtils.showLoadingDialog(context);
+    Map<String, dynamic> queryParams = {
+      "clientid": AppConfig.clientId,
+      "username": AppConfig.username,
+      "stockid": stockID,
+      "searchby": "part"
+    };
+    List? responseList = await StockRepository.findStock(queryParams);
+    Navigator.pop(context);
+    if (responseList == null) {
+      Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+      return;
+    }
+    Stock stock = Stock();
+    stock.fromJson(responseList[0]);
+    Part part = Part.fromStock(stock);
+    part.partId =
+    "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
+    print(stock.stockID);
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => ManageParts2(part: part, stock: stock)));
   }
 
   Widget infoLine(String label, String value) {
