@@ -38,10 +38,11 @@ class Vehicle {
   String cc = "0";
   List<String> imgList = [];
   String engineCode = "";
+  String recallID = "";
 
   Map<String, dynamic> toJson() {
     return {
-      "uniqueId": uniqueId.toString(),
+      // "uniqueId": uniqueId.toString(),
       "VehicleID": vehicleId,
       "Reg": registrationNumber,
       "StockRef": stockReference,
@@ -74,7 +75,8 @@ class Vehicle {
       "uploadStatus": uploadStatus.toString(),
       'VehCC': cc.toString(),
       "engine_code": engineCode,
-      "Images": imgList
+      "Images": imgList,
+      "RecallID" : recallID
     };
   }
 

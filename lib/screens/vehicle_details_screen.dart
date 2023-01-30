@@ -94,8 +94,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     }
     if (PartsList.cachedVehicle != null) {
       Vehicle v = PartsList.cachedVehicle!;
-      // ImageList.vehicleImgList = v.imgList;
-
+      recall = v.recallID.isNotEmpty;
       regNoController.text = v.registrationNumber ?? "";
       stockRefController.text = v.stockReference ?? "";
       makeController.text = v.make ?? "";
@@ -646,10 +645,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     vehicle.costPrice = costPriceController.text.toString();
     vehicle.collectiondate = collectionDateController.text.toString();
     vehicle.depollutiondate = dePollutionDateController.text.toString();
+    vehicle.coddate = destructionDateController.text.toString();
     vehicle.weight = weightController.text.toString();
     vehicle.location = vehicleLocController.text.toString();
     vehicle.commentDetails = commentsController.text.toString();
-
     vehicle.vehicleId =
         "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.vehicleCount.toString().padLeft(4, '0')}";
 

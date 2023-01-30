@@ -160,6 +160,7 @@ class VehicleRepository {
         vehicle.weight =
             response["Weight"].runtimeType == String ? response["Weight"] : "";
         vehicle.commentDetails = response["description"] ?? "";
+        vehicle.recallID = response["RecallCarUKRecallID"];
         PartsList.cachedVehicle = vehicle;
         String model = vehicle.model == "" ? "Model" : vehicle.model;
         MainDashboardUtils.titleList[0] =

@@ -219,14 +219,11 @@ class PartRepository {
         final File file = File(
             '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
         await file.writeAsString(msg, mode: FileMode.append);
-        // FlutterLogs.logToFile(
-        //     logFileName:
-        //         "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-        //     overwrite: false,
-        //     logMessage: msg);
       }
     }
 
     await updateParts(updatePartsList, vehicleID, model);
+
+    return true;
   }
 }

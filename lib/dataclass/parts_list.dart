@@ -32,12 +32,6 @@ class PartsList {
       await file.writeAsString(
           "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} PART LIST $url Success $responseJson\n",
           mode: FileMode.append);
-
-      // FlutterLogs.logToFile(
-      //     logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-      //     overwrite: false,
-      //     logMessage:
-      //         "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} PART LIST $url Success $responseJson\n");
       List l = responseJson['Partslist'] as List;
       partList =
           List<Part>.generate(l.length, (index) => Part.fromJson(l[index]));
@@ -50,7 +44,13 @@ class PartsList {
       return true;
     }
     print("Parts from HIVE");
+    // List l = [];
     partList = box.values.toList();
+    // for(Part part in partList){
+    //   l += part.postageOptions.split(',');
+    //   print(part.postageOptions.split(','));
+    // }
+    // print(l.toSet().toList());
     return true;
   }
 }

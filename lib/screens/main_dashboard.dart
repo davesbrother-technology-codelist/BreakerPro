@@ -6,6 +6,7 @@ import 'package:breaker_pro/dataclass/notification_utils.dart';
 import 'package:breaker_pro/notification_service.dart';
 import 'package:breaker_pro/screens/qr_screen.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:breaker_pro/api/api_config.dart';
@@ -42,6 +43,7 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
+  late Timer timer2;
   late String temp;
   @override
   void initState() {
@@ -62,6 +64,7 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
+    timer2.cancel();
     super.dispose();
   }
 
@@ -121,7 +124,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 await encoder.addDirectory(Directory(externalDirectory.path),
                     includeDirName: false);
                 encoder.close();
-                await ShareExtend.share(encoder.zipPath, "file");
+                await ShareExtend.share(encoder.zipPath, "file",subject: "BreakerPRO - iOS App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",extraText: "Send the logs for better issue tracking.");
               },
               icon: Icon(
                 Icons.share,
@@ -468,12 +471,6 @@ class _MainDashboardState extends State<MainDashboard> {
           "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} SELECT LIST ${ApiConfig.baseUrl + ApiConfig.apiSelectList} Success $response\n",
           mode: FileMode.append);
 
-      // FlutterLogs.logToFile(
-      //     logFileName: "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-      //     overwrite: false,
-      //     logMessage:
-      //         "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} SELECT LIST ${ApiConfig.baseUrl + ApiConfig.apiSelectList} Success $response\n");
-
       List responseList = response['selects'] as List;
       Map<String, dynamic> m = {};
       for (Map a in responseList) {
@@ -498,7 +495,9 @@ class _MainDashboardState extends State<MainDashboard> {
       Navigator.pop(context);
     }
 
-    await upload();
+    // await upload();
+    timer2 =
+        Timer.periodic(const Duration(seconds: 1), (Timer t) async => await upload());
 
     if (prefs.getString('vehicle') != null) {
       print("From cache ${prefs.getString('vehicle')}");
@@ -555,16 +554,26 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> upload() async {
-    print("Uploadinggg");
+
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getString('uploadQueue') == null){
+      return;
+    }
     Map<String, dynamic> map = Map<String, dynamic>.from(
-        jsonDecode(prefs.getString('uploadQueue')!) as Map<dynamic, dynamic>);
+        jsonDecode(prefs.getString('uploadQueue').toString()) as Map<dynamic, dynamic>);
     List t = List.generate(
         map['uploadQueue'].length, (index) => map['uploadQueue'][index]);
     PartsList.uploadQueue = List.generate(
         map['uploadQueue'].length, (index) => map['uploadQueue'][index]);
-    print(PartsList.uploadQueue);
 
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if(!(connectivityResult == ConnectivityResult.ethernet ||connectivityResult == ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) ){
+      print("Returned ${connectivityResult.name}");
+      return;
+    }
+    print("Uploadinggg");
+    print(PartsList.uploadQueue);
     for (String vehicleString in PartsList.uploadQueue) {
       print(prefs.getString(vehicleString));
       Vehicle v = Vehicle();
@@ -578,7 +587,9 @@ class _MainDashboardState extends State<MainDashboard> {
         ImageList.uploadVehicleImgList =
             List<String>.generate(a.length, (index) => a[index]);
         // v.imgList = List.from(ImageList.uploadVehicleImgList);
-        bool r = await VehicleRepository.uploadVehicle(v);
+        bool isVehicleUpload = await VehicleRepository.uploadVehicle(v);
+        bool isPartUpload = false;
+        bool isPhotoUpload = false;
 
         await VehicleRepository.fileUpload(v);
         Box<Part> box1 = await Hive.openBox('uploadPartListBox');
@@ -591,16 +602,27 @@ class _MainDashboardState extends State<MainDashboard> {
             }
           }
         } else {
-          print(" empyt");
+          print(" empty part list");
         }
 
-        print("Uplaof Part List ${PartsList.uploadPartList}");
+        print("Upload Part List ${PartsList.uploadPartList}");
 
-        await PartRepository.uploadParts(
-            PartsList.uploadPartList, v.vehicleId, v.model);
-        await PartRepository.fileUpload(
-            PartsList.uploadPartList, v.vehicleId, v.model);
-        if (r) {
+        if(PartsList.uploadPartList.isNotEmpty){
+          isPartUpload = await PartRepository.uploadParts(
+              PartsList.uploadPartList, v.vehicleId, v.model);
+          isPhotoUpload = await PartRepository.fileUpload(
+              PartsList.uploadPartList, v.vehicleId, v.model);
+        }else{
+          isPartUpload = true;
+          isPhotoUpload = true;
+        }
+
+
+        if (isVehicleUpload && isPhotoUpload && isPartUpload) {
+          t.remove(vehicleString);
+          bool b = await prefs.setString('uploadQueue', jsonEncode({'uploadQueue': t}));
+          print("Removed Vehicle: $b");
+
           PartsList.uploadPartList = [];
           PartsList.selectedPartList = [];
           PartsList.cachedVehicle = null;
@@ -609,12 +631,6 @@ class _MainDashboardState extends State<MainDashboard> {
           fetchPartsListNetwork();
           NotificationService().instantNofitication("Upload Complete");
           MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
-        }
-
-        t.remove(vehicleString);
-        prefs.setString('uploadQueue', jsonEncode({'uploadQueue': t}));
-
-        if (r) {
           await PartsList.prefs!.remove(vehicleString);
           await prefs.remove('vehicle');
           Box<Part> box = await Hive.openBox('partListBox');
@@ -704,7 +720,6 @@ class _MainDashboardState extends State<MainDashboard> {
     String result = await AuthRepository.login(
         ApiConfig.baseUrl + ApiConfig.apiLogin, ApiConfig.baseQueryParams);
     temp = result;
-    NotificationUtils().notifyListeners();
     if (result == 'User Active on Another Device') {
       print(result);
       timer.cancel();
@@ -778,6 +793,7 @@ class _MainDashboardState extends State<MainDashboard> {
     // show the dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },

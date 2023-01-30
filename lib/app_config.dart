@@ -9,8 +9,8 @@ class AppConfig {
   static String username = "";
   static String password = "";
   static String appName = "Breaker Pro";
-  static String appVersion = "version 135(4.1.29)";
-  static String updateDate = "Updated on ${DateTime.now().day.toString()} ${Month[DateTime.now().month.toInt()]} ${DateTime.now().year.toString()}";
+  static String appVersion = "version 0.1.0";
+  static String updateDate = "Updated on 19 December 2022";
   static String rightsInfo = "${DateTime.now().year.toString()} All Right Reserved by Lyons System Ltd.";
 
   static String deviceId = "";
