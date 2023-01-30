@@ -48,15 +48,14 @@ class _AddPartState extends State<AddPart> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Container(
+        bottomSheet: Container(
           color: MyTheme.materialColor,
           width: MediaQuery.of(context).size.width,
           child: TextButton(
             onPressed: () {
               Navigator.pop(
                   context,
-                  Part(0, partNameEditingController.text.toString(),
+                  Part(0, partNameEditingController.text.toString().toUpperCase(),
                       partTypeValue.toString(), "", "", "", "", "", ""));
             },
             child: Text(
@@ -85,7 +84,7 @@ class _AddPartState extends State<AddPart> {
               height: 20,
             ),
             customTextField("Part Type"),
-            custom2TextField("Part Name", 1, TextInputType.text),
+            custom2TextField("Part Name", 1, TextInputType.name),
           ],
         ),
       ),
@@ -141,6 +140,7 @@ class _AddPartState extends State<AddPart> {
               ),
             ),
             TextField(
+                textCapitalization: TextCapitalization.characters,
                 controller: partNameEditingController,
                 keyboardType: TType,
                 decoration: InputDecoration(
