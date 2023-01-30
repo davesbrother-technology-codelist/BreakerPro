@@ -328,21 +328,39 @@ class _ManageParts2State extends State<ManageParts2> {
                                   color: MyTheme.black, fontSize: 20)),
                           onPressed: () async {
                             // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                            XFile? image = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
-
-                            if (image != null) {
-                              File imgFile = File(image.path);
-                              print(imgFile.path);
-                              String dir = path.dirname(imgFile.path);
-                              setState(() {
+                            final ImagePicker imagePicker = ImagePicker();
+                            List<XFile> imageFileList=[];
+                            List<XFile>? selectedImages = await imagePicker.pickMultiImage();
+                            if(selectedImages.isNotEmpty){
+                              imageFileList.addAll(selectedImages);
+                            }
+                            setState(() {
+                              for(XFile image in imageFileList){
+                                File imgFile = File(image.path);
+                                String dir = path.dirname(imgFile.path);
                                 int count = PartsList.partCount;
                                 String newPath = path.join(dir,
                                     'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                                 imgFile = imgFile.renameSync(newPath);
                                 ImageList.partImageList.add(imgFile.path);
-                              });
-                            }
+                              }
+
+                            });
+                            // XFile? image = await ImagePicker()
+                            //     .pickImage(source: ImageSource.gallery);
+                            //
+                            // if (image != null) {
+                            //   File imgFile = File(image.path);
+                            //   print(imgFile.path);
+                            //   String dir = path.dirname(imgFile.path);
+                            //   setState(() {
+                            //     int count = PartsList.partCount;
+                            //     String newPath = path.join(dir,
+                            //         'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                            //     imgFile = imgFile.renameSync(newPath);
+                            //     ImageList.partImageList.add(imgFile.path);
+                            //   });
+                            // }
                             for (String img in ImageList.partImageList) {
                               print(img);
                             }
