@@ -98,7 +98,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 Directory externalDirectory = AppConfig.externalDirectory!;
                 var encoder = ZipFileEncoder();
                 encoder.create(
-                    "${externalDirectory.parent.path}/ExportedLogs/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+                    "${externalDirectory.parent.path}/ExportedLogs/iOSLogger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
                 // if (Platform.isIOS) {
                 //   externalDirectory = await getApplicationDocumentsDirectory();

@@ -116,6 +116,7 @@ class ManagePartRepository {
         print(responseString);
 
         msg += "\n$responseString\n";
+        print(msg);
         final File file = File(
             '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
         await file.writeAsString(msg, mode: FileMode.append);
