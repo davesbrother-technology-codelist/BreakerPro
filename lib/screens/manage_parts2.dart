@@ -46,34 +46,7 @@ class _ManageParts2State extends State<ManageParts2> {
     'VERY GOOD',
     'WORN'
   ];
-  final List<String> postageItems = [
-    'Old 24 hrs 6.00 + Collection Only 0.00',
-    'Old 24 hrs 0.00 + Collection Only 0.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 12.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 18.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 24.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 28.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 36.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 40.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 50.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 6.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 60.00',
-    '2-3 days 0.00 + Collection 0.00 + 24 Hrs 9.60',
-    'Old 2-3 days 0.00 + Collection Only 0.00',
-    'Old 2-3 days 12.00 + Collection Only 0.00',
-    'Old 2-3 days 18.00 + Collection Only 0.00',
-    'Old 2-3 days 24.00 + Collection Only 0.00',
-    'Old 2-3 days 36.00 + Collection Only 0.00',
-    'Old 2-3 days 50.00 + Collection Only 0.00',
-    'Old 2-3 days 6.00 + Collection Only 0.00 + Collection Only 0.00',
-    'Old 2-3 days 60.00 + Collection Only 0.00',
-    'Old 2-3 days 9.60 + Collection Only 0.00',
-    'Old 24 hrs 12.00 + Collection Only 0.00',
-    'Old 24 hrs 18.00 + Collection Only 0.00',
-    'Old 24 hrs 36.00 + Collection Only 0.00',
-    'Old 24 hrs 9.60 + Collection Only 0.00',
-    'Old Collection Only 0.00'
-  ];
+  final List<String> postageItems = AppConfig.postageOptionsList;
   List<String> fuelItems = ['Diesel','LPG','Petrol'];
   late List<bool> postageSelected =
       List.generate(postageItems.length, (index) => false);

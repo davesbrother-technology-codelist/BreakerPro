@@ -44,6 +44,7 @@ class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
   late String temp;
+  late Map responseJson;
   bool isUploading = false;
   @override
   void initState() {
@@ -485,30 +486,35 @@ class _MainDashboardState extends State<MainDashboard> {
           mode: FileMode.append);
 
       List responseList = response['selects'] as List;
-      Map<String, dynamic> m = {};
       for (Map a in responseList) {
         if (a['SelectList'] != "MODEL") {
-          if (m[a['SelectList']] == null) {
+          if (responseJson[a['SelectList']] == null) {
             if (a['SelectValue'] != "No Value") {
-              m[a['SelectList']] = [a['SelectValue']];
+              responseJson[a['SelectList']] = [a['SelectValue']];
             }
           } else {
-            m[a['SelectList']]?.add(a['SelectValue']);
+            responseJson[a['SelectList']]?.add(a['SelectValue']);
           }
         }
         else {
-          if (m[a['RelatedValue']] == null) {
-            m[a['RelatedValue']] = [a['SelectValue']];
+          if (responseJson[a['RelatedValue']] == null) {
+            responseJson[a['RelatedValue']] = [a['SelectValue']];
           } else {
-            m[a['RelatedValue']]?.add(a['SelectValue']);
+            responseJson[a['RelatedValue']]?.add(a['SelectValue']);
           }
         }
       }
-      String user = jsonEncode(m);
-      AppConfig.postageOptionsList = createMenuList('POSTAGE', AppConfig.postageOptionsList, m);
+      String user = jsonEncode(responseJson);
       prefs.setString('selectList', user);
       Navigator.pop(context);
     }
+    else{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String response = prefs.getString('selectList').toString();
+      responseJson = jsonDecode(response);
+
+    }
+    AppConfig.postageOptionsList = createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
 
     // await upload();
     await upload();
