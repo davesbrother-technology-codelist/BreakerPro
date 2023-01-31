@@ -96,9 +96,16 @@ class _MainDashboardState extends State<MainDashboard> {
                 Fluttertoast.showToast(
                     msg: "Please wait while creating zip...");
                 Directory externalDirectory = AppConfig.externalDirectory!;
+                String platform = "";
+                if(Platform.isAndroid){
+                  platform = "Android";
+                }
+                else{
+                  platform = "iOS";
+                }
                 var encoder = ZipFileEncoder();
                 encoder.create(
-                    "${externalDirectory.parent.path}/ExportedLogs/iOSLogger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+                    "${externalDirectory.parent.path}/ExportedLogs/${platform}Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
                 // if (Platform.isIOS) {
                 //   externalDirectory = await getApplicationDocumentsDirectory();
@@ -123,7 +130,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 await encoder.addDirectory(Directory(externalDirectory.path),
                     includeDirName: false);
                 encoder.close();
-                await ShareExtend.share(encoder.zipPath, "file",subject: "BreakerPRO - iOS App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",extraText: "Send the logs for better issue tracking.");
+                await ShareExtend.share(encoder.zipPath, "file",subject: "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",extraText: "Send the logs for better issue tracking.");
               },
               icon: Icon(
                 Icons.share,
