@@ -792,6 +792,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                       engineEbayController.text = s;
                     });
                   }
+                  if (title == "Type Model" && s != null) {
+                    setState(() {
+                      modelEbayController.text = "${modelController.text} $s";
+                    });
+                  }
                   if (makeController.text.isNotEmpty) {
                     saveVehicle();
                   }
@@ -848,7 +853,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                           break;
                         case 'Model':
                           {
-                            modelEbayController.text = value['value'];
+                            modelEbayController.text = value['value'] + " " + typeModelController.text;
                           }
                           break;
                         case 'Body Style':
@@ -867,7 +872,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         modelController.clear();
                         modelMenuItems = createMenuList(
                             value['value'], modelMenuItems, responseJson);
-                        modelEbayController.text = "";
+                        modelEbayController.text = typeModelController.text;
                       }
                       controller.text = value['value'];
 

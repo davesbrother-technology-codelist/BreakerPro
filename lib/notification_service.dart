@@ -24,14 +24,15 @@ class NotificationService extends ChangeNotifier {
   }
 
   //Instant Notifications
-  Future instantNofitication(String msg) async {
+  Future instantNofitication(String msg, {bool playSound = false}) async {
     await _flutterLocalNotificationsPlugin.cancel(0);
     var android = AndroidNotificationDetails("id", "channel",
         channelDescription: "description",
         styleInformation: BigTextStyleInformation(msg),
-        importance: Importance.high);
+        importance: Importance.high,
+    playSound: playSound,enableVibration: false);
 
-    var ios = const DarwinNotificationDetails();
+    var ios = DarwinNotificationDetails(presentSound: playSound);
 
     var platform = NotificationDetails(android: android, iOS: ios);
 

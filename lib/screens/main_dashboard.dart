@@ -43,8 +43,8 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
-  late Timer timer2;
   late String temp;
+  bool isUploading = false;
   @override
   void initState() {
     // upload();
@@ -64,7 +64,6 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
-    timer2.cancel();
     super.dispose();
   }
 
@@ -496,8 +495,7 @@ class _MainDashboardState extends State<MainDashboard> {
     }
 
     // await upload();
-    timer2 =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) async => await upload());
+    await upload();
 
     if (prefs.getString('vehicle') != null) {
       print("From cache ${prefs.getString('vehicle')}");
@@ -554,8 +552,6 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> upload() async {
-
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if(prefs.getString('uploadQueue') == null){
       return;
@@ -572,9 +568,14 @@ class _MainDashboardState extends State<MainDashboard> {
       print("Returned ${connectivityResult.name}");
       return;
     }
-    print("Uploadinggg");
-    print(PartsList.uploadQueue);
+    if(isUploading){
+      return;
+    }
+    isUploading = true;
+
     for (String vehicleString in PartsList.uploadQueue) {
+      print("Uploadinggg");
+      print(vehicleString);
       print(prefs.getString(vehicleString));
       Vehicle v = Vehicle();
       if (prefs.getString(vehicleString) != null) {
@@ -629,7 +630,7 @@ class _MainDashboardState extends State<MainDashboard> {
           prefs.setBool('uploadParts', false);
           ImageList.partImageList = [];
           fetchPartsListNetwork();
-          NotificationService().instantNofitication("Upload Complete");
+          NotificationService().instantNofitication("Upload Complete",playSound: true);
           MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
           await PartsList.prefs!.remove(vehicleString);
           await prefs.remove('vehicle');
@@ -644,6 +645,8 @@ class _MainDashboardState extends State<MainDashboard> {
         }
       }
     }
+
+    isUploading = false;
 
     // bool? vUpload = prefs.getBool('uploadVehicle');
     // bool? pUpload = prefs.getBool('uploadParts');
@@ -686,6 +689,16 @@ class _MainDashboardState extends State<MainDashboard> {
     //     NotificationService().instantNofitication("Upload Complete");
     //   }
     // }
+  }
+
+  checkConnectivity() async{
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if(!(connectivityResult == ConnectivityResult.ethernet ||connectivityResult == ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) ){
+      AppConfig.isConnected = false;
+    }
+    else{
+      AppConfig.isConnected = true;
+    }
   }
 
   login(Map<String, dynamic> queryParams) async {
@@ -823,4 +836,5 @@ class _MainDashboardState extends State<MainDashboard> {
     //     debugFileOperations: true,
     //     isDebuggable: true);
   }
+
 }

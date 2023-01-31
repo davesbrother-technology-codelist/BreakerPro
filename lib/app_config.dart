@@ -22,6 +22,8 @@ class AppConfig {
 
   static Directory? externalDirectory;
 
+  static bool isConnected = false;
+
   static Map aspectMap = {
     'Default': 9 / 16,
     '1:1': 1 / 1,
