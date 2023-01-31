@@ -4,12 +4,16 @@ import 'package:breaker_pro/screens/stocks_screen.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import '../api/api_config.dart';
+import '../api/manage_part_repository.dart';
 import '../api/stock_repository.dart';
 import '../app_config.dart';
 import '../dataclass/image_list.dart';
 import '../dataclass/part.dart';
 import '../dataclass/stock.dart';
+import '../notification_service.dart';
 import 'manage_parts2.dart';
 import 'dart:io';
 
@@ -199,7 +203,7 @@ class _ManagePartState extends State<ManagePart> {
               //   child: SizedBox(
               //     width: 9,
               //     height: 6,
-              //     child: Image.file(File("/data/user/0/com.example.breaker_pro/cache/IMGPRT202301291921000012122023012919210020230129192100.jpg")),
+              //     child: Image.file(File("/data/user/0/com.example.breaker_pro/cache/IMG2023013114003820230131140038.jpg")),
               //   ),
               // ),
             ],
@@ -437,4 +441,6 @@ class _ManagePartState extends State<ManagePart> {
         builder: (_) =>
             StocksScreen(stockList: stockList, partList: partList)));
   }
+
+
 }

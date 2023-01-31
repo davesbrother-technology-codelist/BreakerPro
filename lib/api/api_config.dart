@@ -36,6 +36,10 @@ class ApiConfig {
       AppConfig.username = baseQueryParams['username'];
       AppConfig.clientId = baseQueryParams['clientid'];
       AppConfig.password = baseQueryParams['password'];
+       AppConfig.deviceId = baseQueryParams['deviceid'];
+     AppConfig.appVersion = baseQueryParams['appversion'];
+     AppConfig.osVersion = baseQueryParams['osversion'];
+     AppConfig.deviceName = baseQueryParams['devicename'];
       print("Query Params from storage $baseQueryParams");
       return true;
     }

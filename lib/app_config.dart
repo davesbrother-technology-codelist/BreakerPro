@@ -31,6 +31,8 @@ class AppConfig {
     '6:9': 9 / 6,
   };
 
+  static List<String> postageOptionsList = [];
+
   static getDeviceInfo() async {
     deviceId = (await PlatformDeviceId.getDeviceId)!;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();

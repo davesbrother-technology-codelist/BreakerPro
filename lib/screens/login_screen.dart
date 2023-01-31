@@ -6,8 +6,11 @@ import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_config.dart';
+import '../dataclass/part.dart';
 import '../my_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,7 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (widget.noLogin) {
       loginFromCache();
     }
-
     clientIdController = TextEditingController(
         text: ApiConfig.baseQueryParams['clientid'] ?? "");
     usernameController = TextEditingController(
@@ -237,11 +239,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result == 'Login Successfully') {
       await ApiConfig.uploadParamsToStorage(queryParams);
-
-      // PartsList partsList = PartsList();
-      // queryParams['index'] = "0";
-      // await partsList.loadParts(
-      //     ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
       Navigator.pop(context);
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const MainDashboard(),
@@ -286,6 +283,16 @@ class _LoginScreenState extends State<LoginScreen> {
       "osversion": AppConfig.osVersion,
       "devicename": AppConfig.deviceName,
     };
+
+    if(AppConfig.clientId != clientIdController.text.toString()){
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('selectList');
+      PartsList.partList.clear();
+      Box<Part> box = await Hive.openBox('partsBox');
+      await box.clear();
+      await box.close();
+      print("CLEARED LIST");
+    }
 
     print("Query Params from user");
     await login(queryParams);

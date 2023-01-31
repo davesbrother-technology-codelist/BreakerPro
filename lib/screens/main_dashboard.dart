@@ -452,6 +452,13 @@ class _MainDashboardState extends State<MainDashboard> {
     );
   }
 
+  createMenuList(String title, List<String> menu, Map responseJson) {
+    List l = responseJson[title];
+    menu.clear();
+    menu = List<String>.generate(l.length, (index) => l[index]);
+    return menu;
+  }
+
   fetchSelectListNetwork() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     PartsList.prefs = prefs;
@@ -488,7 +495,8 @@ class _MainDashboardState extends State<MainDashboard> {
           } else {
             m[a['SelectList']]?.add(a['SelectValue']);
           }
-        } else {
+        }
+        else {
           if (m[a['RelatedValue']] == null) {
             m[a['RelatedValue']] = [a['SelectValue']];
           } else {
@@ -497,6 +505,7 @@ class _MainDashboardState extends State<MainDashboard> {
         }
       }
       String user = jsonEncode(m);
+      AppConfig.postageOptionsList = createMenuList('POSTAGE', AppConfig.postageOptionsList, m);
       prefs.setString('selectList', user);
       Navigator.pop(context);
     }

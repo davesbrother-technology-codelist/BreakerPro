@@ -114,7 +114,6 @@ class _ManageParts2State extends State<ManageParts2> {
     partCommentsEditingController.text = part.comments;
     postageOptionsController.text = part.postageOptions;
     fuelController.text = stock.fuel;
-    ImageList.partImageList = List.from(part.imgList);
 
     for (int i = 0; i < postageItems.length; i++) {
       if (part.postageOptions.contains(postageItems[i])) {
@@ -125,9 +124,10 @@ class _ManageParts2State extends State<ManageParts2> {
 
   @override
   void dispose() {
-    ImageList.partImageList.clear();
+    ImageList.managePartImageList.clear();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +297,7 @@ class _ManageParts2State extends State<ManageParts2> {
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
-                height: ImageList.partImageList.isNotEmpty ? 210 : 80,
+                height: ImageList.managePartImageList.isNotEmpty ? 210 : 80,
                 color: MyTheme.black12,
                 child: Column(
                   children: [
@@ -342,7 +342,7 @@ class _ManageParts2State extends State<ManageParts2> {
                                 String newPath = path.join(dir,
                                     'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                                 imgFile = imgFile.renameSync(newPath);
-                                ImageList.partImageList.add(imgFile.path);
+                                ImageList.managePartImageList.add(imgFile.path);
                               }
 
                             });
@@ -361,21 +361,21 @@ class _ManageParts2State extends State<ManageParts2> {
                             //     ImageList.partImageList.add(imgFile.path);
                             //   });
                             // }
-                            for (String img in ImageList.partImageList) {
+                            for (String img in ImageList.managePartImageList) {
                               print(img);
                             }
                           },
                         ),
                       ],
                     ),
-                    ImageList.partImageList.isNotEmpty
+                    ImageList.managePartImageList.isNotEmpty
                         ? Align(
                             alignment: Alignment.bottomLeft,
                             child: SizedBox(
                               height: 140,
                               child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
-                                  itemCount: ImageList.partImageList.length,
+                                  itemCount: ImageList.managePartImageList.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return Stack(
@@ -389,7 +389,7 @@ class _ManageParts2State extends State<ManageParts2> {
                                               width: 9,
                                               height: 16,
                                               child: Image.file(File(ImageList
-                                                  .partImageList[index])),
+                                                  .managePartImageList[index])),
                                             ),
                                           ),
                                         ),
@@ -405,7 +405,7 @@ class _ManageParts2State extends State<ManageParts2> {
                                             ),
                                             onPressed: () {
                                               setState(() {
-                                                ImageList.partImageList
+                                                ImageList.managePartImageList
                                                     .removeAt(index);
                                                 // part.imgList.removeAt(index);
                                               });
@@ -695,7 +695,7 @@ class _ManageParts2State extends State<ManageParts2> {
     part.comments = partCommentsEditingController.text.toString();
     part.postageOptions = postageOptionsController.text.toString();
     part.ebayTitle = isEbay ? ebayTitleEditingController.text.toString() : "";
-    part.imgList = List.from(ImageList.partImageList);
+    part.imgList = List.from(ImageList.managePartImageList);
     part.isEbay = isEbay;
     part.hasPrintLabel = hasPrintLabel;
     part.isDefault = isDefault;
@@ -705,8 +705,7 @@ class _ManageParts2State extends State<ManageParts2> {
     // final File file = File(
     //     '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
     // await file.writeAsString(msg, mode: FileMode.append);
-    await ManagePartRepository.uploadPart(part, stock);
-    await ManagePartRepository.fileUpload(part, stock);
-    Navigator.pop(context, part);
+    ManagePartRepository.uploadPart(part, stock);
+    Navigator.pop(context, {"part" : part,"stock" : stock});
   }
 }

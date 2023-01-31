@@ -220,7 +220,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                         'IMG${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                                     imgFile = imgFile.renameSync(newPath);
                                     imgList.add(imgFile.path);
-                                    ImageList.partImageList.add(imgFile.path);
+                                    ImageList.managePartImageList.add(imgFile.path);
                                     print(imgFile.path);
                                   }
                                   else {

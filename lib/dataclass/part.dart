@@ -102,9 +102,11 @@ class Part {
       this.ebayTitle);
 
   static Part fromJson(Map<String, dynamic> json) {
+    String name = json["PartName"];
+    name = name.replaceAll("&amp;", "&");
     return Part(
         0,
-        json["PartName"],
+        name,
         json["PartType"],
         json["PredefinedLists"],
         json["PostageOptions"],
@@ -147,12 +149,12 @@ class Part {
       "PartDescription": isDefault ? defaultDescription : description,
       "PartComments": comments,
       "Marketing": isEbay ? "Ebay," : "",
-      "PartImageFiles": imgList.toString(),
+      "PartImageFiles": "",
       "PostageRate": postageOptions,
       "PostageCode": postageOptionsCode,
       "Qty": qty.toString(),
       "ManPartNo": mnfPartNo,
-      "Images": imgList.toString(),
+      "Images": "",
       "PrintLabel": hasPrintLabel ? "1" : "0",
       "warranty": warranty.toString(),
       "Ebay_Title": ebayTitle,
