@@ -1,4 +1,6 @@
 import 'package:breaker_pro/api/vehicle_repository.dart';
+import 'package:breaker_pro/api/workOrder_repository.dart';
+import 'package:breaker_pro/dataclass/workOrder.dart';
 import 'package:breaker_pro/screens/quickScan.dart';
 import 'package:breaker_pro/screens/scanImaging.dart';
 import 'package:breaker_pro/screens/scanStockReconcile.dart';
@@ -9,6 +11,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:url_launcher/url_launcher.dart';
+import '../api/api_config.dart';
+import '../app_config.dart';
 import '../dataclass/parts_list.dart';
 import '../my_theme.dart';
 import 'package:breaker_pro/screens/scanPart.dart';
@@ -68,20 +72,20 @@ class MainDashboardUtils {
                         if (vrn != null) {
                           AuthUtils.showLoadingDialog(context);
                           bool b =
-                              await VehicleRepository.findVehicleFromVRN(vrn);
+                          await VehicleRepository.findVehicleFromVRN(vrn);
                           Navigator.pop(context);
                           if (b) {
                             PartsList.recall = true;
                             Navigator.of(context)
                                 .push(MaterialPageRoute(
                               builder: (context) =>
-                                  const VehicleDetailsScreen(),
+                              const VehicleDetailsScreen(),
                             ))
                                 .then((value) {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (_) => MainDashboard()),
-                                  (Route r) => false);
+                                      (Route r) => false);
                             });
                           }
                         }
@@ -119,13 +123,13 @@ class MainDashboardUtils {
                             Navigator.of(context)
                                 .push(MaterialPageRoute(
                               builder: (context) =>
-                                  const VehicleDetailsScreen(),
+                              const VehicleDetailsScreen(),
                             ))
                                 .then((value) {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (_) => MainDashboard()),
-                                  (Route r) => false);
+                                      (Route r) => false);
                             });
                           }
                         }
@@ -147,19 +151,19 @@ class MainDashboardUtils {
                   ),
                   TextButton(
                       onPressed: () => {
-                            // Navigator.of(context).pop(),
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(
-                              builder: (context) =>
-                                  const VehicleDetailsScreen(),
-                            ))
-                                .then((value) {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (_) => MainDashboard()),
+                        // Navigator.of(context).pop(),
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(
+                          builder: (context) =>
+                          const VehicleDetailsScreen(),
+                        ))
+                            .then((value) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => MainDashboard()),
                                   (Route r) => false);
-                            })
-                          },
+                        })
+                      },
                       child: const Text(
                         "MANUAL ENTRY",
                         style: TextStyle(fontSize: 18),
@@ -206,20 +210,20 @@ class MainDashboardUtils {
                         if (vrn != null) {
                           AuthUtils.showLoadingDialog(context);
                           bool b =
-                              await VehicleRepository.findVehicleFromVRN(vrn);
+                          await VehicleRepository.findVehicleFromVRN(vrn);
                           Navigator.pop(context);
                           if (b) {
                             PartsList.recall = true;
                             Navigator.of(context)
                                 .push(MaterialPageRoute(
                               builder: (context) =>
-                                  const VehicleDetailsScreen(),
+                              const VehicleDetailsScreen(),
                             ))
                                 .then((value) {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (_) => MainDashboard()),
-                                  (Route r) => false);
+                                      (Route r) => false);
                             });
                           }
                         }
@@ -256,13 +260,13 @@ class MainDashboardUtils {
                             Navigator.of(context)
                                 .push(MaterialPageRoute(
                               builder: (context) =>
-                                  const VehicleDetailsScreen(),
+                              const VehicleDetailsScreen(),
                             ))
                                 .then((value) {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
                                       builder: (_) => MainDashboard()),
-                                  (Route r) => false);
+                                      (Route r) => false);
                             });
                           }
                         }
@@ -284,19 +288,19 @@ class MainDashboardUtils {
                   ),
                   TextButton(
                       onPressed: () => {
-                            // Navigator.of(context).pop(),
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(
-                              builder: (context) =>
-                                  const VehicleDetailsScreen(),
-                            ))
-                                .then((value) {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (_) => MainDashboard()),
+                        // Navigator.of(context).pop(),
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(
+                          builder: (context) =>
+                          const VehicleDetailsScreen(),
+                        ))
+                            .then((value) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => MainDashboard()),
                                   (Route r) => false);
-                            })
-                          },
+                        })
+                      },
                       child: const Text(
                         "MANUAL ENTRY",
                         style: TextStyle(fontSize: 18),
@@ -407,7 +411,7 @@ class MainDashboardUtils {
                                 ),
                                 border: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: MyTheme.black)),
+                                    BorderSide(color: MyTheme.black)),
                                 labelText: 'Part ID',
                                 labelStyle: TextStyle(color: MyTheme.black)),
                           ),
@@ -421,11 +425,11 @@ class MainDashboardUtils {
                           color: MyTheme.materialColor,
                           child: TextButton(
                               onPressed: () => {
-                                    Navigator.of(context).pop(),
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) => ScanPart()))
-                                  },
+                                Navigator.of(context).pop(),
+                                Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => ScanPart()))
+                              },
                               child: Text(
                                 "Find",
                                 style: TextStyle(
@@ -443,10 +447,10 @@ class MainDashboardUtils {
                     color: MyTheme.materialColor,
                     child: TextButton(
                         onPressed: () => {
-                              Navigator.of(context).pop(),
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ScanPart()))
-                            },
+                          Navigator.of(context).pop(),
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ScanPart()))
+                        },
                         child: Text(
                           "Scan Part",
                           style: TextStyle(
@@ -462,10 +466,10 @@ class MainDashboardUtils {
                     padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                     child: TextButton(
                         onPressed: () => {
-                              Navigator.of(context).pop(),
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => QuickScan()))
-                            },
+                          Navigator.of(context).pop(),
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => QuickScan()))
+                        },
                         child: Text(
                           "Quick Scan",
                           style: TextStyle(
@@ -496,10 +500,24 @@ class MainDashboardUtils {
         .push(MaterialPageRoute(builder: (context) => const ManagePart()));
   }
 
-  static void WorkOrdersFunction(BuildContext context) {
+  static void WorkOrdersFunction(BuildContext context) async {
 
+    AuthUtils.showLoadingDialog(context);
+    Map<String, dynamic> queryParams = {
+      "clientid": AppConfig.clientId,
+      "WO_Status": "All",
+    };
+    String url = ApiConfig.baseUrl + ApiConfig.apiGetWorkOrders;
+    List? responseList = await WorkOrderRepository.getWorkOrder(url,queryParams);
+
+    List<workOrder> workOrderList = List.generate(responseList!.length, (index) {
+      workOrder WorkOrder = workOrder();
+      WorkOrder.fromJson(responseList[index]);
+      return WorkOrder;
+    });
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => WorkOrderScreen()));
+        .push(MaterialPageRoute(builder: (context) => WorkOrderScreen(workOrderList: workOrderList)));
+
   }
 
   static List<String> titleList = [

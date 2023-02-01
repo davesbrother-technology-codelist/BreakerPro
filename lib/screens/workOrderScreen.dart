@@ -1,31 +1,35 @@
 import 'package:bottom_drawer/bottom_drawer.dart';
+import 'package:breaker_pro/dataclass/workOrder.dart';
 import 'package:breaker_pro/my_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:breaker_pro/screens/workOrderScreen2.dart';
-
+import '../utils/auth_utils.dart';
+import 'package:breaker_pro/api/workOrder_repository.dart';
+import 'package:breaker_pro/app_config.dart';
 class WorkOrderScreen extends StatefulWidget {
-  const WorkOrderScreen({Key? key}) : super(key: key);
-
+  const WorkOrderScreen({Key? key, required this.workOrderList}) : super(key: key);
+  final List<workOrder> workOrderList;
   @override
   State<WorkOrderScreen> createState() => _WorkOrderScreenState();
 }
 
 class _WorkOrderScreenState extends State<WorkOrderScreen>
     with SingleTickerProviderStateMixin {
+  late List<workOrder> workOrderList;
   String? _selectedValue;
   TextStyle customTextStyle =
-      TextStyle(fontWeight: FontWeight.bold, color: MyTheme.materialColor);
+  TextStyle(fontWeight: FontWeight.bold, color: MyTheme.materialColor);
   late AnimationController _controller;
   final BottomDrawerController _controller1 = BottomDrawerController();
   final BottomDrawerController _controller2 = BottomDrawerController();
 
   EdgeInsetsGeometry textEdgeInsetsGeometry =
-      const EdgeInsets.fromLTRB(0, 10, 10, 10);
+  const EdgeInsets.fromLTRB(0, 10, 10, 10);
   EdgeInsetsGeometry containerEdgeInsetsGeometry =
-      const EdgeInsets.fromLTRB(10, 5, 10, 5);
+  const EdgeInsets.fromLTRB(10, 5, 10, 5);
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
-      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+  OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   String? predefinedValue;
   String? partTypeValue;
 
@@ -49,7 +53,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
   @override
   void initState() {
     super.initState();
-
+    workOrderList=widget.workOrderList;
     for (String item in columnList) {
       preDefinedDropDownItems.add(DropdownMenuItem(
         value: item,
@@ -172,17 +176,17 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
             floatingActionButton: !isEdit ?Container(
-              color: MyTheme.materialColor,
-              width: MediaQuery.of(context).size.width,
-              child: TextButton(
-                onPressed: (){
-                  customAlertField('Change Work Order Status');
-                },
-                child: Text(
-                  "Batch Mark Status",
-                  style: TextStyle(color: MyTheme.white),
-                ),
-              )
+                color: MyTheme.materialColor,
+                width: MediaQuery.of(context).size.width,
+                child: TextButton(
+                  onPressed: (){
+                    customAlertField('Change Work Order Status');
+                  },
+                  child: Text(
+                    "Batch Mark Status",
+                    style: TextStyle(color: MyTheme.white),
+                  ),
+                )
             ):Container(),
             body: CustomScrollView(
               slivers: [
@@ -319,16 +323,16 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                       ),
                       Expanded(
                           child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isEdit=!isEdit;
-                                });
-                                // if(isEdit==false){
+                            onPressed: () {
+                              setState(() {
+                                isEdit=!isEdit;
+                              });
+                              // if(isEdit==false){
 
-                                //   _controller2.open();
-                                // }
-                              },
-                              icon: isEdit ? Icon(Icons.edit,size: 35,) : Icon(Icons.clear,size: 35,),
+                              //   _controller2.open();
+                              // }
+                            },
+                            icon: isEdit ? Icon(Icons.edit,size: 35,) : Icon(Icons.clear,size: 35,),
                           )),
                       Expanded(
                           child: GestureDetector(
@@ -346,15 +350,15 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                 SliverList(
                   delegate: SliverChildListDelegate([
                     Table(
-                      columnWidths:  {
-                  0: FlexColumnWidth(3),
-                  1: FlexColumnWidth(2),
-                  2: FlexColumnWidth(3),
-                  3:FlexColumnWidth(2)
-                  },
-                      border: TableBorder.all(
-                          width: 1, color: Colors.black45), //table border
-                      children:createTable()
+                        columnWidths:  {
+                          0: FlexColumnWidth(3),
+                          1: FlexColumnWidth(2),
+                          2: FlexColumnWidth(3),
+                          3:FlexColumnWidth(2)
+                        },
+                        border: TableBorder.all(
+                            width: 1, color: Colors.black45), //table border
+                        children:createTable()
                       // [
                       //   TableRow(
                       //       children: [
@@ -405,78 +409,126 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
     List<TableRow> rows = [];
     rows.add(
       TableRow(
-        children: [
-          TableCell(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text("Invoice Details",
-                    style: customTextStyle),
-              )),
-          TableCell(
-              child: Text(
-                "Date",
-                style: customTextStyle,
-              )),
-          TableCell(
-              child: Text(
-                "Order Details",
-                style: customTextStyle,
-              )),
-          TableCell(
-              child: Text(
-                "Location",
-                style: customTextStyle,
-              ))
-        ],
-        decoration: BoxDecoration(
-            color: Color.fromRGBO(238, 180, 22, .1))),
+          children: [
+            TableCell(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Invoice     Details",
+                      style: customTextStyle),
+                )),
+            TableCell(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Date",
+                    style: customTextStyle,
+                  ),
+                )),
+            TableCell(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Order Details",
+                    style: customTextStyle,
+                  ),
+                )),
+            TableCell(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Location",
+                    style: customTextStyle,
+                  ),
+                ))
+          ],
+          decoration: BoxDecoration(
+              color: Color.fromRGBO(238, 180, 22, .1))),
     );
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 1; i < workOrderList.length; ++i) {
+      workOrder WorkOrder= workOrderList[i];
+
       rows.add(
           TableRow(children: [
-        GestureDetector(
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
-          },
-          child: !isEdit? Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex:1,
-                child: Checkbox(
-                  value: isEdit,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isEdit = value!;
-                    });
-                  },
-                ),
-              ),
+            GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+                },
+                child: !isEdit? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex:1,
+                      child: Checkbox(
+                        value: isEdit,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isEdit = value!;
+                          });
+                        },
+                      ),
+                    ),
 
-              Expanded(flex:1,child: Text("Invoice Details ",)),
+                    Expanded(flex:1,child:
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 5,),
+                        Text(WorkOrder.woNumber,style: TextStyle(fontSize: 12),),
+                        SizedBox(height: 10,),
+                        Text(WorkOrder.woShippingDetails,style: TextStyle(fontSize: 12),),
+                        SizedBox(height: 5,),
 
-            ],
-          ): Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text('Invoice Details'),
-          )
-        ),
-        GestureDetector(
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
-          },
-            child: Text("Date ")),
-        GestureDetector(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
-            },
-            child: Text("Order Details")),
-        GestureDetector(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
-            },
-            child: Text("Location"))
-      ],
+                      ],
+                    )
+
+                    )],
+                ): Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 5,),
+                      Text(WorkOrder.woNumber,style: TextStyle(fontSize: 12),),
+                      SizedBox(height: 10,),
+                      Text(WorkOrder.woShippingDetails,style: TextStyle(fontSize: 12),),
+                      SizedBox(height: 5,),
+
+                    ],
+                  ),
+                )
+            ),
+            GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+                },
+                child:Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(WorkOrder.woDateTime.substring(8,10)+"/"+WorkOrder.woDateTime.substring(5,7),style: TextStyle(fontSize: 12),),
+                      Divider(thickness: 1,color: Colors.grey,),
+                      Text(WorkOrder.woDateTime.substring(11),style: TextStyle(fontSize: 12),)
+                    ],
+                  ),
+                )
+            ),
+            GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(WorkOrder.woPartName+" "+WorkOrder.woVehicleDetails,style: TextStyle(fontSize: 12),),
+                )),
+            GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkOrderScreen2()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(WorkOrder.woPartLocation,style: TextStyle(fontSize: 12),),
+                ))
+          ],
               decoration: BoxDecoration(
                   color: Color.fromRGBO(238, 180, 22, .1)) )
       );
@@ -484,6 +536,17 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
     return rows;
   }
 
+  // Future<void> getWorkOrder(String stockID) async {
+  //   AuthUtils.showLoadingDialog(context);
+  //   Map<String, dynamic> queryParams = {
+  //     "clientid": AppConfig.clientId,
+  //     "WO_Status": "All",
+  //   };
+  //   List? responseList = await WorkOrderRepository.getWorkOrder(queryParams);
+  //   Navigator.pop(context);
+  //   workOrder WorkOrder=workOrder();
+  //   WorkOrder.fromJson(responseList![0]);
+  // }
 
   Future<dynamic> customAlertField(String title){
     return showDialog(context: context, builder: (context)=>AlertDialog(
@@ -528,13 +591,13 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
             SizedBox(height: 10,),
             if(selectedRadio==0) TextField(
               decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2.0,
-                    color: Colors.grey
-                  )
-                ),
-                labelText: 'Enter Comments'
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          width: 2.0,
+                          color: Colors.grey
+                      )
+                  ),
+                  labelText: 'Enter Comments'
               ) ,
             )
             else if(selectedRadio==1) TextField(
@@ -549,7 +612,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
               ) ,
             )
             else SingleChildScrollView(
-              child: Wrap(
+                child: Wrap(
                   children: [
                     TextField(
                       decoration: InputDecoration(
@@ -592,8 +655,8 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                     )
                   ],
                 ),
-            )
-      ],
+              )
+          ],
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
