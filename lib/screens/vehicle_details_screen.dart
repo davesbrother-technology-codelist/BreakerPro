@@ -101,6 +101,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       makeController.text = v.make ?? "";
       ccController.text = v.cc ?? "";
       modelController.text = v.model ?? "";
+      typeModelController.text = v.type;
       fuelController.text = v.fuel ?? "";
       bodyStyleController.text = v.bodyStyle ?? "";
       vinController.text = v.vin ?? "";
@@ -119,15 +120,23 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       modelEbayController.text = v.ebayModel ?? "";
       styleEbayController.text = v.ebayStyle ?? "";
       colorEbayController.text = v.ebayColor ?? "";
+      mileageController.text = v.mileage;
+      costPriceController.text = v.costPrice;
+      collectionDateController.text = v.collectiondate;
+      dePollutionDateController.text = v.depollutiondate;
+      destructionDateController.text = v.coddate;
+      vehicleLocController.text = v.location;
       weightController.text = v.weight ?? "";
       commentsController.text = v.commentDetails ?? "";
       setState(() {});
     }
+
   }
 
   @override
   void dispose() {
     if (makeController.text.isNotEmpty && PartsList.saveVehicle) {
+      print("Saving while dispose");
       saveVehicle();
     } else {
       ImageList.vehicleImgList = [];
