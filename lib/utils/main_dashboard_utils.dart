@@ -152,6 +152,7 @@ class MainDashboardUtils {
                   TextButton(
                       onPressed: () => {
                         // Navigator.of(context).pop(),
+                        print("Hello ${PartsList.cachedVehicle}"),
                         Navigator.of(context)
                             .push(MaterialPageRoute(
                           builder: (context) =>

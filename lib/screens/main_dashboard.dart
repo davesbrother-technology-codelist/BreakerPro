@@ -43,20 +43,43 @@ class MainDashboard extends StatefulWidget {
 class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
+  late Timer timer2;
   late String temp;
+  late StreamSubscription<ConnectivityResult> _networkSubscription;
   Map responseJson = {};
   bool isUploading = false;
   @override
   void initState() {
-    // upload();
-    initialiseLog();
+    print("Helllllllo");
     partsList = PartsList();
     fetchSelectListNetwork();
     fetchPartsListNetwork();
-
     super.initState();
     timer =
         Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
+    _networkSubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult connectivityResult) async {
+      if (connectivityResult == ConnectivityResult.ethernet ||
+          connectivityResult == ConnectivityResult.mobile ||
+          connectivityResult == ConnectivityResult.wifi) {
+          print("Uplaod resume $connectivityResult");
+          if(!isUploading){
+            isUploading = true;
+            try{
+              await upload();
+            }
+            catch(e){
+              isUploading = false;
+            }
+
+            isUploading = false;
+          }
+
+
+        return;
+      }
+    });
   }
 
   @override
@@ -65,6 +88,7 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
+    _networkSubscription.cancel();
     super.dispose();
   }
 
@@ -98,10 +122,9 @@ class _MainDashboardState extends State<MainDashboard> {
                     msg: "Please wait while creating zip...");
                 Directory externalDirectory = AppConfig.externalDirectory!;
                 String platform = "";
-                if(Platform.isAndroid){
+                if (Platform.isAndroid) {
                   platform = "Android";
-                }
-                else{
+                } else {
                   platform = "iOS";
                 }
                 var encoder = ZipFileEncoder();
@@ -131,7 +154,10 @@ class _MainDashboardState extends State<MainDashboard> {
                 await encoder.addDirectory(Directory(externalDirectory.path),
                     includeDirName: false);
                 encoder.close();
-                await ShareExtend.share(encoder.zipPath, "file",subject: "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",extraText: "Send the logs for better issue tracking.");
+                await ShareExtend.share(encoder.zipPath, "file",
+                    subject:
+                        "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
+                    extraText: "Send the logs for better issue tracking.");
               },
               icon: Icon(
                 Icons.share,
@@ -164,8 +190,9 @@ class _MainDashboardState extends State<MainDashboard> {
                 //     context,
                 //     MaterialPageRoute(
                 //         builder: (BuildContext context) => super.widget));
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => QrScreen()));
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove('uploadQueue');
+
               },
               icon: Icon(
                 Icons.refresh,
@@ -194,8 +221,16 @@ class _MainDashboardState extends State<MainDashboard> {
                                 MainDashboardUtils.openUrl(
                                     "https://breakerpro.co.uk/livechat");
                               },
-                              icon: const Icon(Icons.chat,color: Colors.white,),
-                              label: const Text("LIVE CHAT",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                              icon: const Icon(
+                                Icons.chat,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "LIVE CHAT",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: MyTheme.redLiveChat,
                                 textStyle: const TextStyle(fontSize: 15),
@@ -213,8 +248,16 @@ class _MainDashboardState extends State<MainDashboard> {
                                 MainDashboardUtils.openUrl(
                                     "https://breakerpro.co.uk/whatsapp");
                               },
-                              icon: const Icon(Icons.whatsapp,color: Colors.white,),
-                              label: const Text("WhatsApp Chat",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                              icon: const Icon(
+                                Icons.whatsapp,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "WhatsApp Chat",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: MyTheme.greenWhatsapp,
                                 textStyle: const TextStyle(fontSize: 14),
@@ -230,7 +273,11 @@ class _MainDashboardState extends State<MainDashboard> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(AppConfig.rightsInfo),
-                          Text(AppConfig.appVersion,style: TextStyle(fontWeight: FontWeight.bold),),                        ],
+                          Text(
+                            AppConfig.appVersion,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     )
                   ],
@@ -244,6 +291,7 @@ class _MainDashboardState extends State<MainDashboard> {
                       print(index);
                       if (index == 0 || index == 1) {
                         if (PartsList.cachedVehicle != null) {
+                          print("Hello ${PartsList.cachedVehicle}");
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => const VehicleDetailsScreen(),
                           ))
@@ -290,6 +338,7 @@ class _MainDashboardState extends State<MainDashboard> {
                                         ImageList.vehicleImgList = [];
                                         ImageList.partImageList = [];
                                         PartsList.selectedPartList = [];
+                                        PartsList.saveVehicle = false;
 
                                         fetchPartsListNetwork();
                                       });
@@ -475,7 +524,6 @@ class _MainDashboardState extends State<MainDashboard> {
       AuthUtils.showLoadingDialog(context);
       await ApiConfig.fetchParamsFromStorage();
       var q = ApiConfig.baseQueryParams;
-      // q['index'] = "1";
       response =
           await ApiCall.get(ApiConfig.baseUrl + ApiConfig.apiSelectList, q);
 
@@ -495,8 +543,7 @@ class _MainDashboardState extends State<MainDashboard> {
           } else {
             responseJson[a['SelectList']]?.add(a['SelectValue']);
           }
-        }
-        else {
+        } else {
           if (responseJson[a['RelatedValue']] == null) {
             responseJson[a['RelatedValue']] = [a['SelectValue']];
           } else {
@@ -507,17 +554,27 @@ class _MainDashboardState extends State<MainDashboard> {
       String user = jsonEncode(responseJson);
       prefs.setString('selectList', user);
       Navigator.pop(context);
-    }
-    else{
+    } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String response = prefs.getString('selectList').toString();
       responseJson = jsonDecode(response);
-
     }
-    AppConfig.postageOptionsList = createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
+    AppConfig.postageOptionsList =
+        createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
 
-    // await upload();
-    await upload();
+
+    if(!isUploading){
+      isUploading = true;
+      try{
+        await upload();
+      }
+      catch(e){
+        isUploading = false;
+      }
+
+      isUploading = false;
+    }
+
 
     if (prefs.getString('vehicle') != null) {
       print("From cache ${prefs.getString('vehicle')}");
@@ -555,46 +612,44 @@ class _MainDashboardState extends State<MainDashboard> {
       print(" empyt");
     }
     Map<String, dynamic> queryParams = ApiConfig.baseQueryParams;
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // if (prefs.getString('partList') != null) {
-    //   Map<String, List> map = Map<String, List>.from(
-    //       jsonDecode(prefs.getString('partList')!) as Map<dynamic, dynamic>);
-    //   print("Cached ${map}");
-    //   // print("Cached ${l}");
-    // }
 
     queryParams['index'] = "0";
     if (PartsList.partList.isEmpty) {
       bool b = await partsList.loadParts(
           ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
-      if (b) {
-        setState(() {});
-      }
+      // if (b) {
+      //   setState(() {});
+      // }
     }
   }
 
   Future<void> upload() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.getString('uploadQueue') == null){
+    if (prefs.getString('uploadQueue') == null) {
+      print("No upload found");
       return;
     }
     Map<String, dynamic> map = Map<String, dynamic>.from(
-        jsonDecode(prefs.getString('uploadQueue').toString()) as Map<dynamic, dynamic>);
+        jsonDecode(prefs.getString('uploadQueue').toString())
+            as Map<dynamic, dynamic>);
     List t = List.generate(
         map['uploadQueue'].length, (index) => map['uploadQueue'][index]);
     PartsList.uploadQueue = List.generate(
         map['uploadQueue'].length, (index) => map['uploadQueue'][index]);
 
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if(!(connectivityResult == ConnectivityResult.ethernet ||connectivityResult == ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) ){
+    if (!(connectivityResult == ConnectivityResult.ethernet ||
+        connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi)) {
       print("Returned ${connectivityResult.name}");
       return;
     }
-    if(isUploading){
-      return;
-    }
-    isUploading = true;
 
+    await startUpload(prefs, t);
+
+  }
+
+  Future<void> startUpload(SharedPreferences prefs, List<dynamic> t) async {
     for (String vehicleString in PartsList.uploadQueue) {
       print("Uploadinggg");
       print(vehicleString);
@@ -630,20 +685,20 @@ class _MainDashboardState extends State<MainDashboard> {
 
         print("Upload Part List ${PartsList.uploadPartList}");
 
-        if(PartsList.uploadPartList.isNotEmpty){
+        if (PartsList.uploadPartList.isNotEmpty) {
           isPartUpload = await PartRepository.uploadParts(
               PartsList.uploadPartList, v.vehicleId, v.model);
           isPhotoUpload = await PartRepository.fileUpload(
               PartsList.uploadPartList, v.vehicleId, v.model);
-        }else{
+        } else {
           isPartUpload = true;
           isPhotoUpload = true;
         }
 
-
         if (isVehicleUpload && isPhotoUpload && isPartUpload) {
           t.remove(vehicleString);
-          bool b = await prefs.setString('uploadQueue', jsonEncode({'uploadQueue': t}));
+          bool b = await prefs.setString(
+              'uploadQueue', jsonEncode({'uploadQueue': t}));
           print("Removed Vehicle: $b");
 
           PartsList.uploadPartList = [];
@@ -652,7 +707,8 @@ class _MainDashboardState extends State<MainDashboard> {
           prefs.setBool('uploadParts', false);
           ImageList.partImageList = [];
           fetchPartsListNetwork();
-          NotificationService().instantNofitication("Upload Complete",playSound: true);
+          NotificationService()
+              .instantNofitication("Upload Complete", playSound: true);
           MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
           await PartsList.prefs!.remove(vehicleString);
           await prefs.remove('vehicle');
@@ -663,62 +719,19 @@ class _MainDashboardState extends State<MainDashboard> {
           await box.clear();
           await box1.clear();
           await box2.clear();
-          setState(() {});
+          // setState(() {});
         }
       }
     }
-
-    isUploading = false;
-
-    // bool? vUpload = prefs.getBool('uploadVehicle');
-    // bool? pUpload = prefs.getBool('uploadParts');
-    // Vehicle? v = PartsList.cachedVehicle;
-    // print("VV: ${PartsList.cachedVehicle!.imgList}");
-    // if (vUpload == true) {
-    //   setState(() {
-    //     MainDashboardUtils.titleList[0] = "Add Breaker";
-    //     PartsList.cachedVehicle = null;
-    //     PartsList.recall = false;
-    //   });
-    //   bool r = await VehicleRepository.uploadVehicle(v!);
-    //
-    //   await VehicleRepository.fileUpload(v);
-    //   if (r) {
-    //     setState(() {
-    //       PartsList.cachedVehicle = null;
-    //       prefs.setBool('uploadVehicle', false);
-    //       MainDashboardUtils.titleList[0] = "Add Breaker";
-    //       PartsList.cachedVehicle = null;
-    //       PartsList.prefs!.remove('vehicle');
-    //       PartsList.recall = false;
-    //       ImageList.vehicleImgList = [];
-    //     });
-    //   }
-    //   if (pUpload == false || pUpload == null) {
-    //     NotificationService().instantNofitication("Upload Complete");
-    //   }
-    // }
-    // if (pUpload == true) {
-    //   bool r = await PartRepository.uploadParts(
-    //       PartsList.uploadPartList!, v!.vehicleId);
-    //   await PartRepository.fileUpload(PartsList.uploadPartList!, v!.vehicleId);
-    //   if (r) {
-    //     PartsList.uploadPartList = [];
-    //     PartsList.selectedPartList = [];
-    //     prefs.setBool('uploadParts', false);
-    //     ImageList.partImageList = [];
-    //     fetchPartsListNetwork();
-    //     NotificationService().instantNofitication("Upload Complete");
-    //   }
-    // }
   }
 
-  checkConnectivity() async{
+  checkConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
-    if(!(connectivityResult == ConnectivityResult.ethernet ||connectivityResult == ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) ){
+    if (!(connectivityResult == ConnectivityResult.ethernet ||
+        connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi)) {
       AppConfig.isConnected = false;
-    }
-    else{
+    } else {
       AppConfig.isConnected = true;
     }
   }
@@ -834,29 +847,4 @@ class _MainDashboardState extends State<MainDashboard> {
       },
     );
   }
-
-  Future<void> initialiseLog() async {
-    // await FlutterLogs.initLogs(
-    //     logLevelsEnabled: [
-    //       LogLevel.INFO,
-    //       LogLevel.WARNING,
-    //       LogLevel.ERROR,
-    //       LogLevel.SEVERE
-    //     ],
-    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-    //     directoryStructure: DirectoryStructure.FOR_DATE,
-    //     logTypesEnabled: [
-    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-    //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-    //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-    //     ],
-    //     logFileExtension: LogFileExtension.TXT,
-    //     logsWriteDirectoryName: "MyLogs",
-    //     logsExportDirectoryName: "MyLogs/Exported",
-    //     logsExportZipFileName:
-    //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-    //     debugFileOperations: true,
-    //     isDebuggable: true);
-  }
-
 }

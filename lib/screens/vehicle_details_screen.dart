@@ -93,6 +93,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       yearsList.add(i.toString());
     }
     if (PartsList.cachedVehicle != null) {
+      PartsList.saveVehicle = true;
       Vehicle v = PartsList.cachedVehicle!;
       recall = v.recallID.isNotEmpty;
       regNoController.text = v.registrationNumber ?? "";
@@ -126,7 +127,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   @override
   void dispose() {
-    if (makeController.text.isNotEmpty) {
+    if (makeController.text.isNotEmpty && PartsList.saveVehicle) {
       saveVehicle();
     } else {
       ImageList.vehicleImgList = [];
@@ -575,16 +576,20 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
     Widget okButton = TextButton(
       onPressed: () async {
-        saveVehicle();
+        await saveVehicle();
+        makeController.clear();
+        PartsList.saveVehicle = false;
         PartsList.uploadQueue.add(vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         PartsList.vehicleCount += 1;
-        prefs.setBool('uploadVehicle', true);
-        await prefs.remove('vehicle');
-        MainDashboardUtils.titleList[0] = "Add Breaker";
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
+        prefs.setBool('uploadVehicle', true);
+        await prefs.remove('vehicle');
+        print("Cleared cache");
+        MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
+
         Box<Part> box = await Hive.openBox('partListBox');
         Box<Part> box1 = await Hive.openBox('selectPartListBox');
         await box.clear();
@@ -594,6 +599,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         PartsList.uploadPartList = [];
         prefs.setString(
             'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
+        print(PartsList.cachedVehicle);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (builder) => MainDashboard()),
@@ -618,7 +624,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
   }
 
-  saveVehicle() {
+  saveVehicle() async {
+    PartsList.saveVehicle = true;
     vehicle.imgList = List<String>.from(ImageList.vehicleImgList);
     vehicle.registrationNumber = regNoController.text.toString();
     vehicle.stockReference = stockRefController.text.toString();
@@ -657,8 +664,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     MainDashboardUtils.titleList[0] = "Resume Work ( ${vehicle.make}-$model )";
 
     String vehicleString = jsonEncode(vehicle.toJson());
-    PartsList.prefs!.setString(vehicle.vehicleId, vehicleString);
-    PartsList.prefs!.setString('vehicle', vehicleString);
+    await PartsList.prefs!.setString(vehicle.vehicleId, vehicleString);
+    await PartsList.prefs!.setString('vehicle', vehicleString);
     print(PartsList.prefs!.getString(vehicle.vehicleId));
 
     print("Save Vehicle ${MainDashboardUtils.titleList[0]}");

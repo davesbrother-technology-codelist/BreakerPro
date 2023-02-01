@@ -337,6 +337,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
             'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
         prefs.setString(
             widget.vehicle.vehicleId, jsonEncode(widget.vehicle.toJson()));
+        PartsList.saveVehicle = false;
         // prefs.setBool('uploadVehicle', true);
         // prefs.setBool('uploadParts', true);
         Navigator.pushAndRemoveUntil(
