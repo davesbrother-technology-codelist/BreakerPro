@@ -44,7 +44,7 @@ class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
   late String temp;
-  late Map responseJson;
+  Map responseJson = {};
   bool isUploading = false;
   @override
   void initState() {

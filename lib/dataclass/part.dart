@@ -171,6 +171,7 @@ class Part {
     part.salesPrice = stock.price != "" ? double.parse(stock.price) : 0;
     part.comments = stock.partComments;
     part.mnfPartNo = stock.thatchamPartManufacturerNumber;
+    part.defaultDescription = stock.details;
 
     return part;
   }
