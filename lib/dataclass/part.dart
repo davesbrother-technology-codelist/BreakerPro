@@ -87,7 +87,13 @@ class Part {
   @HiveField(26)
   String partId = "";
 
+  @HiveField(27)
+  bool isUploaded = false;
+
+  @HiveField(28)
   bool hasPrintLabel = false;
+
+  @HiveField(29)
   bool isDelete = false;
 
   Part(

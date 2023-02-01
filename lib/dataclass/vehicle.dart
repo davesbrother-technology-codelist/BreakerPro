@@ -34,11 +34,13 @@ class Vehicle {
   String depollutiondate = "";
   String coddate = "";
   String weight = "";
-  String uploadStatus = "1";
+  String uploadStatus = "0";
   String cc = "0";
   List<String> imgList = [];
   String engineCode = "";
   String recallID = "";
+  bool isUploaded = false;
+  List<bool> uploadVehicleImgListStatus = [];
 
   Map<String, dynamic> toJson() {
     return {

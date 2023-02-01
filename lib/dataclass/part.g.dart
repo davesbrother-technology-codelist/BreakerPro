@@ -44,13 +44,16 @@ class PartAdapter extends TypeAdapter<Part> {
       ..isEbay = fields[23] as bool
       ..isFeaturedWeb = fields[24] as bool
       ..featuredWebDate = fields[25] as String
-      ..partId = fields[26] as String;
+      ..partId = fields[26] as String
+      ..isUploaded = fields[27] as bool
+      ..hasPrintLabel = fields[28] as bool
+      ..isDelete = fields[29] as bool;
   }
 
   @override
   void write(BinaryWriter writer, Part obj) {
     writer
-      ..writeByte(27)
+      ..writeByte(30)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -104,7 +107,13 @@ class PartAdapter extends TypeAdapter<Part> {
       ..writeByte(25)
       ..write(obj.featuredWebDate)
       ..writeByte(26)
-      ..write(obj.partId);
+      ..write(obj.partId)
+      ..writeByte(27)
+      ..write(obj.isUploaded)
+      ..writeByte(28)
+      ..write(obj.hasPrintLabel)
+      ..writeByte(29)
+      ..write(obj.isDelete);
   }
 
   @override

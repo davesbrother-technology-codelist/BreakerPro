@@ -608,7 +608,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         PartsList.uploadPartList = [];
         prefs.setString(
             'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
-        print(PartsList.cachedVehicle);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (builder) => MainDashboard()),
@@ -636,6 +635,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   saveVehicle() async {
     PartsList.saveVehicle = true;
     vehicle.imgList = List<String>.from(ImageList.vehicleImgList);
+    vehicle.uploadVehicleImgListStatus = List.generate(vehicle.imgList.length, (index) => false);
+    ImageList.uploadVehicleImgListStatus = List<bool>.from(vehicle.uploadVehicleImgListStatus);
     vehicle.registrationNumber = regNoController.text.toString();
     vehicle.stockReference = stockRefController.text.toString();
     vehicle.make = makeController.text.toString();

@@ -54,28 +54,16 @@ class VehicleRepository {
   }
 
   static fileUpload(Vehicle vehicle) async {
-    // await FlutterLogs.initLogs(
-    //     logLevelsEnabled: [
-    //       LogLevel.INFO,
-    //       LogLevel.WARNING,
-    //       LogLevel.ERROR,
-    //       LogLevel.SEVERE
-    //     ],
-    //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-    //     directoryStructure: DirectoryStructure.FOR_DATE,
-    //     logTypesEnabled: [
-    //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-    //     ],
-    //     logFileExtension: LogFileExtension.TXT,
-    //     logsWriteDirectoryName: "MyLogs",
-    //     debugFileOperations: true,
-    //     isDebuggable: true);
+
     print("\n\n Uploading Photos\n\n");
     List<File> imgList = List.generate(ImageList.uploadVehicleImgList.length,
         (index) => File(ImageList.uploadVehicleImgList[index]));
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
     for (int i = 0; i < imgList.length; i++) {
+      if(ImageList.uploadVehicleImgListStatus[i]){
+        continue;
+      }
       File image = imgList[i];
       NotificationService().instantNofitication(
           "2/5 - Uploading Vehicle Images ${i + 1}/${imgList.length} ${vehicle.model == "" ? "Model" : vehicle.model}");
@@ -116,6 +104,7 @@ class VehicleRepository {
       print(response.statusCode);
       print(responseString);
       msg += "\n$responseString\n";
+      ImageList.uploadVehicleImgListStatus[i] = true;
       final File file = File(
           '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
       await file.writeAsString(msg, mode: FileMode.append);
