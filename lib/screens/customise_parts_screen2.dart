@@ -35,14 +35,7 @@ class _CustomiseState extends State<Customise> {
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.materialColor));
   OutlineInputBorder redBorder =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.red));
-  List<String> partConditionItems = [
-    'BRAND NEW',
-    'GOOD',
-    'PERFECT',
-    'POOR',
-    'VERY GOOD',
-    'WORN'
-  ];
+  List<String> partConditionItems = AppConfig.partConditionList;
   final List<String> postageItems = AppConfig.postageOptionsList;
   late List<bool> postageSelected =
       List.generate(postageItems.length, (index) => false);

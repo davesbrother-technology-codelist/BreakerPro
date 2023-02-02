@@ -576,6 +576,8 @@ class _MainDashboardState extends State<MainDashboard> {
     }
     AppConfig.postageOptionsList =
         createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
+    AppConfig.partConditionList =
+        createMenuList('PART CONDITION', AppConfig.partConditionList, responseJson);
 
 
     if(!PartsList.isUploading){

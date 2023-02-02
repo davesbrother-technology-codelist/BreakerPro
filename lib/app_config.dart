@@ -32,6 +32,7 @@ class AppConfig {
   };
 
   static List<String> postageOptionsList = [];
+  static List<String> partConditionList = [];
 
   static getDeviceInfo() async {
     deviceId = (await PlatformDeviceId.getDeviceId)!;
