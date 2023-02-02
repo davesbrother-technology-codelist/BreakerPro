@@ -325,7 +325,7 @@ class _CustomiseState extends State<Customise> {
                                 imageFileList.addAll(selectedImages);
                               }
                               setState(() {
-                                int i = 1
+                                int i = 1;
                                 for(XFile image in imageFileList){
                                   File imgFile = File(image.path);
                                   String dir = path.dirname(imgFile.path);
