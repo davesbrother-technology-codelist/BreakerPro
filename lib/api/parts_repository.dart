@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
@@ -17,9 +18,12 @@ class PartRepository {
       List<Part> partsList, String vehicleID, String model) async {
     Map response = {};
     for (int i = 0; i < partsList.length; i++) {
+      Part part = partsList[i];
+      if(part.status != ""){
+        continue;
+      }
       NotificationService().instantNofitication(
           "3/5 - Uploading Parts Data $model ${partsList[i].partName}");
-      Part part = partsList[i];
 
       // Map m = {...ApiConfig.baseQueryParams, ...part.toJson()};
       Map m = {...part.toJson()};
@@ -31,8 +35,10 @@ class PartRepository {
       m['VehicleID'] = vehicleID;
       if (part.imgList.isEmpty) {
         m['status'] = "Pending";
+        part.status = "Pending";
       } else {
         m['status'] = "Uploading";
+        part.status = "Uploading";
       }
       print("Body of api call:\n$m\n Body Ends");
       Uri url = Uri.parse("${ApiConfig.baseUrl}${ApiConfig.apiSubmitParts}");
@@ -54,13 +60,13 @@ class PartRepository {
       print(r.body);
       response = jsonDecode(r.body);
       msg += "\n${r.body}\n";
+      Box<Part> box1 = await Hive.openBox('uploadPartListBox$vehicleID');
+      await box1.putAt(i, part);
+      box1.close();
       final File file = File(
           '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
       await file.writeAsString(msg, mode: FileMode.append);
-      // FlutterLogs.logToFile(
-      //     logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-      //     overwrite: false,
-      //     logMessage: msg);
+
     }
 
     if (response['result'] == "Inserted Successfully") {
@@ -144,7 +150,7 @@ class PartRepository {
       if (part.imgList.isNotEmpty) {
         updatePartsList.add(part);
       }
-      j += 1;
+
       print(part);
       NotificationService().instantNofitication(
           "4/5 - Uploading Part Images $j/$t $model ${part.partName}");
@@ -154,6 +160,7 @@ class PartRepository {
       Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
       for (int i = 0; i < imgList.length; i++) {
+        j += 1;
         String msg =
             "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
         msg += "URL: $uri";

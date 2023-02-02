@@ -305,13 +305,16 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     );
     Widget okButton = TextButton(
       onPressed: () async {
+        if(PartsList.isUploading){
+          PartsList.newAdded = true;
+        }
         for (Part p in partsList) {
           if (p.forUpload) {
             PartsList.uploadPartList.add(p);
             print(p.imgList);
           }
         }
-        Box<Part> box = await Hive.openBox('uploadPartListBox');
+        Box<Part> box = await Hive.openBox('uploadPartListBox${widget.vehicle.vehicleId}');
         Map<dynamic, Part> boxMap = {
           for (var part in PartsList.uploadPartList) part.partName: part
         };
@@ -319,6 +322,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
           box.putAll(boxMap);
           print("saved uploadpartList");
         }
+        box.close();
         PartsList.uploadQueue.add(widget.vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.remove('vehicle');
@@ -326,16 +330,12 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
-        // Box<Part> box = await Hive.openBox('partListBox');
-        // Box<Part> box1 = await Hive.openBox('selectPartListBox');
-        // await box.clear();
-        // await box1.clear();
         PartsList.selectedPartList = [];
         PartsList.partList = [];
         PartsList.uploadPartList = [];
-        prefs.setString(
+        await prefs.setString(
             'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
-        prefs.setString(
+        await prefs.setString(
             widget.vehicle.vehicleId, jsonEncode(widget.vehicle.toJson()));
         PartsList.saveVehicle = false;
         // prefs.setBool('uploadVehicle', true);

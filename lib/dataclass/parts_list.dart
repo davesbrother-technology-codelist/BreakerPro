@@ -21,6 +21,8 @@ class PartsList {
   static int partCount = 1;
   static List<String> uploadQueue = [];
   static bool saveVehicle = true;
+  static bool isUploading = false;
+  static bool newAdded = false;
 
   Future<bool> loadParts(String url, Map<String, dynamic> queryParams) async {
     Box<Part> box = await Hive.openBox('partsBox');

@@ -47,7 +47,6 @@ class _MainDashboardState extends State<MainDashboard> {
   late String temp;
   late StreamSubscription<ConnectivityResult> _networkSubscription;
   Map responseJson = {};
-  bool isUploading = false;
   @override
   void initState() {
     print("Helllllllo");
@@ -64,23 +63,36 @@ class _MainDashboardState extends State<MainDashboard> {
           connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
           print("Uplaod resume $connectivityResult");
-          if(!isUploading){
-            isUploading = true;
+          if(!PartsList.isUploading){
+            PartsList.isUploading = true;
             try{
               await upload();
+              // if(PartsList.newAdded){
+              //   await upload();
+              //   PartsList.newAdded = false;
+              // }
             }
             catch(e){
-              isUploading = false;
+              PartsList.isUploading = false;
             }
 
-            isUploading = false;
+            PartsList.isUploading = false;
           }
-
-
         return;
       }
     });
+
+    if(PartsList.newAdded){
+      PartsList.newAdded = false;
+      timer2 = Timer.periodic(Duration(seconds: 1), (timer) async {
+        if(!PartsList.isUploading){
+        print("Hrllo");
+        await upload();
+        timer2.cancel();
+      }});
+    }
   }
+
 
   @override
   void dispose() {
@@ -88,6 +100,9 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
+    // if(timer2.isActive){
+    //   timer2.cancel();
+    // }
     _networkSubscription.cancel();
     super.dispose();
   }
@@ -186,12 +201,12 @@ class _MainDashboardState extends State<MainDashboard> {
               )),
           IconButton(
               onPressed: () async {
-                // Navigator.pushReplacement(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (BuildContext context) => super.widget));
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.remove('uploadQueue');
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => super.widget));
+              //   SharedPreferences prefs = await SharedPreferences.getInstance();
+              // await prefs.remove('uploadQueue');
 
               },
               icon: Icon(
@@ -563,16 +578,21 @@ class _MainDashboardState extends State<MainDashboard> {
         createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
 
 
-    if(!isUploading){
-      isUploading = true;
+    if(!PartsList.isUploading){
+      PartsList.isUploading = true;
       try{
         await upload();
+        if(PartsList.newAdded){
+          await upload();
+          PartsList.newAdded = false;
+        }
       }
       catch(e){
-        isUploading = false;
+        PartsList.isUploading = false;
       }
 
-      isUploading = false;
+      PartsList.isUploading = false;
+
     }
 
 
@@ -644,6 +664,7 @@ class _MainDashboardState extends State<MainDashboard> {
       print("Returned ${connectivityResult.name}");
       return;
     }
+    print("To Be Uploaded ${PartsList.uploadQueue}");
 
     await startUpload(prefs, t);
 
@@ -665,12 +686,35 @@ class _MainDashboardState extends State<MainDashboard> {
         ImageList.uploadVehicleImgList =
             List<String>.generate(a.length, (index) => a[index]);
         // v.imgList = List.from(ImageList.uploadVehicleImgList);
-        bool isVehicleUpload = await VehicleRepository.uploadVehicle(v);
+        bool isVehicleUpload = false;
+
+        if(v.uploadStatus == "0"){
+          v.uploadStatus = "1";
+          try{
+            isVehicleUpload = await VehicleRepository.uploadVehicle(v);
+            if(isVehicleUpload){
+              v.imgList = ImageList.uploadVehicleImgList;
+              print(jsonEncode(v.toJson()));
+              await prefs.setString(vehicleString, jsonEncode(v.toJson()));
+            }
+          }catch(e){
+            v.uploadStatus = "0";
+            v.imgList = ImageList.uploadVehicleImgList;
+            await prefs.setString(vehicleString, jsonEncode(v.toJson()));
+          }
+
+        }
+        else{
+          isVehicleUpload = true;
+        }
+
+
         bool isPartUpload = false;
         bool isPhotoUpload = false;
 
+
         await VehicleRepository.fileUpload(v);
-        Box<Part> box1 = await Hive.openBox('uploadPartListBox');
+        Box<Part> box1 = await Hive.openBox('uploadPartListBox${v.vehicleId}');
         if (box1.isNotEmpty) {
           PartsList.uploadPartList = [];
           PartsList.selectedPartList = box1.values.toList();
@@ -697,10 +741,9 @@ class _MainDashboardState extends State<MainDashboard> {
 
         if (isVehicleUpload && isPhotoUpload && isPartUpload) {
           t.remove(vehicleString);
-          bool b = await prefs.setString(
-              'uploadQueue', jsonEncode({'uploadQueue': t}));
-          print("Removed Vehicle: $b");
-
+          // bool b = await prefs.setString(
+          //     'uploadQueue', jsonEncode({'uploadQueue': t}));
+          // print("Removed Vehicle: $b");
           PartsList.uploadPartList = [];
           PartsList.selectedPartList = [];
           PartsList.cachedVehicle = null;
@@ -719,10 +762,17 @@ class _MainDashboardState extends State<MainDashboard> {
           await box.clear();
           await box1.clear();
           await box2.clear();
-          // setState(() {});
+          setState(() {});
         }
       }
+      else{
+        t.remove(vehicleString);
+        bool b = await prefs.setString(
+            'uploadQueue', jsonEncode({'uploadQueue': t}));
+        print("Removed Vehicle: $b");
+      }
     }
+
   }
 
   checkConnectivity() async {

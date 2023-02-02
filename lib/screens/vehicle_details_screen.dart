@@ -31,6 +31,8 @@ class VehicleDetailsScreen extends StatefulWidget {
 class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+  OutlineInputBorder focusedBorder =
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.materialColor));
   TextStyle textStyle = TextStyle(fontSize: 17, color: MyTheme.grey);
   EdgeInsetsGeometry textEdgeInsetsGeometry =
       const EdgeInsets.fromLTRB(0, 10, 10, 10);
@@ -307,7 +309,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         child: TextField(
                           decoration: InputDecoration(
                             enabledBorder: border,
-                            focusedBorder: border,
+                            focusedBorder: focusedBorder,
                           ),
                           controller: TextEditingController(
                               text: modelEbayController.text),
@@ -368,7 +370,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         child: TextField(
                           decoration: InputDecoration(
                             enabledBorder: border,
-                            focusedBorder: border,
+                            focusedBorder: focusedBorder,
                           ),
                           controller: vehicleLocController,
                         )),
@@ -396,7 +398,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                           decoration: InputDecoration(
                             hintText: "Enter Comments",
                             enabledBorder: border,
-                            focusedBorder: border,
+                            focusedBorder: focusedBorder,
                           ),
                           controller: commentsController,
                         )),
@@ -585,6 +587,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
     Widget okButton = TextButton(
       onPressed: () async {
+        if(PartsList.isUploading){
+          PartsList.newAdded = true;
+          print("Set true");
+        }
         await saveVehicle();
         makeController.clear();
         PartsList.saveVehicle = false;
@@ -606,7 +612,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         PartsList.selectedPartList = [];
         PartsList.partList = [];
         PartsList.uploadPartList = [];
-        prefs.setString(
+        print("Upload Queue: ${PartsList.uploadQueue}");
+        await prefs.setString(
             'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
         Navigator.pushAndRemoveUntil(
             context,
@@ -666,8 +673,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     vehicle.weight = weightController.text.toString();
     vehicle.location = vehicleLocController.text.toString();
     vehicle.commentDetails = commentsController.text.toString();
-    vehicle.vehicleId =
-        "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.vehicleCount.toString().padLeft(4, '0')}";
+    if(vehicle.vehicleId.isEmpty){
+      vehicle.vehicleId =
+      "VHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${PartsList.vehicleCount.toString().padLeft(4, '0')}";
+    }
+
 
     PartsList.cachedVehicle = vehicle;
     String model = modelController.text.isEmpty ? "Model" : vehicle.model;
@@ -722,7 +732,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             decoration: InputDecoration(
                 hintText: selectedDate == null ? "" : selectedDate.toString(),
                 enabledBorder: border,
-                focusedBorder: border,
+                focusedBorder: focusedBorder,
                 suffixIcon: Icon(
                   Icons.arrow_drop_down,
                   color: MyTheme.grey,
@@ -774,7 +784,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                 },
                 decoration: InputDecoration(
                     enabledBorder: border,
-                    focusedBorder: border,
+                    focusedBorder: focusedBorder,
                     suffixIcon: const Icon(Icons.arrow_drop_down),
                     hintText: label),
                 controller: controller,
@@ -820,7 +830,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                 },
                 decoration: InputDecoration(
                   enabledBorder: border,
-                  focusedBorder: border,
+                  focusedBorder: focusedBorder,
                 ),
                 controller: controller,
                 keyboardType:
@@ -904,7 +914,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                 },
                 decoration: InputDecoration(
                     enabledBorder: border,
-                    focusedBorder: border,
+                    focusedBorder: focusedBorder,
                     suffixIcon: Icon(
                       Icons.arrow_drop_down,
                       color: MyTheme.grey,

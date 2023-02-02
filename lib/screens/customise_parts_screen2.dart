@@ -31,6 +31,10 @@ class _CustomiseState extends State<Customise> {
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+  OutlineInputBorder focusedBorder =
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.materialColor));
+  OutlineInputBorder redBorder =
+      OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.red));
   List<String> partConditionItems = [
     'BRAND NEW',
     'GOOD',
@@ -68,7 +72,8 @@ class _CustomiseState extends State<Customise> {
     part = widget.part;
     super.initState();
     ebayTitleEditingController.text =
-        "${PartsList.cachedVehicle!.ebayMake} ${PartsList.cachedVehicle!.ebayModel} ${part.partName} ${part.mnfPartNo}";
+    part.ebayTitle.isEmpty ?
+        "${PartsList.cachedVehicle!.ebayMake} ${PartsList.cachedVehicle!.ebayModel} ${part.partName} ${part.mnfPartNo}" : part.ebayTitle;
     formattedDate = '';
     partConditionController.text = part.partCondition;
     partLocEditingController.text = part.partLocation;
@@ -280,7 +285,7 @@ class _CustomiseState extends State<Customise> {
                               hintText:
                                   formattedDate == '' ? '' : formattedDate,
                               enabledBorder: border,
-                              focusedBorder: border),
+                              focusedBorder: focusedBorder),
                         )),
                       ),
                     )
@@ -435,9 +440,8 @@ class _CustomiseState extends State<Customise> {
                       }
 
                       part.partCondition = partConditionController.text.toString();
-                      part.partLocation = isDefault
-                          ? part.defaultLocation
-                          : partLocEditingController.text.toString();
+                      part.partLocation =
+                          partLocEditingController.text.toString();
                       try {
                         part.warranty = double.parse(warrantyEditingController.text);
                         part.salesPrice =
@@ -449,44 +453,21 @@ class _CustomiseState extends State<Customise> {
                       }
                       part.mnfPartNo = mnfPartNoEditingController.text.toString();
                       print(part.mnfPartNo);
-                      part.description = isDefault
-                          ? part.defaultDescription
-                          : partDescEditingController.text.toString();
+                      part.description =
+                         partDescEditingController.text.toString();
 
-                      part.featuredWebDate = isFeaturedWeb ? formattedDate : "";
+                      part.featuredWebDate =formattedDate;
 
                       part.comments = partCommentsEditingController.text.toString();
                       part.postageOptions = postageOptionsController.text.toString();
-                      part.ebayTitle =
-                      isEbay ? ebayTitleEditingController.text.toString() : "";
+                      part.ebayTitle = ebayTitleEditingController.text.toString();
                       part.imgList = List.from(ImageList.partImageList);
 
                       part.isEbay = isEbay;
                       part.isFeaturedWeb = isFeaturedWeb;
                       part.isDefault = isDefault;
                       print(part.imgList);
-                      // await FlutterLogs.initLogs(
-                      //     logLevelsEnabled: [
-                      //       LogLevel.INFO,
-                      //       LogLevel.WARNING,
-                      //       LogLevel.ERROR,
-                      //       LogLevel.SEVERE
-                      //     ],
-                      //     timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-                      //     directoryStructure: DirectoryStructure.FOR_DATE,
-                      //     logTypesEnabled: [
-                      //       "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-                      //       "LOGGER${DateFormat("ddMMyy").format(DateTime.now())}",
-                      //       "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}"
-                      //     ],
-                      //     logFileExtension: LogFileExtension.TXT,
-                      //     logsWriteDirectoryName: "MyLogs",
-                      //     logsExportDirectoryName: "MyLogs/Exported",
-                      //     logsExportZipFileName:
-                      //         "Logger${DateFormat('dd_MM_YYYY').format(DateTime.now())}",
-                      //     debugFileOperations: true,
-                      //     isDebuggable: true);
-
+                      print(part.ebayTitle);
                       String msg =
                           "\n\n\n\n**************** Inserting Part Details clicked ${DateFormat("hh:mm:ss yyyy/MM/dd").format(DateTime.now())} **************** \n\n";
                       msg += part.addLog();
@@ -494,11 +475,6 @@ class _CustomiseState extends State<Customise> {
                       final File file = File(
                           '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
                       await file.writeAsString(msg, mode: FileMode.append);
-                      // FlutterLogs.logToFile(
-                      //     logFileName:
-                      //         "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
-                      //     overwrite: false,
-                      //     logMessage: msg);
                       Navigator.pop(context, part);
                     },
                     child: Text(
@@ -592,7 +568,7 @@ class _CustomiseState extends State<Customise> {
             },
             decoration: InputDecoration(
                 enabledBorder: border,
-                focusedBorder: border,
+                focusedBorder: focusedBorder,
                 suffixIcon: Icon(
                   Icons.arrow_drop_down,
                   color: MyTheme.grey,
@@ -633,6 +609,13 @@ class _CustomiseState extends State<Customise> {
                     ? 5
                     : 1,
                 controller: controller,
+                onChanged: (String s){
+                  if(title == 'Ebay Title'){
+                    setState(() {
+
+                    });
+                  }
+                },
                 onSubmitted: (String? s) {
                   if (title == 'Manufacturer Part no' && s != null) {
                     setState(() {
@@ -643,7 +626,7 @@ class _CustomiseState extends State<Customise> {
                 },
                 keyboardType: TType,
                 decoration: InputDecoration(
-                    enabledBorder: border, focusedBorder: border))
+                    enabledBorder: border, focusedBorder: title == 'Ebay Title' && ebayTitleEditingController.text.length >= 80 ? redBorder : focusedBorder))
           ]),
     );
   }

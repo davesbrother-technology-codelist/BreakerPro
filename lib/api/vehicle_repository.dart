@@ -61,9 +61,9 @@ class VehicleRepository {
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
     for (int i = 0; i < imgList.length; i++) {
-      if(ImageList.uploadVehicleImgListStatus[i]){
-        continue;
-      }
+      // if(ImageList.uploadVehicleImgListStatus[i]){
+      //   continue;
+      // }
       File image = imgList[i];
       NotificationService().instantNofitication(
           "2/5 - Uploading Vehicle Images ${i + 1}/${imgList.length} ${vehicle.model == "" ? "Model" : vehicle.model}");
@@ -104,7 +104,7 @@ class VehicleRepository {
       print(response.statusCode);
       print(responseString);
       msg += "\n$responseString\n";
-      ImageList.uploadVehicleImgListStatus[i] = true;
+      // ImageList.uploadVehicleImgListStatus[i] = true;
       final File file = File(
           '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
       await file.writeAsString(msg, mode: FileMode.append);

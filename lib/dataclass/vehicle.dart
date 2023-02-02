@@ -78,7 +78,8 @@ class Vehicle {
       'VehCC': cc.toString(),
       "engine_code": engineCode,
       "Images": imgList,
-      "RecallID" : recallID
+      "RecallID" : recallID,
+
     };
   }
 

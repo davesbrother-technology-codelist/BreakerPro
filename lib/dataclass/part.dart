@@ -73,7 +73,7 @@ class Part {
   bool forUpload = false;
 
   @HiveField(22)
-  String status = "Uploading";
+  String status = "";
 
   @HiveField(23)
   bool isEbay = false;
