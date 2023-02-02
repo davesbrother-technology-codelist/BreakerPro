@@ -33,6 +33,7 @@ class AppConfig {
 
   static List<String> postageOptionsList = [];
   static List<String> partConditionList = [];
+  static Map postageOptionsMap = {};
 
   static getDeviceInfo() async {
     deviceId = (await PlatformDeviceId.getDeviceId)!;

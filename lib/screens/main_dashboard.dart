@@ -558,7 +558,8 @@ class _MainDashboardState extends State<MainDashboard> {
           } else {
             responseJson[a['SelectList']]?.add(a['SelectValue']);
           }
-        } else {
+        }
+        else {
           if (responseJson[a['RelatedValue']] == null) {
             responseJson[a['RelatedValue']] = [a['SelectValue']];
           } else {
