@@ -209,6 +209,14 @@ class Part {
 
           break;
         }
+        case "THATCHAM_PARTMANUFACTURERNUMBER":{
+          String mnfNo = mnfPartNo;
+          if(mnfNo.isNotEmpty){
+            finalString += "$mnfNo ";
+          }
+
+          break;
+        }
         case "PART NAME":{
           finalString += "$partName ";
           break;
