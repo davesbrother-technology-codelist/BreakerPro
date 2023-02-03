@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import '../app_config.dart';
+import 'package:path/path.dart' as path;
 import '../dataclass/part.dart';
 import '../dataclass/stock.dart';
 import '../notification_service.dart';
@@ -13,6 +14,16 @@ import 'dart:io';
 class ManagePartRepository {
   static Future<bool> uploadPart(Part part, Stock stock) async {
     Map response = {};
+    if(part.status != ""){
+      if(part.imgList.isNotEmpty){
+        await fileUpload(part, stock);
+        await updatePart(part, stock);
+      }
+
+      NotificationService().instantNofitication(
+          "Upload Complete",playSound: true);
+      return true;
+    }
     NotificationService().instantNofitication(
         "1/3 - Uploading Parts Data\n${part.partName}\n${stock.stockID}");
     Map m = {...part.toStockJson(stock)};
@@ -82,6 +93,10 @@ class ManagePartRepository {
           "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
       msg += "URL: $uri";
       File image = imgList[i];
+      String dir = path.dirname(image.path);
+      String newPath = path.join(dir,
+          'IMG${stock.stockID}1${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+      image = image.renameSync(newPath);
       print(image.path);
       String filename = image.path.split("/").last.toString();
       print(filename);

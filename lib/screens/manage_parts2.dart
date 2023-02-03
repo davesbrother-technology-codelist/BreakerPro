@@ -316,31 +316,17 @@ class _ManageParts2State extends State<ManageParts2> {
                             imageFileList.addAll(selectedImages);
                           }
                           setState(() {
-                            for (XFile image in imageFileList) {
-                              File imgFile = File(image.path);
-                              String dir = path.dirname(imgFile.path);
-                              int count = PartsList.partCount;
-                              String newPath = path.join(dir,
-                                  'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                              imgFile = imgFile.renameSync(newPath);
-                              ImageList.managePartImageList.add(imgFile.path);
-                            }
+                            List<String> l = List.generate(imageFileList.length, (index) => imageFileList[index].path);
+                            // for (XFile image in imageFileList) {
+                            //   File imgFile = File(image.path);
+                            //   String dir = path.dirname(imgFile.path);
+                            //   int count = PartsList.partCount;
+                            //   String newPath = path.join(dir,
+                            //       'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                            //   imgFile = imgFile.renameSync(newPath);
+                              ImageList.managePartImageList.addAll(l);
+                            // }
                           });
-                          // XFile? image = await ImagePicker()
-                          //     .pickImage(source: ImageSource.gallery);
-                          //
-                          // if (image != null) {
-                          //   File imgFile = File(image.path);
-                          //   print(imgFile.path);
-                          //   String dir = path.dirname(imgFile.path);
-                          //   setState(() {
-                          //     int count = PartsList.partCount;
-                          //     String newPath = path.join(dir,
-                          //         'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                          //     imgFile = imgFile.renameSync(newPath);
-                          //     ImageList.partImageList.add(imgFile.path);
-                          //   });
-                          // }
                           for (String img in ImageList.managePartImageList) {
                             print(img);
                           }
@@ -700,7 +686,11 @@ class _ManageParts2State extends State<ManageParts2> {
     part.comments = partCommentsEditingController.text.toString();
     part.postageOptions = postageOptionsController.text.toString();
     part.ebayTitle = isEbay ? ebayTitleEditingController.text.toString() : "";
-    part.imgList = List.from(ImageList.managePartImageList);
+    for(String img in ImageList.managePartImageList){
+      if(!img.contains('http')){
+        part.imgList.add(img);
+      }
+    }
     part.isEbay = isEbay;
     part.hasPrintLabel = hasPrintLabel;
     part.isDefault = isDefault;

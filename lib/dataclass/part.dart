@@ -264,6 +264,9 @@ class Part {
     part.comments = stock.partComments;
     part.mnfPartNo = stock.thatchamPartManufacturerNumber;
     part.defaultDescription = stock.details;
+    part.description = stock.details;
+    part.defaultLocation = stock.vehicleLocation;
+    part.partLocation = stock.vehicleLocation;
 
     return part;
   }
