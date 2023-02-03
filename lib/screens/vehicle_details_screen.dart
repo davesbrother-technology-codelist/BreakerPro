@@ -503,16 +503,14 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             aspectRatio: AppConfig.aspectMap[
                                                 AppConfig.imageAspectRatio],
                                             child: SizedBox(
-                                              width: 9,
-                                              height: 16,
                                               child: Image.file(File(ImageList
-                                                  .vehicleImgList[index])),
+                                                  .vehicleImgList[index]),fit: BoxFit.fill,),
                                             ),
                                           ),
                                         ),
                                         Positioned(
-                                          top: -5,
-                                          right: -13,
+                                          top: -15,
+                                          right: -15,
                                           child: IconButton(
                                             icon: Icon(
                                               Icons.cancel,

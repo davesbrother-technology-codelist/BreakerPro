@@ -32,6 +32,7 @@ class AppConfig {
   };
 
   static List<String> postageOptionsList = [];
+  static List<String> fuelItems = [];
   static List<String> partConditionList = [];
   static Map postageOptionsMap = {};
 

@@ -36,20 +36,17 @@ class _ManageParts2State extends State<ManageParts2> {
   TextStyle textStyle = TextStyle(fontSize: 12, color: MyTheme.grey);
   OutlineInputBorder border =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
+  OutlineInputBorder focusedBorder = OutlineInputBorder(
+      borderSide: BorderSide(width: 2, color: MyTheme.materialColor));
   OutlineInputBorder ebayBorder =
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.red));
-  List<String> partConditionItems = [
-    'BRAND NEW',
-    'GOOD',
-    'PERFECT',
-    'POOR',
-    'VERY GOOD',
-    'WORN'
-  ];
+  List<String> partConditionItems = AppConfig.partConditionList;
   final List<String> postageItems = AppConfig.postageOptionsList;
-  List<String> fuelItems = ['Diesel','LPG','Petrol'];
+  List<String> fuelItems = AppConfig.fuelItems;
   late List<bool> postageSelected =
       List.generate(postageItems.length, (index) => false);
+
+  late List onLineImageList;
   late Part part;
   late Stock stock;
   bool isDefault = false;
@@ -87,10 +84,22 @@ class _ManageParts2State extends State<ManageParts2> {
     partCommentsEditingController.text = part.comments;
     postageOptionsController.text = part.postageOptions;
     fuelController.text = stock.fuel;
+    ImageList.managePartImageList = stock.imageThumbnailURLList.split(',');
 
     for (int i = 0; i < postageItems.length; i++) {
       if (part.postageOptions.contains(postageItems[i])) {
         postageSelected[i] = true;
+        postageOptionsController.text += "${postageItems[i]},";
+      }
+      List l = part.postageOptionsCode.split(',');
+      for (var code in l) {
+        if (postageItems[i] == AppConfig.postageOptionsMap[code]) {
+          print(AppConfig.postageOptionsMap[code]);
+          if (!postageOptionsController.text.contains(postageItems[i])) {
+            postageOptionsController.text += "${postageItems[i]},";
+          }
+          postageSelected[i] = true;
+        }
       }
     }
   }
@@ -101,279 +110,293 @@ class _ManageParts2State extends State<ManageParts2> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: AppBar(
-          backgroundColor: MyTheme.materialColor,
-          title: Text(
-            'Manage Part',
-            style: TextStyle(color: MyTheme.white),
-          ),
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: MyTheme.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: MyTheme.materialColor,
+        title: Text(
+          'Manage Part',
+          style: TextStyle(color: MyTheme.white),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Center(
-                  child: Text(
-                    part.partName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-              ),
-              Center(
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: MyTheme.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Center(
                 child: Text(
-                  "${stock.make} ${stock.model}",
-                  style: const TextStyle(fontSize: 15, color: Colors.black54),
+                  part.partName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                  ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  customDropDownField("Part Condition", partConditionItems,
-                      partConditionController)
-                ],
+            ),
+            Center(
+              child: Text(
+                "${stock.make} ${stock.model}",
+                style: const TextStyle(fontSize: 15, color: Colors.black54),
               ),
-              Row(
-                children: [
-                  custom2TextField("Part Location", 3 / 4, TextInputType.text,
-                      partLocEditingController),
-                  custom2TextField("Warranty", 1 / 4, TextInputType.number,
-                      warrantyEditingController)
-                ],
-              ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.start,
-              //   children: const [
-              //     Padding(
-              //       padding: EdgeInsets.all(8.0),
-              //       child: Text(
-              //         'Quantity In Stock',
-              //         style: TextStyle(color: Colors.grey, fontSize: 20),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              Row(
-                children: [
-                  custom2TextField("Sales Price", 2 / 5, TextInputType.number,
-                      salesPriceEditingController),
-                  custom2TextField("Cost Price", 2 / 5, TextInputType.number,
-                      costPriceEditingController),
-                  custom2TextField("Qty", 1 / 5, TextInputType.number,
-                      qtyEditingController)
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Checkbox(
-                      value: isDefault,
-                      onChanged: (value) {
-                        setState(() {
-                          isDefault = value!;
-                        });
-                      }),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Set Defaults",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
-                    ),
-                  )
-                ],
-              ),
-              custom2TextField("Part Description", 1, TextInputType.text,
-                  partDescEditingController),
-              custom2TextField("Manufacturer Part no", 1, TextInputType.text,
-                  mnfPartNoEditingController),
-              custom2TextField("Part Comments", 1, TextInputType.text,
-                  partCommentsEditingController),
-              // customTextField("Postage Option", postageOptionsValue),
-              customDropDownField(
-                  "Postage Option", postageItems, postageOptionsController),
-              customDropDownField("Fuel", fuelItems, fuelController),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Marketing',
-                      style: TextStyle(color: Colors.grey, fontSize: 20),
-                    ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                customDropDownField("Part Condition", partConditionItems,
+                    partConditionController)
+              ],
+            ),
+            Row(
+              children: [
+                custom2TextField("Part Location", 3 / 4, TextInputType.text,
+                    partLocEditingController),
+                custom2TextField("Warranty", 1 / 4, TextInputType.number,
+                    warrantyEditingController)
+              ],
+            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.start,
+            //   children: const [
+            //     Padding(
+            //       padding: EdgeInsets.all(8.0),
+            //       child: Text(
+            //         'Quantity In Stock',
+            //         style: TextStyle(color: Colors.grey, fontSize: 20),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            Row(
+              children: [
+                custom2TextField("Sales Price", 2 / 5, TextInputType.number,
+                    salesPriceEditingController),
+                custom2TextField("Cost Price", 2 / 5, TextInputType.number,
+                    costPriceEditingController),
+                custom2TextField(
+                    "Qty", 1 / 5, TextInputType.number, qtyEditingController)
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Checkbox(
+                    value: isDefault,
+                    onChanged: (value) {
+                      setState(() {
+                        isDefault = value!;
+                      });
+                    }),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Set Defaults",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey),
                   ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Checkbox(
-                      value: isEbay,
-                      onChanged: (value) {
-                        setState(() {
-                          isEbay = value!;
-                        });
-                      }),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Ebay",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
-                    ),
-                  )
-                ],
-              ),
-              custom2TextField("Ebay Title", 1, TextInputType.text,
-                  ebayTitleEditingController),
-              Row(
-                children: [
-                  Checkbox(
-                      value: hasPrintLabel,
-                      onChanged: (value) async {
-                        hasPrintLabel = value!;
-                        setState(() {});
-                      }),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 8, 8, 8),
-                    child: Text(
-                      "Print Label",
-                      style: TextStyle(fontSize: 18),
-                    ),
+                )
+              ],
+            ),
+            custom2TextField("Part Description", 1, TextInputType.text,
+                partDescEditingController),
+            custom2TextField("Manufacturer Part no", 1, TextInputType.text,
+                mnfPartNoEditingController),
+            custom2TextField("Part Comments", 1, TextInputType.text,
+                partCommentsEditingController),
+            // customTextField("Postage Option", postageOptionsValue),
+            customDropDownField(
+                "Postage Option", postageItems, postageOptionsController),
+            customDropDownField("Fuel", fuelItems, fuelController),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Marketing',
+                    style: TextStyle(color: Colors.grey, fontSize: 20),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(10),
-                height: ImageList.managePartImageList.isNotEmpty ? 210 : 80,
-                color: MyTheme.black12,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton.icon(
-                          icon: Icon(
-                            Icons.camera_alt_outlined,
-                            color: MyTheme.black,
-                            size: 30,
-                          ),
-                          label: Text(
-                            'Capture',
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Checkbox(
+                    value: isEbay,
+                    onChanged: (value) {
+                      setState(() {
+                        isEbay = value!;
+                      });
+                    }),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Ebay",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey),
+                  ),
+                )
+              ],
+            ),
+            custom2TextField("Ebay Title", 1, TextInputType.text,
+                ebayTitleEditingController),
+            Row(
+              children: [
+                Checkbox(
+                    value: hasPrintLabel,
+                    onChanged: (value) async {
+                      hasPrintLabel = value!;
+                      setState(() {});
+                    }),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 8, 8, 8),
+                  child: Text(
+                    "Print Label",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              height: ImageList.managePartImageList.isNotEmpty ? 210 : 80,
+              color: MyTheme.black12,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton.icon(
+                        icon: Icon(
+                          Icons.camera_alt_outlined,
+                          color: MyTheme.black,
+                          size: 30,
+                        ),
+                        label: Text(
+                          'Capture',
+                          style: TextStyle(color: MyTheme.black, fontSize: 20),
+                        ),
+                        onPressed: openCamera,
+                      ),
+                      TextButton.icon(
+                        icon: Icon(
+                          Icons.photo,
+                          color: MyTheme.black,
+                          size: 30,
+                        ),
+                        label: Text('Gallery',
                             style:
-                                TextStyle(color: MyTheme.black, fontSize: 20),
-                          ),
-                          onPressed: openCamera,
-                        ),
-                        TextButton.icon(
-                          icon: Icon(
-                            Icons.photo,
-                            color: MyTheme.black,
-                            size: 30,
-                          ),
-                          label: Text('Gallery',
-                              style: TextStyle(
-                                  color: MyTheme.black, fontSize: 20)),
-                          onPressed: () async {
-                            // List<XFile> pickedGallery= (await _picker.pickMultiImage());
-                            final ImagePicker imagePicker = ImagePicker();
-                            List<XFile> imageFileList=[];
-                            List<XFile>? selectedImages = await imagePicker.pickMultiImage();
-                            if(selectedImages.isNotEmpty){
-                              imageFileList.addAll(selectedImages);
+                                TextStyle(color: MyTheme.black, fontSize: 20)),
+                        onPressed: () async {
+                          // List<XFile> pickedGallery= (await _picker.pickMultiImage());
+                          final ImagePicker imagePicker = ImagePicker();
+                          List<XFile> imageFileList = [];
+                          List<XFile>? selectedImages =
+                              await imagePicker.pickMultiImage();
+                          if (selectedImages.isNotEmpty) {
+                            imageFileList.addAll(selectedImages);
+                          }
+                          setState(() {
+                            for (XFile image in imageFileList) {
+                              File imgFile = File(image.path);
+                              String dir = path.dirname(imgFile.path);
+                              int count = PartsList.partCount;
+                              String newPath = path.join(dir,
+                                  'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                              imgFile = imgFile.renameSync(newPath);
+                              ImageList.managePartImageList.add(imgFile.path);
                             }
-                            setState(() {
-                              for(XFile image in imageFileList){
-                                File imgFile = File(image.path);
-                                String dir = path.dirname(imgFile.path);
-                                int count = PartsList.partCount;
-                                String newPath = path.join(dir,
-                                    'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                imgFile = imgFile.renameSync(newPath);
-                                ImageList.managePartImageList.add(imgFile.path);
-                              }
-
-                            });
-                            // XFile? image = await ImagePicker()
-                            //     .pickImage(source: ImageSource.gallery);
-                            //
-                            // if (image != null) {
-                            //   File imgFile = File(image.path);
-                            //   print(imgFile.path);
-                            //   String dir = path.dirname(imgFile.path);
-                            //   setState(() {
-                            //     int count = PartsList.partCount;
-                            //     String newPath = path.join(dir,
-                            //         'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                            //     imgFile = imgFile.renameSync(newPath);
-                            //     ImageList.partImageList.add(imgFile.path);
-                            //   });
-                            // }
-                            for (String img in ImageList.managePartImageList) {
-                              print(img);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    ImageList.managePartImageList.isNotEmpty
-                        ? Align(
-                            alignment: Alignment.bottomLeft,
-                            child: SizedBox(
-                              height: 140,
-                              child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: ImageList.managePartImageList.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return Stack(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: AspectRatio(
-                                            aspectRatio: AppConfig.aspectMap[
-                                                AppConfig.imageAspectRatio],
-                                            child: SizedBox(
-                                              width: 9,
-                                              height: 16,
-                                              child: Image.file(File(ImageList
-                                                  .managePartImageList[index])),
-                                            ),
+                          });
+                          // XFile? image = await ImagePicker()
+                          //     .pickImage(source: ImageSource.gallery);
+                          //
+                          // if (image != null) {
+                          //   File imgFile = File(image.path);
+                          //   print(imgFile.path);
+                          //   String dir = path.dirname(imgFile.path);
+                          //   setState(() {
+                          //     int count = PartsList.partCount;
+                          //     String newPath = path.join(dir,
+                          //         'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                          //     imgFile = imgFile.renameSync(newPath);
+                          //     ImageList.partImageList.add(imgFile.path);
+                          //   });
+                          // }
+                          for (String img in ImageList.managePartImageList) {
+                            print(img);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  ImageList.managePartImageList.isNotEmpty
+                      ? Align(
+                          alignment: Alignment.bottomLeft,
+                          child: SizedBox(
+                            height: 140,
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: ImageList.managePartImageList.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Stack(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: AspectRatio(
+                                          aspectRatio: AppConfig.aspectMap[
+                                              AppConfig.imageAspectRatio],
+                                          child: SizedBox(
+                                            child: ImageList
+                                                    .managePartImageList[index]
+                                                    .contains('http')
+                                                ? Image.network(
+                                                    ImageList
+                                                            .managePartImageList[
+                                                        index],
+                                                    fit: BoxFit.fill,
+                                                    errorBuilder:
+                                                        (BuildContext context,
+                                                            Object exception,
+                                                            StackTrace?
+                                                                stackTrace) {
+                                                      return const SizedBox();
+                                                    },
+                                                  )
+                                                : Image.file(File(ImageList
+                                                        .managePartImageList[
+                                                    index]),fit: BoxFit.fill,),
                                           ),
                                         ),
-                                        Positioned(
-                                          top: -5,
-                                          right: -13,
+                                      ),
+                                      Positioned(
+                                        top: -15,
+                                        right: -15,
+                                        child: Align(
+                                          alignment: Alignment.topRight,
                                           child: IconButton(
                                             icon: Icon(
                                               Icons.cancel,
-                                              color: Colors.black
-                                                  .withOpacity(0.7),
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
                                               size: 20,
                                             ),
                                             onPressed: () {
@@ -385,88 +408,86 @@ class _ManageParts2State extends State<ManageParts2> {
                                             },
                                           ),
                                         ),
-                                      ],
-                                    );
-                                  }),
-                            ),
-                          )
-                        : const SizedBox()
-                  ],
+                                      ),
+                                    ],
+                                  );
+                                }),
+                          ),
+                        )
+                      : const SizedBox()
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  flex: 2,
+                  child: SizedBox(),
                 ),
-              ),
-              Row(
-                children: [
-                  const Expanded(
-                    flex: 2,
-                    child: SizedBox(),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(5, 10.0, 15, 10),
-                      child: Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(
-                          onPressed: () {
-                            openDeleteDialog(context);
-                          },
-                          child: Text(
-                            "Delete",
-                            style:
-                                TextStyle(color: MyTheme.red, fontSize: 17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 5, 5, 10),
-                      child: Container(
-                        color: MyTheme.grey,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Re-Search",
-                            style:
-                                TextStyle(color: MyTheme.white, fontSize: 17),
-                          ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 10.0, 15, 10),
+                    child: Container(
+                      color: MyTheme.materialColor,
+                      child: TextButton(
+                        onPressed: () {
+                          openDeleteDialog(context);
+                        },
+                        child: Text(
+                          "Delete",
+                          style: TextStyle(color: MyTheme.red, fontSize: 17),
                         ),
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(5, 5.0, 15, 10),
-                      child: Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(
-                          onPressed: () {
-                            upload();
-                          },
-                          child: Text(
-                            "Upload",
-                            style:
-                                TextStyle(color: MyTheme.white, fontSize: 17),
-                          ),
+                )
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 5, 5, 10),
+                    child: Container(
+                      color: MyTheme.grey,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Re-Search",
+                          style: TextStyle(color: MyTheme.white, fontSize: 17),
                         ),
                       ),
                     ),
-                  )
-                ],
-              )
-            ],
-          ),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 5.0, 15, 10),
+                    child: Container(
+                      color: MyTheme.materialColor,
+                      child: TextButton(
+                        onPressed: () {
+                          upload();
+                        },
+                        child: Text(
+                          "Upload",
+                          style: TextStyle(color: MyTheme.white, fontSize: 17),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )
+          ],
         ),
-      );
+      ),
+    );
   }
 
   openDeleteDialog(BuildContext context) {
@@ -478,7 +499,7 @@ class _ManageParts2State extends State<ManageParts2> {
       },
     );
     Widget logoutButton = TextButton(
-      onPressed: (){
+      onPressed: () {
         Navigator.of(context).pop();
         part.isDelete = true;
         upload();
@@ -619,6 +640,11 @@ class _ManageParts2State extends State<ManageParts2> {
                     ? 5
                     : 1,
                 controller: controller,
+                onChanged: (String s) {
+                  if (title == 'Ebay Title') {
+                    setState(() {});
+                  }
+                },
                 onSubmitted: (String? s) {
                   if (title == 'Manufacturer Part no' && s != null) {
                     setState(() {
@@ -629,8 +655,14 @@ class _ManageParts2State extends State<ManageParts2> {
                 },
                 keyboardType: TType,
                 decoration: InputDecoration(
-                    enabledBorder: title == "Ebay Title" ? ebayBorder : border,
-                    focusedBorder: title == "Ebay Title" ? ebayBorder : border))
+                    enabledBorder: title == 'Ebay Title' &&
+                            ebayTitleEditingController.text.length >= 80
+                        ? ebayBorder
+                        : border,
+                    focusedBorder: title == 'Ebay Title' &&
+                            ebayTitleEditingController.text.length >= 80
+                        ? ebayBorder
+                        : focusedBorder))
           ]),
     );
   }
@@ -679,6 +711,6 @@ class _ManageParts2State extends State<ManageParts2> {
     //     '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
     // await file.writeAsString(msg, mode: FileMode.append);
     ManagePartRepository.uploadPart(part, stock);
-    Navigator.pop(context, {"part" : part,"stock" : stock});
+    Navigator.pop(context, {"part": part, "stock": stock});
   }
 }

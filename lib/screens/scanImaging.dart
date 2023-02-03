@@ -156,8 +156,8 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
                                 ),
                               ),
                               Positioned(
-                                top: -5,
-                                right: -13,
+                                top: -15,
+                                right: -15,
                                 child: IconButton(
                                   icon: Icon(
                                     Icons.cancel,

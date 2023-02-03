@@ -582,6 +582,8 @@ class _MainDashboardState extends State<MainDashboard> {
     }
     AppConfig.postageOptionsList =
         createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
+    AppConfig.fuelItems =
+        createMenuList('FUEL', AppConfig.fuelItems, responseJson);
     AppConfig.partConditionList =
         createMenuList('PART CONDITION', AppConfig.partConditionList, responseJson);
     AppConfig.postageOptionsMap = { for (var v in AppConfig.postageOptionsList) responseJson[v]:  v};

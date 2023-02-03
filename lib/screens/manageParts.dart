@@ -425,14 +425,14 @@ class _ManagePartState extends State<ManagePart> {
     List<Stock> stockList = List.generate(responseList.length, (index) {
       Stock stock = Stock();
       stock.fromJson(responseList[index]);
-      print("${responseList[index]}");
+      // print("${responseList[index]}");
       return stock;
     });
     List<Part> partList = List.generate(responseList.length, (index) {
       Part part = Part.fromStock(stockList[index]);
       // part.partId =
       //     "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
-      print("${stockList[index].stockID} ${part.partCondition}");
+      // print("${stockList[index].stockID} ${part.partCondition}");
       return part;
     });
 

@@ -1,4 +1,4 @@
-import 'package:breaker_pro/screens/manage_parts2.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +8,7 @@ import '../dataclass/part.dart';
 import '../dataclass/stock.dart';
 import '../my_theme.dart';
 import '../utils/auth_utils.dart';
+import 'manage_parts2.dart';
 
 class StocksScreen extends StatefulWidget {
   const StocksScreen(

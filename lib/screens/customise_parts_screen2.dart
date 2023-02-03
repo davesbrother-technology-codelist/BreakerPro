@@ -394,16 +394,14 @@ class _CustomiseState extends State<Customise> {
                                               aspectRatio: AppConfig.aspectMap[
                                                   AppConfig.imageAspectRatio],
                                               child: SizedBox(
-                                                width: 9,
-                                                height: 16,
                                                 child: Image.file(File(ImageList
-                                                    .partImageList[index])),
+                                                    .partImageList[index]),fit: BoxFit.fill,),
                                               ),
                                             ),
                                           ),
                                           Positioned(
-                                            top: -5,
-                                            right: -13,
+                                            top: -15,
+                                            right: -15,
                                             child: IconButton(
                                               icon: Icon(
                                                 Icons.cancel,
