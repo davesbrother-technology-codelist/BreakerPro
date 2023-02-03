@@ -987,10 +987,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     responseJson = jsonDecode(response);
 
     for(var a in responseJson.keys){
-      if(a == "EBAYSTORECAT"){
-        print(responseJson[a]);
-      }
-      print(a);
+      // if(a == "EBAYSTORECAT"){
+      //   print(responseJson[a]);
+      // }
+      print(responseJson[a]);
     }
     if (makeController.text.isNotEmpty) {
       modelMenuItems =

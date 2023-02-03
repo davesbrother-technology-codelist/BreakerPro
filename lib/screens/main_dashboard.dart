@@ -566,6 +566,11 @@ class _MainDashboardState extends State<MainDashboard> {
             responseJson[a['RelatedValue']]?.add(a['SelectValue']);
           }
         }
+
+
+        if (a['SelectList'] == "POSTAGE"){
+          responseJson[a['SelectValue']] = a['RelatedValue'];
+        }
       }
       String user = jsonEncode(responseJson);
       prefs.setString('selectList', user);
@@ -579,6 +584,8 @@ class _MainDashboardState extends State<MainDashboard> {
         createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
     AppConfig.partConditionList =
         createMenuList('PART CONDITION', AppConfig.partConditionList, responseJson);
+    AppConfig.postageOptionsMap = { for (var v in AppConfig.postageOptionsList) responseJson[v]:  v};
+    print(AppConfig.postageOptionsMap);
 
 
     if(!PartsList.isUploading){

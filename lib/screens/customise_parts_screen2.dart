@@ -56,17 +56,25 @@ class _CustomiseState extends State<Customise> {
   TextEditingController partDescEditingController = TextEditingController();
   TextEditingController mnfPartNoEditingController = TextEditingController();
   TextEditingController partCommentsEditingController = TextEditingController();
-  TextEditingController ebayTitleEditingController = TextEditingController();
+  TextEditingController ebayTitleEditingController = TextEditingController(text: "");
   TextEditingController partConditionController = TextEditingController();
   TextEditingController postageOptionsController = TextEditingController();
 
   @override
   void initState() {
     part = widget.part;
+    if(part.ebayTitle.contains('[')){
+      print(part.ebayTitle);
+      ebayTitleEditingController.text = part.generateEbayTitle(part.ebayTitle);
+    }
+    else{
+      ebayTitleEditingController.text = part.ebayTitle;
+    }
+
     super.initState();
-    ebayTitleEditingController.text =
-    part.ebayTitle.isEmpty ?
-        "${PartsList.cachedVehicle!.ebayMake} ${PartsList.cachedVehicle!.ebayModel} ${part.partName} ${part.mnfPartNo}" : part.ebayTitle;
+    // ebayTitleEditingController.text =
+    // part.ebayTitle.isEmpty ?
+    //     "${PartsList.cachedVehicle!.ebayMake} ${PartsList.cachedVehicle!.ebayModel} ${part.partName} ${part.mnfPartNo}" : part.ebayTitle;
     formattedDate = '';
     partConditionController.text = part.partCondition;
     partLocEditingController.text = part.partLocation;
@@ -82,6 +90,13 @@ class _CustomiseState extends State<Customise> {
     for (int i = 0; i < postageItems.length; i++) {
       if (part.postageOptions.contains(postageItems[i])) {
         postageSelected[i] = true;
+      }
+      List l = part.postageOptionsCode.split(',');
+      for (var code in l){
+        if(postageItems[i] == AppConfig.postageOptionsMap[code]){
+          print(AppConfig.postageOptionsMap[code]);
+          postageSelected[i] = true;
+        }
       }
     }
   }

@@ -143,6 +143,84 @@ class Part {
     };
   }
 
+  String generateEbayTitle(String format){
+    format = format.replaceAll('[', "");
+    String finalString = "";
+    List l = format.split('] ');
+    for(var a in l){
+      switch(a){
+        case "EBAY_MAKE":{
+          finalString += "${PartsList.cachedVehicle!.ebayMake} ";
+          break;
+        }
+        case "EBAY_MODEL":{
+          String model = PartsList.cachedVehicle!.ebayModel;
+          if(model.isNotEmpty){
+            finalString += "$model ";
+          }
+
+          break;
+        }
+        case "EBAY_COLOUR":{
+          String color = PartsList.cachedVehicle!.ebayColor;
+          if(color.isNotEmpty){
+            finalString += "$color ";
+          }
+
+          break;
+        }
+        case "EBAY_STYLE":{
+          String style = PartsList.cachedVehicle!.ebayStyle;
+          if(style.isNotEmpty){
+            finalString += "$style ";
+          }
+
+          break;
+        }
+        case "YEAR*2":{
+          String year2 = "${PartsList.cachedVehicle!.fromYear}-${PartsList.cachedVehicle!.toYear}";
+          if(year2.length > 1){
+            finalString += "${PartsList.cachedVehicle!.fromYear}-${PartsList.cachedVehicle!.toYear} ";
+          }
+
+          break;
+        }
+        case "YEAR*":{
+          String year2 = "${PartsList.cachedVehicle!.fromYear}-${PartsList.cachedVehicle!.toYear}";
+          if(year2.length > 1){
+            finalString += "${PartsList.cachedVehicle!.fromYear}-${PartsList.cachedVehicle!.toYear} ";
+          }
+
+          break;
+        }
+        case "EBAY_CC":{
+          String cc = PartsList.cachedVehicle!.ebayEngine;
+          if(cc.isNotEmpty){
+            finalString += "$cc ";
+          }
+
+          break;
+        }
+        case "YEAR MANUFACTURE":{
+          String mnf = PartsList.cachedVehicle!.manufacturingYear;
+          if(mnf.isNotEmpty){
+            finalString += "$mnf ";
+          }
+
+          break;
+        }
+        case "PART NAME":{
+          finalString += "$partName ";
+          break;
+        }
+        default:
+          finalString += "";
+      }
+    }
+    print(finalString);
+    return finalString;
+  }
+
   Map<String, dynamic> toStockJson(Stock stock) {
     return {
       "PartID": partId,
