@@ -4,6 +4,8 @@ import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:path/path.dart' as path;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
@@ -165,6 +167,11 @@ class PartRepository {
             "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
         msg += "URL: $uri";
         File image = imgList[i];
+        String dir = path.dirname(image.path);
+          int count = PartsList.partCount;
+          String newPath = path.join(dir,
+              'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+          image = image.renameSync(newPath);
         print(image.path);
         String filename = image.path.split("/").last.toString();
         print(filename);

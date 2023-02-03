@@ -4,6 +4,7 @@ import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -65,6 +66,11 @@ class VehicleRepository {
       //   continue;
       // }
       File image = imgList[i];
+      String dir = path.dirname(image.path);
+      int count = PartsList.vehicleCount;
+      String newPath = path.join(dir,
+                'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+      image = image.renameSync(newPath);
       NotificationService().instantNofitication(
           "2/5 - Uploading Vehicle Images ${i + 1}/${imgList.length} ${vehicle.model == "" ? "Model" : vehicle.model}");
       print(image.path);

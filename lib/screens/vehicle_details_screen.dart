@@ -446,17 +446,18 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               imageFileList.addAll(selectedImages);
                             }
                             setState(() {
-                              int i = 1;
-                              for(XFile image in imageFileList){
-                                File imgFile = File(image.path);
-                                  String dir = path.dirname(imgFile.path);
-                                    int count = PartsList.vehicleCount;
-                                    String newPath = path.join(dir,
-                                        'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                    imgFile = imgFile.renameSync(newPath);
-                                    ImageList.vehicleImgList.add(imgFile.path);
-                                    i += 1;
-                              }
+                              List<String> l = List.generate(imageFileList.length, (index) => imageFileList[index].path);
+                              // int i = 1;
+                              // for(XFile image in imageFileList){
+                              //   File imgFile = File(image.path);
+                              //     String dir = path.dirname(imgFile.path);
+                              //       int count = PartsList.vehicleCount;
+                              //       String newPath = path.join(dir,
+                              //           'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                              //       imgFile = imgFile.renameSync(newPath);
+                                    ImageList.vehicleImgList.addAll(l);
+                              //       i += 1;
+                              // }
                               saveVehicle();
                             });
 

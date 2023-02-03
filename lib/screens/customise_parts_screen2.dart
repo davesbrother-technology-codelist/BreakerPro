@@ -325,17 +325,18 @@ class _CustomiseState extends State<Customise> {
                                 imageFileList.addAll(selectedImages);
                               }
                               setState(() {
-                                int i = 1;
-                                for(XFile image in imageFileList){
-                                  File imgFile = File(image.path);
-                                  String dir = path.dirname(imgFile.path);
-                                  int count = PartsList.partCount;
-                                  String newPath = path.join(dir,
-                                      'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                  imgFile = imgFile.renameSync(newPath);
-                                  ImageList.partImageList.add(imgFile.path);
-                                  i += 1;
-                                }
+                                List<String> l = List.generate(imageFileList.length, (index) => imageFileList[index].path);
+                                // int i = 1;
+                                // for(XFile image in imageFileList){
+                                //   File imgFile = File(image.path);
+                                //   String dir = path.dirname(imgFile.path);
+                                //   int count = PartsList.partCount;
+                                //   String newPath = path.join(dir,
+                                //       'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                //   imgFile = imgFile.renameSync(newPath);
+                                  ImageList.partImageList.addAll(l);
+                                //   i += 1;
+                                // }
 
                               });
                               // XFile? image = await ImagePicker()
