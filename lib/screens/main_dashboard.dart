@@ -29,10 +29,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
+import '../api/manage_part_repository.dart';
 import '../api/parts_repository.dart';
 import '../dataclass/image_list.dart';
 import '../dataclass/part.dart';
 import '../dataclass/parts_list.dart';
+import '../dataclass/stock.dart';
 import '../dataclass/vehicle.dart';
 
 class MainDashboard extends StatefulWidget {
@@ -69,10 +71,7 @@ class _MainDashboardState extends State<MainDashboard> {
             PartsList.isUploading = true;
             try{
               await upload();
-              // if(PartsList.newAdded){
-              //   await upload();
-              //   PartsList.newAdded = false;
-              // }
+              await uploadManagePart();
             }
             catch(e){
               PartsList.isUploading = false;
@@ -916,5 +915,27 @@ class _MainDashboardState extends State<MainDashboard> {
         return alert;
       },
     );
+  }
+
+  Future<void> uploadManagePart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List? l = prefs.getStringList('uploadManagePartQueue');
+    if(l == null){
+      return;
+    }
+    Box<Part> box = await Hive.openBox('manageParts');
+    print(box.values.toList());
+    for(var partID in l){
+      String? s = prefs.getString(partID);
+      if(s != null){
+        Stock stock = Stock();
+        stock.fromJson(jsonDecode(s));
+        Part part = box.get(partID)!;
+        print(stock.toJson());
+        print(part.addStockLog(stock));
+        await ManagePartRepository.uploadPart(part, stock);
+      }
+    }
+    await box.close();
   }
 }

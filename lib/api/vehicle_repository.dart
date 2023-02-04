@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/parts_list.dart';
 import '../dataclass/vehicle.dart';
 import '../notification_service.dart';
@@ -57,22 +58,25 @@ class VehicleRepository {
   static fileUpload(Vehicle vehicle) async {
 
     print("\n\n Uploading Photos\n\n");
-    List<File> imgList = List.generate(ImageList.uploadVehicleImgList.length,
-        (index) => File(ImageList.uploadVehicleImgList[index]));
+    print(ImageList.uploadVehicleImgList);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // List<File> imgList = List.generate(ImageList.uploadVehicleImgList.length,
+    //     (index) => File(ImageList.uploadVehicleImgList[index]));
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
-    for (int i = 0; i < imgList.length; i++) {
-      // if(ImageList.uploadVehicleImgListStatus[i]){
-      //   continue;
-      // }
-      File image = imgList[i];
-      String dir = path.dirname(image.path);
+    for (int i = 0; i < ImageList.uploadVehicleImgList.length; i++) {
+      if(ImageList.uploadVehicleImgList[i].isEmpty){
+        continue;
+      }
+      print(ImageList.uploadVehicleImgList[i]);
+      File initialImage = File(ImageList.uploadVehicleImgList[i]);
+      String dir = path.dirname(initialImage.path);
       int count = PartsList.vehicleCount;
       String newPath = path.join(dir,
                 'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-      image = image.renameSync(newPath);
+      File image = initialImage.copySync(newPath);
       NotificationService().instantNofitication(
-          "2/5 - Uploading Vehicle Images ${i + 1}/${imgList.length} ${vehicle.model == "" ? "Model" : vehicle.model}");
+          "2/5 - Uploading Vehicle Images ${i + 1}/${ImageList.uploadVehicleImgList.length} ${vehicle.model == "" ? "Model" : vehicle.model}");
       print(image.path);
       String filename = image.path.split("/").last.toString();
       print(filename);
@@ -110,14 +114,13 @@ class VehicleRepository {
       print(response.statusCode);
       print(responseString);
       msg += "\n$responseString\n";
-      // ImageList.uploadVehicleImgListStatus[i] = true;
+      vehicle.imgList[i] = "";
+      // String vehicleString = jsonEncode(vehicle.toJson());
+      // await prefs.setString(vehicle.vehicleId, vehicleString);
       final File file = File(
           '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
       await file.writeAsString(msg, mode: FileMode.append);
-      // FlutterLogs.logToFile(
-      //     logFileName: "UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}",
-      //     overwrite: false,
-      //     logMessage: msg);
+      print("Done");
     }
   }
 

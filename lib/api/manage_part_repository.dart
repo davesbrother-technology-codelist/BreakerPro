@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../app_config.dart';
 import 'package:path/path.dart' as path;
 import '../dataclass/part.dart';
@@ -13,13 +15,22 @@ import 'dart:io';
 
 class ManagePartRepository {
   static Future<bool> uploadPart(Part part, Stock stock) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Box<Part> box = await Hive.openBox('manageParts');
     Map response = {};
     if(part.status != ""){
       if(part.imgList.isNotEmpty){
         await fileUpload(part, stock);
         await updatePart(part, stock);
       }
-
+      if(!box.isOpen){
+        box = await Hive.openBox('manageParts');
+      }
+      await box.delete(part.partId);
+      await prefs.remove(part.partId);
+      List<String>? l = prefs.getStringList('uploadManagePartQueue');
+      l!.remove(part.partId);
+      await prefs.setStringList("uploadManagePartQueue", l);
       NotificationService().instantNofitication(
           "Upload Complete",playSound: true);
       return true;
@@ -35,8 +46,11 @@ class ManagePartRepository {
     m['VehicleID'] = stock.vehicleId;
     if (part.imgList.isEmpty) {
       m['status'] = "Pending";
+      part.status = "Pending";
     } else {
       m['status'] = "Uploading";
+      part.status = "Uploading";
+
     }
     print("Body of api call:\n$m\n Body Ends");
     Uri url = Uri.parse("${ApiConfig.baseUrl}${ApiConfig.apiSubmitParts}");
@@ -64,11 +78,20 @@ class ManagePartRepository {
     await file.writeAsString(msg, mode: FileMode.append);
 
     if (response['result'] == "Inserted Successfully") {
+      await box.put(part.partId, part);
       Fluttertoast.showToast(msg: "Parts Upload Successful");
       if(part.imgList.isNotEmpty){
         await fileUpload(part, stock);
         await updatePart(part, stock);
       }
+      if(!box.isOpen){
+        box = await Hive.openBox('manageParts');
+      }
+      await box.delete(part.partId);
+      await prefs.remove(part.partId);
+      List<String>? l = prefs.getStringList('uploadManagePartQueue');
+      l!.remove(part.partId);
+      await prefs.setStringList("uploadManagePartQueue", l);
 
       NotificationService().instantNofitication(
           "Upload Complete",playSound: true);
@@ -81,22 +104,26 @@ class ManagePartRepository {
 
   static fileUpload(
       Part part, Stock stock) async {
+    Box<Part> box = await Hive.openBox('manageParts');
     print("\n\n Uploading Parts Photos\n\n");
     int t = part.imgList.length;
-    List<File> imgList = List.generate(
-          part.imgList.length, (index) => File(part.imgList[index]));
+    // List<File> imgList = List.generate(
+    //       part.imgList.length, (index) => File(part.imgList[index]));
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
-    for (int i = 0; i < imgList.length; i++) {
+    for (int i = 0; i < part.imgList.length; i++) {
+      if(part.imgList[i].isEmpty){
+        continue;
+      }
       NotificationService().instantNofitication(
           "2/3 - Uploading Part Images ${i+1}/$t \n${part.partName}\n${stock.stockID}");
       String msg =
           "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
       msg += "URL: $uri";
-      File image = imgList[i];
-      String dir = path.dirname(image.path);
+      File initialImage = File(part.imgList[i]);
+      String dir = path.dirname(initialImage.path);
       String newPath = path.join(dir,
           'IMG${stock.stockID}1${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-      image = image.renameSync(newPath);
+      File image = initialImage.copySync(newPath);
       print(image.path);
       String filename = image.path.split("/").last.toString();
       print(filename);
@@ -133,6 +160,8 @@ class ManagePartRepository {
 
       print(response.statusCode);
       print(responseString);
+      part.imgList[i] = "";
+      await box.put(part.partId, part);
 
       msg += "\n$responseString\n";
       print(msg);
@@ -146,7 +175,7 @@ class ManagePartRepository {
   static updatePart(Part part, Stock stock) async {
 
       NotificationService().instantNofitication(
-          "2/3 - Updating Part Data\n${part.partName}\n${stock.stockID}");
+          "3/3 - Updating Part Data\n${part.partName}\n${stock.stockID}");
 
       Map m = {};
       m['appversion'] = AppConfig.appVersion;

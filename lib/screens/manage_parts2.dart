@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:breaker_pro/api/manage_part_repository.dart';
 import 'package:breaker_pro/screens/postage_dropdown_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workmanager/workmanager.dart';
 import '../api/api_config.dart';
@@ -747,6 +751,19 @@ class _ManageParts2State extends State<ManageParts2> {
     // final File file = File(
     //     '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
     // await file.writeAsString(msg, mode: FileMode.append);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getStringList('uploadManagePartQueue') == null){
+      await prefs.setStringList('uploadManagePartQueue', [part.partId]);
+    }
+    else{
+      List<String> l = prefs.getStringList('uploadManagePartQueue')!;
+      l.add(part.partId);
+      await prefs.setStringList('uploadManagePartQueue', l);
+    }
+    await prefs.setString(part.partId, jsonEncode(stock.toJson()));
+    Box<Part> box = await Hive.openBox('manageParts');
+    await box.put(part.partId, part);
+    await box.close();
     ManagePartRepository.uploadPart(part, stock);
     Navigator.pop(context, {"part": part, "stock": stock});
   }

@@ -68,4 +68,42 @@ class Stock {
     ebayTitle = json["Ebay_Title"];
     ebayNumber = json["ebay_number"];
   }
+
+  Map<String, dynamic> toJson(){
+    return {
+      "StockID":stockID,
+      "Make":make,
+      "Model":model,
+      "ClientID":clientID,
+      "PartName":partName,
+      "Year":year,
+      "Warranty":warranty,
+      "Reg":reg,
+      "Price":price,
+      "Condition":condition,
+      "Details":details,
+      "PartComments":partComments,
+      "PostageRate":postageRate,
+      "PostageCode":postageCode,
+      "Marketting":marketing,
+      "VehicleId":vehicleId,
+      "StockRef":stockRef,
+      "Fuel":fuel,
+      "BodyStyle":bodyStyle,
+      "VIN":vin,
+      "Colour":colour,
+      "Manufact_year":manufacturingYear,
+      "DateAdded":dateAdded,
+      "Mileage":mileage,
+      "Vehlocation":vehicleLocation,
+      "Vehcost":vehicleCost,
+      "Vehdetails":vehicleDetails,
+      "Engine":engine,
+      "VehiclethumbnailURLlist":vehicleThumbnailURLList,
+      "ImageThumbnailURLList":imageThumbnailURLList,
+      "Thatcham_PartManufacturerNumber":thatchamPartManufacturerNumber,
+      "Ebay_Title":ebayTitle,
+      "ebay_number":ebayNumber,
+    };
+  }
 }

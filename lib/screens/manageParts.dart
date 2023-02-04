@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:breaker_pro/my_theme.dart';
 import 'package:breaker_pro/screens/scanPart.dart';
 import 'package:breaker_pro/screens/stocks_screen.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_config.dart';
 import '../api/manage_part_repository.dart';
 import '../api/stock_repository.dart';
@@ -58,6 +62,7 @@ class _ManagePartState extends State<ManagePart> {
     locationController = TextEditingController();
     partNumberController = TextEditingController();
     super.initState();
+    f();
   }
 
   @override
@@ -468,6 +473,30 @@ class _ManagePartState extends State<ManagePart> {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) =>
             StocksScreen(stockList: stockList, partList: partList)));
+  }
+
+  Future<void> f() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List? l = prefs.getStringList('uploadManagePartQueue');
+    if(l == null){
+      return;
+    }
+    Box<Part> box = await Hive.openBox('manageParts');
+    print(box.values.toList());
+    for(var partID in l){
+      String? s = prefs.getString(partID);
+      if(s != null){
+        Stock stock = Stock();
+        stock.fromJson(jsonDecode(s));
+        Part part = box.get(partID)!;
+        print(stock.toJson());
+        print(part.addStockLog(stock));
+        await ManagePartRepository.uploadPart(part, stock);
+      }
+    }
+    await box.close();
+    // await box.clear();
+    // await prefs.remove('uploadManagePartQueue');
   }
 
 

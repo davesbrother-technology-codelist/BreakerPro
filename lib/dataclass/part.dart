@@ -280,7 +280,7 @@ class Part {
 
   String addStockLog(Stock stock) {
     String m =
-        "PartID : $partId\nBPPartID: ${stock.stockID}\nPartName : $partName\nPartType : $partType\nPartSellPrice : $salesPrice\nPartCondition : $costPrice\nPartLocation : ${isDefault ? defaultLocation : partLocation}\nPartDescription : ${isDefault ? defaultDescription : description}\nPartComments : $comments\nMarketing: ${isEbay ? "Ebay," : ""}\nPartImageFiles: $imgList\nPostageRate : $postageOptions\nPostageCode: $postageOptionsCode\nQty : $costPrice\nManPartNo : $mnfPartNo\nPrintLabel: ${hasPrintLabel ? "1" : "0"}\nDeletePart: ${isDelete ? "1" : "0"}\n";
+        "PartID : $partId\nBPPartID: ${stock.stockID}\nPartName : $partName\nPartType : $partType\nPartSellPrice : $salesPrice\nPartCondition : $partCondition\nPartLocation : ${isDefault ? defaultLocation : partLocation}\nPartDescription : ${isDefault ? defaultDescription : description}\nPartComments : $comments\nMarketing: ${isEbay ? "Ebay," : ""}\nPartImageFiles: $imgList\nPostageRate : $postageOptions\nPostageCode: $postageOptionsCode\nQty : $costPrice\nManPartNo : $mnfPartNo\nPrintLabel: ${hasPrintLabel ? "1" : "0"}\nDeletePart: ${isDelete ? "1" : "0"}\n";
 
     return m;
   }

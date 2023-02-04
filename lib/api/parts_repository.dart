@@ -74,10 +74,12 @@ class PartRepository {
     if (response['result'] == "Inserted Successfully") {
       Fluttertoast.showToast(msg: "Parts Upload Successful");
       return true;
-    } else {
-      Fluttertoast.showToast(msg: "Failed to Upload Parts");
-      return false;
     }
+    return true;
+    // } else {
+    //   Fluttertoast.showToast(msg: "Failed to Upload Parts");
+    //   return false;
+    // }
   }
 
   static Future<void> updateParts(
@@ -154,24 +156,28 @@ class PartRepository {
       }
 
       print(part);
-      NotificationService().instantNofitication(
-          "4/5 - Uploading Part Images $j/$t $model ${part.partName}");
-      List<File> imgList = List.generate(
-          part.imgList.length, (index) => File(part.imgList[index]));
+
+      // List<File> imgList = List.generate(
+      //     part.imgList.length, (index) => File(part.imgList[index]));
 
       Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
-      for (int i = 0; i < imgList.length; i++) {
+      for (int i = 0; i < part.imgList.length; i++) {
         j += 1;
+        if(part.imgList[i].isEmpty){
+          continue;
+        }
         String msg =
             "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
         msg += "URL: $uri";
-        File image = imgList[i];
-        String dir = path.dirname(image.path);
+        NotificationService().instantNofitication(
+            "4/5 - Uploading Part Images $j/$t $model ${part.partName}");
+        File initialImage = File(part.imgList[i]);
+        String dir = path.dirname(initialImage.path);
           int count = PartsList.partCount;
           String newPath = path.join(dir,
               'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now().add(Duration(seconds: i)))}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-          image = image.renameSync(newPath);
+        File image = initialImage.copySync(newPath);
         print(image.path);
         String filename = image.path.split("/").last.toString();
         print(filename);
@@ -207,6 +213,9 @@ class PartRepository {
 
         print(response.statusCode);
         print(responseString);
+        Box<Part> box1 = await Hive.openBox('uploadPartListBox$vehicleID');
+        part.imgList[i] = "";
+        await box1.put(part.partName, part);
 
         msg += "\n$responseString\n";
         final File file = File(
@@ -216,6 +225,7 @@ class PartRepository {
     }
 
     await updateParts(updatePartsList, vehicleID, model);
+    print("Hello");
 
     return true;
   }
