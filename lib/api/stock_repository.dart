@@ -20,7 +20,7 @@ class StockRepository {
     final File file = File(
         '${AppConfig.externalDirectory!.path}/LOGGER${DateFormat("ddMMyy").format(DateTime.now())}.txt');
     await file.writeAsString(
-        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} FIND STOCK $url Success = ${jsonDecode(response.body)}\n",
+        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())} FIND STOCK ${ApiConfig.apiFindStock} Success = ${jsonDecode(response.body)}\n",
         mode: FileMode.append);
     List result = jsonDecode(response.body)['DataSet'];
     return result;

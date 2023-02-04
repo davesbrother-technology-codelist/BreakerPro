@@ -188,7 +188,12 @@ class _ManagePartState extends State<ManagePart> {
                   width: MediaQuery.of(context).size.width,
                   color: MyTheme.materialColor,
                   child: TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final File file = File(
+                            '${AppConfig.externalDirectory!.path}/UPLOAD_MANAGE_PARTS${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+                        await file.writeAsString(
+                            "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: showAdvanceSearchDialog\n",
+                            mode: FileMode.append);
                         advanceSearch(context);
                       },
                       child: Text(
@@ -375,6 +380,11 @@ class _ManagePartState extends State<ManagePart> {
   }
 
   Future<void> findStockFromID() async {
+    final File file = File(
+        '${AppConfig.externalDirectory!.path}/UPLOAD_MANAGE_PARTS${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+    await file.writeAsString(
+        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId ${partIdController.text}\n",
+        mode: FileMode.append);
     AuthUtils.showLoadingDialog(context);
     Map<String, dynamic> queryParams = {
       "clientid": AppConfig.clientId,
@@ -385,6 +395,9 @@ class _ManagePartState extends State<ManagePart> {
     List? responseList = await StockRepository.findStock(queryParams);
     Navigator.pop(context);
     if (responseList == null) {
+      await file.writeAsString(
+          "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Not Found (or not synced)\n",
+          mode: FileMode.append);
       Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
       return;
     }
@@ -394,12 +407,22 @@ class _ManagePartState extends State<ManagePart> {
     part.partId =
         "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
     print(stock.stockID);
+
+    await file.writeAsString(
+        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Found ${part.partName}, ${stock.stockID}\n",
+        mode: FileMode.append);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => ManageParts2(part: part, stock: stock)));
   }
 
   Future<void> findStockFromParams() async {
     AuthUtils.showLoadingDialog(context);
+    final File file = File(
+        '${AppConfig.externalDirectory!.path}/UPLOAD_MANAGE_PARTS${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+    await file.writeAsString(
+        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: showAdvanceSearchDialog onFindClicked\n",
+        mode: FileMode.append);
+
     Map<String, dynamic> queryParams = {
       "clientid": AppConfig.clientId,
       "username": AppConfig.username,
@@ -415,13 +438,21 @@ class _ManagePartState extends State<ManagePart> {
       "vrn": vrnController.text,
       "partnumber": partNumberController.text,
     };
+    String msg = "stockRef=${stockRefIdController.text}\nmake=${makeController.text}\nmodel=${modelController.text}\nmnfYear=${mnfYearController.text}\npartName=${partNameController.text}\nebay=${ebayNumberController.text}\nvehicleLocation=${locationController.text}\nvrn=${vrnController.text}\npartNumber=${partNameController.text}\n";
     List? responseList = await StockRepository.findStock(queryParams);
     Navigator.pop(context);
     if (responseList == null) {
+      msg += "${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: showAdvanceSearchDialog onFindClicked Part Not Found (or not synced)\n";
       Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+      await file.writeAsString(
+          msg,
+          mode: FileMode.append);
       return;
     }
-
+    msg += "${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: showAdvanceSearchDialog onFindClicked Part Found\n";
+    await file.writeAsString(
+        msg,
+        mode: FileMode.append);
     List<Stock> stockList = List.generate(responseList.length, (index) {
       Stock stock = Stock();
       stock.fromJson(responseList[index]);
@@ -430,9 +461,6 @@ class _ManagePartState extends State<ManagePart> {
     });
     List<Part> partList = List.generate(responseList.length, (index) {
       Part part = Part.fromStock(stockList[index]);
-      // part.partId =
-      //     "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
-      // print("${stockList[index].stockID} ${part.partCondition}");
       return part;
     });
 

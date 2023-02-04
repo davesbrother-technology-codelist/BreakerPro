@@ -2,7 +2,9 @@ import 'package:breaker_pro/api/manage_part_repository.dart';
 import 'package:breaker_pro/screens/postage_dropdown_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:workmanager/workmanager.dart';
 import '../api/api_config.dart';
 import '../app_config.dart';
@@ -70,6 +72,7 @@ class _ManageParts2State extends State<ManageParts2> {
 
   @override
   void initState() {
+    addLog();
     part = widget.part;
     stock = widget.stock;
     super.initState();
@@ -84,7 +87,12 @@ class _ManageParts2State extends State<ManageParts2> {
     partCommentsEditingController.text = part.comments;
     postageOptionsController.text = part.postageOptions;
     fuelController.text = stock.fuel;
-    ImageList.managePartImageList = stock.imageThumbnailURLList.split(',');
+    isEbay = part.isEbay;
+    if (stock.imageThumbnailURLList.isNotEmpty) {
+      ImageList.managePartImageList = stock.imageThumbnailURLList.split(',');
+    }
+
+    print(ImageList.managePartImageList.isEmpty);
 
     for (int i = 0; i < postageItems.length; i++) {
       if (part.postageOptions.contains(postageItems[i])) {
@@ -253,7 +261,42 @@ class _ManageParts2State extends State<ManageParts2> {
                         fontWeight: FontWeight.bold,
                         color: Colors.grey),
                   ),
-                )
+                ),
+                stock.ebayNumber.isNotEmpty
+                    ? Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: GestureDetector(
+                              onTap: () async {
+                                await launchUrl(
+                                    Uri.parse(
+                                        "https://www.ebay.com/itm/${stock.ebayNumber}"),
+                                    mode: LaunchMode.externalApplication);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.arrowUpRightFromSquare,
+                                    size: 18,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0),
+                                    child: Text(
+                                      stock.ebayNumber,
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : SizedBox()
               ],
             ),
             custom2TextField("Ebay Title", 1, TextInputType.text,
@@ -316,7 +359,8 @@ class _ManageParts2State extends State<ManageParts2> {
                             imageFileList.addAll(selectedImages);
                           }
                           setState(() {
-                            List<String> l = List.generate(imageFileList.length, (index) => imageFileList[index].path);
+                            List<String> l = List.generate(imageFileList.length,
+                                (index) => imageFileList[index].path);
                             // for (XFile image in imageFileList) {
                             //   File imgFile = File(image.path);
                             //   String dir = path.dirname(imgFile.path);
@@ -324,7 +368,7 @@ class _ManageParts2State extends State<ManageParts2> {
                             //   String newPath = path.join(dir,
                             //       'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                             //   imgFile = imgFile.renameSync(newPath);
-                              ImageList.managePartImageList.addAll(l);
+                            ImageList.managePartImageList.addAll(l);
                             // }
                           });
                           for (String img in ImageList.managePartImageList) {
@@ -367,9 +411,12 @@ class _ManageParts2State extends State<ManageParts2> {
                                                       return const SizedBox();
                                                     },
                                                   )
-                                                : Image.file(File(ImageList
-                                                        .managePartImageList[
-                                                    index]),fit: BoxFit.fill,),
+                                                : Image.file(
+                                                    File(ImageList
+                                                            .managePartImageList[
+                                                        index]),
+                                                    fit: BoxFit.fill,
+                                                  ),
                                           ),
                                         ),
                                       ),
@@ -686,8 +733,8 @@ class _ManageParts2State extends State<ManageParts2> {
     part.comments = partCommentsEditingController.text.toString();
     part.postageOptions = postageOptionsController.text.toString();
     part.ebayTitle = isEbay ? ebayTitleEditingController.text.toString() : "";
-    for(String img in ImageList.managePartImageList){
-      if(!img.contains('http')){
+    for (String img in ImageList.managePartImageList) {
+      if (!img.contains('http')) {
         part.imgList.add(img);
       }
     }
@@ -702,5 +749,13 @@ class _ManageParts2State extends State<ManageParts2> {
     // await file.writeAsString(msg, mode: FileMode.append);
     ManagePartRepository.uploadPart(part, stock);
     Navigator.pop(context, {"part": part, "stock": stock});
+  }
+
+  Future<void> addLog() async {
+    final File file = File(
+        '${AppConfig.externalDirectory!.path}/UPLOAD_MANAGE_PARTS${DateFormat("ddMMyy").format(DateTime.now())}.txt');
+    await file.writeAsString(
+        "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: Manage Part Details Screen ${widget.part.partName}, ${widget.stock.stockID}\n",
+        mode: FileMode.append);
   }
 }

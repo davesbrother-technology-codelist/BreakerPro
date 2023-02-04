@@ -267,7 +267,7 @@ class Part {
     part.description = stock.details;
     part.defaultLocation = stock.vehicleLocation;
     part.partLocation = stock.vehicleLocation;
-
+    part.isEbay = stock.marketing.contains('Ebay') || stock.ebayNumber.isNotEmpty;
     return part;
   }
 

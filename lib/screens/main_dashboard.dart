@@ -24,7 +24,9 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
 import '../api/parts_repository.dart';
@@ -168,11 +170,15 @@ class _MainDashboardState extends State<MainDashboard> {
                 // print(externalDirectory.listSync(recursive: true));
                 await encoder.addDirectory(Directory(externalDirectory.path),
                     includeDirName: false);
+
                 encoder.close();
-                await ShareExtend.share(encoder.zipPath, "file",
-                    subject:
-                        "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
-                    extraText: "Send the logs for better issue tracking.");
+                // var a = await Share.shareXFiles([XFile(encoder.zipPath)],text:"Send the logs for better issue tracking.",subject: "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}");
+                // print(a.raw);
+                await launchUrl(Uri.parse("mailto:smith@example.org"));
+                // await ShareExtend.share(encoder.zipPath, "file",
+                //     subject:
+                //         "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
+                //     extraText: "Send the logs for better issue tracking.");
               },
               icon: Icon(
                 Icons.share,
@@ -587,7 +593,9 @@ class _MainDashboardState extends State<MainDashboard> {
     AppConfig.partConditionList =
         createMenuList('PART CONDITION', AppConfig.partConditionList, responseJson);
     AppConfig.postageOptionsMap = { for (var v in AppConfig.postageOptionsList) responseJson[v]:  v};
-    print(AppConfig.postageOptionsMap);
+    for(var a in AppConfig.postageOptionsMap.keys){
+      print(a);
+    }
 
 
     if(!PartsList.isUploading){
