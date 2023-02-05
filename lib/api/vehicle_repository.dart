@@ -65,6 +65,7 @@ class VehicleRepository {
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
     for (int i = 0; i < ImageList.uploadVehicleImgList.length; i++) {
+      print(i);
       if(ImageList.uploadVehicleImgList[i].isEmpty){
         continue;
       }
@@ -114,13 +115,16 @@ class VehicleRepository {
       print(response.statusCode);
       print(responseString);
       msg += "\n$responseString\n";
-      vehicle.imgList[i] = "";
-      // String vehicleString = jsonEncode(vehicle.toJson());
-      // await prefs.setString(vehicle.vehicleId, vehicleString);
+      ImageList.uploadVehicleImgList[i] = "";
+      vehicle.imgList = List.from(ImageList.uploadVehicleImgList);
+
+      String vehicleString = jsonEncode(vehicle.toJson());
+      await prefs.setString(vehicle.vehicleId, vehicleString);
+
       final File file = File(
           '${AppConfig.externalDirectory!.path}/UPLOAD__${DateFormat("ddMMyy").format(DateTime.now())}.txt');
       await file.writeAsString(msg, mode: FileMode.append);
-      print("Done");
+
     }
   }
 

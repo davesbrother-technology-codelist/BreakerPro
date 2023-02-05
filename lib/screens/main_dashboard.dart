@@ -74,6 +74,7 @@ class _MainDashboardState extends State<MainDashboard> {
               await uploadManagePart();
             }
             catch(e){
+              print(e);
               PartsList.isUploading = false;
             }
 
@@ -607,6 +608,7 @@ class _MainDashboardState extends State<MainDashboard> {
         }
       }
       catch(e){
+        print(e);
         PartsList.isUploading = false;
       }
 
@@ -730,7 +732,6 @@ class _MainDashboardState extends State<MainDashboard> {
 
         bool isPartUpload = false;
         bool isPhotoUpload = false;
-
 
         await VehicleRepository.fileUpload(v);
         Box<Part> box1 = await Hive.openBox('uploadPartListBox${v.vehicleId}');
