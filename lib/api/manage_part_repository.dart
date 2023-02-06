@@ -36,7 +36,7 @@ class ManagePartRepository {
       return true;
     }
     NotificationService().instantNofitication(
-        "1/3 - Uploading Parts Data\n${part.partName}\n${stock.stockID}");
+        "1/3 - Uploading Parts Data\n\n${part.partName}\n${stock.stockID}");
     Map m = {...part.toStockJson(stock)};
     m['appversion'] = AppConfig.appVersion;
     m['osversion'] = ApiConfig.baseQueryParams['osversion'];

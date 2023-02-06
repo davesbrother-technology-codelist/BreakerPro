@@ -245,7 +245,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                             }),
                           },
                           trailing: Text(partsList[index].id.toString()),
-                          title: Text(partsList[index].partName),
+                          title: Text(partsList[index].partName,),
                         ),
                       ),
                     );
@@ -330,6 +330,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
+        PartsList.isStockRef = false;
         PartsList.selectedPartList = [];
         PartsList.partList = [];
         PartsList.uploadPartList = [];

@@ -78,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextField(
                   controller: clientIdController,
                   style: TextStyle(color: MyTheme.materialColor),
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.fingerprint,

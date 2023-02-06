@@ -206,7 +206,8 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     imgList.add(imgFile.path);
                                     ImageList.vehicleImgList.add(imgFile.path);
                                     print(imgFile.path);
-                                  } else if(widget.type=='ScanImaging'){
+                                  }
+                                  else if(widget.type=='ScanImaging'){
                                     int count = PartsList.vehicleCount;
 
                                     String newPath = path.join(dir,
@@ -215,7 +216,8 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     imgList.add(imgFile.path);
                                     ImageList.scanImagingList.add(imgFile.path);
                                     print(imgFile.path);
-                                  }else if(widget.type=='ManagePart'){
+                                  }
+                                  else if(widget.type=='ManagePart'){
                                     String newPath = path.join(dir,
                                         'IMG${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                                     imgFile = imgFile.renameSync(newPath);
@@ -232,6 +234,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                     ImageList.partImageList.add(imgFile.path);
                                     print(imgFile.path);
                                   }
+                                  image = XFile(imgFile.path);
                                 });
                               } catch (e) {
                                 // If an error occurs, log the error to the console.

@@ -43,7 +43,7 @@ class Part {
   double warranty = 0;
 
   @HiveField(12)
-  int qty = 0;
+  int qty = -1;
 
   @HiveField(13)
   late double salesPrice = 0;

@@ -91,7 +91,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     recall = PartsList.recall;
     super.initState();
     int currentYear = DateTime.now().year;
-    for (int i = 1980; i <= currentYear; i++) {
+    for (int i = currentYear; i >= 1980; i--) {
       yearsList.add(i.toString());
     }
     if (PartsList.cachedVehicle != null) {
@@ -548,7 +548,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         openBreakingSparesDialog(context);
                       },
                       child: Text(
-                        'Breaking for Spares',
+                        PartsList.isStockRef ? 'Update Part':'Breaking for Spares',
                         style: TextStyle(color: MyTheme.white, fontSize: 15),
                       ),
                     ),
@@ -601,6 +601,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
+        PartsList.isStockRef = true;
         prefs.setBool('uploadVehicle', true);
         await prefs.remove('vehicle');
         print("Cleared cache");
@@ -625,7 +626,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     );
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text("OK to Add Breaking for Spares?"),
+      title: PartsList.isStockRef ? const Text("Update Breaker") : const Text("OK to Add Breaking for Spares?"),
       actions: [
         cancelButton,
         okButton,

@@ -1,9 +1,16 @@
 import 'dart:io';
 
+import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+import '../api/stock_repository.dart';
+import '../app_config.dart';
+import '../dataclass/part.dart';
+import '../dataclass/stock.dart';
 import '../my_theme.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -16,42 +23,50 @@ class QuickScan extends StatefulWidget {
 }
 
 class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  bool _isVisible = true;
-  final GlobalKey _gLobalkey = GlobalKey();
-  QRViewController? controller;
+  late AnimationController animationController;
+  late Part part;
+  late Stock stock = Stock();
+  final GlobalKey globalKey = GlobalKey();
+  late QRViewController controller;
   Barcode? result;
-  bool Mode=false;
-  void qr(QRViewController controller) {
+  bool isOffline = false;
+  bool isFound = false;
+  void onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedDataStream.listen((event) {
-      setState(() {
-        result = event;
-      });
+    controller.scannedDataStream.listen((event) async {
+
+        print(event.code);
+        if(event.code != null){
+          controller.pauseCamera();
+          await findStockFromID(context, event.code!);
+        }
+
     });
     controller.pauseCamera();
     controller.resumeCamera();
   }
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: Duration(seconds: 6),
+  void initialiseRedLineAnimation() {
+    animationController = AnimationController(
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     )..addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _animationController.reverse();
+        animationController.reverse();
       } else if (status == AnimationStatus.dismissed) {
-        _animationController.forward();
+        animationController.forward();
       }
     });
-    _animationController.forward();
+    animationController.forward();
+  }
+  @override
+  void initState() {
+    super.initState();
+    initialiseRedLineAnimation();
   }
   @override
   void dispose() {
-    controller?.dispose();
-    _animationController.dispose();
+    controller.dispose();
+    animationController.dispose();
 
     super.dispose();
   }
@@ -60,239 +75,176 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
   void reassemble() async {
     super.reassemble();
     if(Platform.isIOS){
-      await controller!.pauseCamera();
+      await controller.pauseCamera();
     }
-    controller!.resumeCamera();
+    controller.resumeCamera();
+  }
+
+  Future<void> findStockFromID(
+      BuildContext context, String partID) async {
+    Map<String, dynamic> queryParams = {
+      "clientid": AppConfig.clientId,
+      "username": AppConfig.username,
+      "stockid": partID,
+      "searchby": "part"
+    };
+    List? responseList = await StockRepository.findStock(queryParams);
+    if (responseList == null) {
+      // await file.writeAsString(
+      //     "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Not Found (or not synced)\n",
+      //     mode: FileMode.append);
+      Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+      return;
+    }
+    // stock = Stock();
+    stock.fromJson(responseList[0]);
+    part = Part.fromStock(stock);
+    part.partId =
+    "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
+    print(stock.stockID);
+    setState(() {
+
+    });
+
+    // await file.writeAsString(
+    //     "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Found ${part.partName}, ${stock.stockID}\n",
+    //     mode: FileMode.append);
+    // Navigator.pop(context);
+  }
+
+  Widget infoContainer(String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
+            child: Text(
+              title,
+              style: TextStyle(color: MyTheme.black54),
+            ),
+          ),
+          Expanded(
+            child : Padding(
+              padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+              child: Text(
+                desc ,
+                style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
+      appBar: EmptyAppBar(),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(child : MainDashboardUtils.qrWidget2(context, globalKey, onQRViewCreated, animationController)),
 
-      body: SingleChildScrollView(
-        child: Center(
-          child: SafeArea(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Image.asset("assets/laser.png",
-                      height: 60,
-                      width: 50,
-                    )
-                  ],
+          isOffline?const Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):Container(),
+
+          infoContainer("Part ID", stock.stockID),
+          infoContainer("Part Name", stock.partName),
+          infoContainer("Current Location", stock.vehicleLocation),
+          infoContainer("Vehicle",
+              "${stock.make} ${stock.model} ${stock.year}"),
+          Padding(
+            padding: const EdgeInsets.only(left: 14,right: 14),
+            child: TextField(
+              decoration: InputDecoration(
+                  hintText: "Location",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      borderSide: BorderSide(
+                          color: Colors.grey,
+                          width: 2
+                      )
+                  )
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  color: MyTheme.materialColor,
+                  child: TextButton(onPressed: (){},
+                      child: Text("Set Location",
+                        style: TextStyle(
+                            fontSize:18,
+                            color: MyTheme.white
+
+                        ) ,
+                      )),
+                ),
+                SizedBox(
+                  width: 15,
+                ),
+                isOffline?Container(
+                  color: MyTheme.materialColor,
+                  child: TextButton(onPressed: (){
+                    setState(() {
+                      isOffline=!isOffline;
+                    });
+                  },
+                      child: Text("Online Mode",
+                        style: TextStyle(
+                            fontSize:18,
+                            color: MyTheme.white
+
+                        ) ,
+                      )),
+                ):Container(
+                  color: MyTheme.materialColor,
+                  child: TextButton(onPressed: (){
+                    setState(() {
+                      isOffline=!isOffline;
+                    });
+                  },
+                      child: Text("Offline Mode",
+                        style: TextStyle(
+                            fontSize:18,
+                            color: MyTheme.white
+
+                        ) ,
+                      )),
+                ),
+                SizedBox(
+                  width: 15,
                 ),
                 Container(
-                  height:5* MediaQuery.of(context).size.height/9,
-                  width: 400,
-
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10,right: 10),
-                    child: Stack(
-                        children:[
-                          QRView(
-
-                            key: _gLobalkey,
-                            onQRViewCreated: qr,
-                            cameraFacing: CameraFacing.back,
-                            overlay: QrScannerOverlayShape(
-                              borderLength: 35,
-                              borderWidth: 4,
-                              borderColor: Colors.lightGreenAccent,
-                              cutOutHeight:MediaQuery.of(context).size.height*0.26,
-                              cutOutWidth: MediaQuery.of(context).size.width*0.7,
-                            ),
-
-
-                          ),
-                          Positioned(
-                            top: 220,
-                            left: 50,
-                            right: 50,
-                            child: AnimatedBuilder(
-                              animation: _animationController,
-                              builder: (context, child) {
-                                return Opacity(
-                                  opacity: _animationController.value,
-                                  child: Container(
-                                    width: 420,
-                                    height: 1,
-                                    color: Colors.red,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ]
-
-                    ),
-                  ),
-                ),
-                // Center(
-                //   child: (result !=null) ? Text('${result!.code}') : Text('Scan a code'),
-                // ),
-                Mode?Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):Container(),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Row(
-                    children: [
-                      Text('Part ID',
+                  color: MyTheme.materialColor,
+                  child: TextButton(onPressed: (){},
+                      child: Text("Exit",
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey
-                        ),),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      (result !=null) ? Text('${result!.code}') : Text('')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Row(
-                    children: [
-                      Text('Part Name',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey
-                        ),),
-                      Text('')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Row(
-                    children: [
-                      Text('Current Location',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey
-                        ),),
-                      Text('')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Row(
-                    children: [
-                      Text('Vehicle',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey
-                        ),),
-                      Text('')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 14,right: 14),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        hintText: "Location",
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 2
-                            )
-                        )
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(onPressed: (){},
-                            child: Text("Set Location",
-                              style: TextStyle(
-                                  fontSize:18,
-                                  color: MyTheme.white
+                            fontSize:18,
+                            color: MyTheme.white
 
-                              ) ,
-                            )),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Mode?Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(onPressed: (){
-                          setState(() {
-                            Mode=!Mode;
-                          });
-                        },
-                            child: Text("Online Mode",
-                              style: TextStyle(
-                                  fontSize:18,
-                                  color: MyTheme.white
+                        ) ,
+                      )),
+                ),
 
-                              ) ,
-                            )),
-                      ):Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(onPressed: (){
-                          setState(() {
-                            Mode=!Mode;
-                          });
-                        },
-                            child: Text("Offline Mode",
-                              style: TextStyle(
-                                  fontSize:18,
-                                  color: MyTheme.white
-
-                              ) ,
-                            )),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(onPressed: (){},
-                            child: Text("Exit",
-                              style: TextStyle(
-                                  fontSize:18,
-                                  color: MyTheme.white
-
-                              ) ,
-                            )),
-                      ),
-
-
-                    ],
-                  ),
-                )
 
               ],
             ),
-          ),
-        ),
+          )
+
+        ],
       ),
     );
 
@@ -317,5 +269,16 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
     //   print("error");
     // }
 
+class EmptyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: MyTheme.materialColor,
+    );
+  }
 
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size(0, 0);
+}
 

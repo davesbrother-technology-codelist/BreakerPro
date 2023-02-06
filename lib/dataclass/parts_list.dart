@@ -20,6 +20,7 @@ class PartsList {
   static int vehicleCount = 1;
   static int partCount = 1;
   static List<String> uploadQueue = [];
+  static bool isStockRef = false;
   static bool saveVehicle = true;
   static bool isUploading = false;
   static bool newAdded = false;

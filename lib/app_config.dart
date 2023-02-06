@@ -10,8 +10,8 @@ class AppConfig {
   static String password = "";
   static String appName = "Breaker Pro";
   static String appVersion = "version 0.1.0";
-  static String updateDate = "Updated on 19 December 2022";
-  static String rightsInfo = "${DateTime.now().year.toString()} All Right Reserved by Lyons System Ltd.";
+  static String updateDate = "Updated on 3 February 2023";
+  static String rightsInfo = "${DateTime.now().year.toString()} All Right Reserved by Lyons Systems Ltd.";
 
   static String deviceId = "";
   static String deviceName = "";
@@ -34,6 +34,7 @@ class AppConfig {
   static List<String> postageOptionsList = [];
   static List<String> fuelItems = [];
   static List<String> partConditionList = [];
+  static List<String> partTypeList = [];
   static Map postageOptionsMap = {};
 
   static getDeviceInfo() async {

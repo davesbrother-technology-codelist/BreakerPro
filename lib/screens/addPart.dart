@@ -1,3 +1,4 @@
+import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:flutter/material.dart';
 import '../dataclass/part.dart';
@@ -20,17 +21,7 @@ class _AddPartState extends State<AddPart> {
       OutlineInputBorder(borderSide: BorderSide(width: 2, color: MyTheme.grey));
   String? partTypeValue;
   TextEditingController partNameEditingController = TextEditingController();
-  List<String> items = [
-    'INTERIOR',
-    'MECHANICAL',
-    'BODY PARTS',
-    'ENGINE BAY',
-    'WHEELS',
-    'LIGHTS',
-    'DASHBOARD BARE',
-    'GLASS',
-    'ELECTRICAL'
-  ];
+  List<String> items = AppConfig.partTypeList;
   List<DropdownMenuItem<String>> dropdownItems = [];
 
   @override
@@ -53,10 +44,12 @@ class _AddPartState extends State<AddPart> {
           width: MediaQuery.of(context).size.width,
           child: TextButton(
             onPressed: () {
+              Part part = Part(0, partNameEditingController.text.toString().toUpperCase(),
+                  partTypeValue.toString(), "", "", "", "", "", "[EBAY_MAKE] [EBAY_MODEL] [YEAR*] [PART NAME] [THATCHAM_PARTMANUFACTURERNUMBER]");
+              part.isDefault = true;
               Navigator.pop(
-                  context,
-                  Part(0, partNameEditingController.text.toString().toUpperCase(),
-                      partTypeValue.toString(), "", "", "", "", "", ""));
+                  context, part);
+
             },
             child: Text(
               "Save",

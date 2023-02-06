@@ -206,6 +206,7 @@ class _ManageParts2State extends State<ManageParts2> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Checkbox(
+                    activeColor: MyTheme.materialColor,
                     value: isDefault,
                     onChanged: (value) {
                       setState(() {
@@ -250,6 +251,7 @@ class _ManageParts2State extends State<ManageParts2> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Checkbox(
+                    activeColor: MyTheme.materialColor,
                     value: isEbay,
                     onChanged: (value) {
                       setState(() {
@@ -308,6 +310,7 @@ class _ManageParts2State extends State<ManageParts2> {
             Row(
               children: [
                 Checkbox(
+                    activeColor: MyTheme.materialColor,
                     value: hasPrintLabel,
                     onChanged: (value) async {
                       hasPrintLabel = value!;

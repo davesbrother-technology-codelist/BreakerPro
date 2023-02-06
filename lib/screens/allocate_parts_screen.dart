@@ -219,19 +219,12 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                     onTap: () async {
                       await openSelectAll(context);
                       setState(() {
-                        for (Part part in partsList) {
-                          part.isSelected = selectAll;
-                        }
-                        if (selectAll) {
-                          PartsList.selectedPartList = partsList;
-                        } else {
-                          PartsList.selectedPartList = [];
-                        }
+
                       });
                     },
                     child: Row(
                       children: [
-                        Checkbox(value: selectAll, onChanged: (bool? value) {}),
+                        Checkbox(activeColor: MyTheme.materialColor,value: selectAll, onChanged: (bool? value) {}),
                         const Text(
                           "Select All",
                           style: TextStyle(fontSize: 18),
@@ -267,10 +260,23 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                         height: 50,
                         color: Colors.white,
                         child: CheckboxListTile(
+                          activeColor: MyTheme.materialColor,
                           controlAffinity: ListTileControlAffinity.leading,
                           value: partsList[index].isSelected,
                           secondary: Text(partsList[index].id.toString()),
-                          title: Text(partsList[index].partName),
+                          title: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  partsList[index].partName.toString(),
+                                  overflow: TextOverflow.visible,
+                                  style: TextStyle(overflow: TextOverflow.visible),
+                                  // softWrap: false,
+                                ),
+                              )
+                            ],
+                          ),
                           onChanged: (bool? value) {
                             partsList[index].isSelected = value!;
                             if (value == true) {
@@ -444,6 +450,7 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
         List.generate(partsList.length, (index) => partsList[index].partType);
     var seen = <String>{};
     partTypeList = l.where((part) => seen.add(part)).toList();
+    AppConfig.partTypeList = partTypeList;
   }
 
   fetchPreDefinedList() {
@@ -472,6 +479,14 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
       onPressed: () {
         setState(() {
           selectAll = !selectAll;
+          for (Part part in partsList) {
+            part.isSelected = selectAll;
+          }
+          if (selectAll) {
+            PartsList.selectedPartList = partsList;
+          } else {
+            PartsList.selectedPartList = [];
+          }
         });
         Navigator.pop(context);
       },

@@ -459,6 +459,7 @@ class _WorkOrderScreenState extends State<WorkOrderScreen>
                     Expanded(
                       flex:1,
                       child: Checkbox(
+                        activeColor: MyTheme.materialColor,
                         value: isEdit,
                         onChanged: (bool? value) {
                           setState(() {
