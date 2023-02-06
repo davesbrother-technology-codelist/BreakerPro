@@ -504,9 +504,15 @@ class _CustomiseState extends State<Customise> {
                     await file.writeAsString(msg, mode: FileMode.append);
                     Navigator.pop(context, part);
                   },
-                  child: Text(
-                    "Save",
-                    style: TextStyle(color: MyTheme.white),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: Text(
+                        "Save",
+                        style: TextStyle(color: MyTheme.white),
+                      ),
+                    ),
                   ),
                 ),
               )
