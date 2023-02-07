@@ -48,6 +48,7 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
               stock = Stock();
               stock.stockID = event.code!;
               code = event.code!;
+              isFound = false;
             }
 
           });
