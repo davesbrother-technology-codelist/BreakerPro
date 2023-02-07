@@ -66,7 +66,7 @@ class _QrScreenState extends State<QrScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MainDashboardUtils.qrWidget(
+      body: MainDashboardUtils.qrWidgetFullScreen(
           context, _globalKey, onQRViewCreated, _animationController),
     );
   }

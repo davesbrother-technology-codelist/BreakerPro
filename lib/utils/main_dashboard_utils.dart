@@ -6,7 +6,6 @@ import 'package:breaker_pro/screens/scanImaging.dart';
 import 'package:breaker_pro/screens/scanStockReconcile.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:breaker_pro/screens/workOrderScreen.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -31,14 +30,41 @@ class MainDashboardUtils {
     addBreakerDialog,
     addPartDialog,
     scanLocationDialogue,
-    ScanStockReconcileFunction,
-    ScanImagingFunction,
-    ManagePartsFunction,
-    WorkOrdersFunction
+    scanStockReconcileFunction,
+    scanImagingFunction,
+    managePartsFunction,
+    workOrdersFunction
+  ];
+  static List<String> titleList = [
+    "Add & Manage Breaker",
+    "Add Part",
+    "Scan Location",
+    "Scan Stock Reconcile",
+    "Scan Imaging",
+    "Manage Parts",
+    "Work Orders"
+  ];
+  static List<String> subtitleList = [
+    "Add a new breaker, or customised to an existing",
+    "Easily add the part according to your specific needs",
+    "Allocate parts into a shelf location by scanning or searching the parts",
+    "Quick scan stock take of your parts, and reconcile report",
+    "Quick way to scan and take images",
+    "Search and manage existing stock",
+    "Process and manage picking, packing and dispatch orders"
+  ];
+  static List<Image> imageList = [
+    Image.asset("assets/ic_add_new.png"),
+    Image.asset("assets/ic_add_parts.png"),
+    Image.asset("assets/ic_scan.png"),
+    Image.asset("assets/ic_scan_stock_reconcile.png"),
+    Image.asset("assets/ic_scan_imaging.png"),
+    Image.asset("assets/ic_manage.png"),
+    Image.asset("assets/ic_work_order.png")
   ];
 
   static TextEditingController partIdEditingController =
-      TextEditingController();
+      TextEditingController(text: "1024-171219-165004-12");
   static TextEditingController locationEditingController =
       TextEditingController();
 
@@ -324,7 +350,164 @@ class MainDashboardUtils {
         });
   }
 
-  static Widget qrWidget(
+  static void scanLocationDialogue(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 13),
+              contentPadding: const EdgeInsets.all(10),
+              title: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10),
+                    child:
+                    SizedBox(height: 100, width: 100, child: imageList[2]),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
+                    child: Text(
+                      titleList[2],
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  )
+                ],
+              ),
+              content: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
+                            child: TextFormField(
+                              controller: partIdEditingController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  prefixIcon: Padding(
+                                    padding:
+                                    EdgeInsets.symmetric(horizontal: 3.0),
+                                    child: Icon(Icons.search),
+                                  ),
+                                  prefixIconConstraints:
+                                  BoxConstraints(minHeight: 5, minWidth: 5),
+                                  hintText: "Part ID",
+                                  contentPadding:
+                                  EdgeInsets.fromLTRB(5, 20, 5, 20),
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey, width: 2))),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                              color: MyTheme.materialColor,
+                              child: TextButton(
+                                  onPressed: () {
+                                    findStockFromID(
+                                        context, partIdEditingController.text);
+                                  },
+                                  child: Text(
+                                    "Find",
+                                    style: TextStyle(
+                                        fontSize: 18, color: MyTheme.white),
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ScanPart())).then((value) {
+                                if(value != null){
+                                  findStockFromID(context, value);
+                                }
+                              });
+                            },
+                            child: Text(
+                              "Scan Part",
+                              style:
+                              TextStyle(fontSize: 18, color: MyTheme.white),
+                            )),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuickScan()));
+                            },
+                            child: Text(
+                              "Quick Scan",
+                              style:
+                              TextStyle(fontSize: 18, color: MyTheme.white),
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+        });
+  }
+
+  static void scanStockReconcileFunction(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
+  }
+
+  static void scanImagingFunction(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ScanImaging()));
+  }
+
+  static void managePartsFunction(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const ManagePart()));
+  }
+
+  static void workOrdersFunction(BuildContext context) async {
+    AuthUtils.showLoadingDialog(context);
+    Map<String, dynamic> queryParams = {
+      "clientid": AppConfig.clientId,
+      "WO_Status": "All",
+    };
+    String url = ApiConfig.baseUrl + ApiConfig.apiGetWorkOrders;
+    List? responseList =
+    await WorkOrderRepository.getWorkOrder(url, queryParams);
+
+    List<workOrder> workOrderList =
+    List.generate(responseList!.length, (index) {
+      workOrder WorkOrder = workOrder();
+      WorkOrder.fromJson(responseList[index]);
+      return WorkOrder;
+    });
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => WorkOrderScreen(workOrderList: workOrderList)));
+  }
+
+  static Widget qrWidgetFullScreen(
       BuildContext context,
       Key key,
       Function(QRViewController) onQRViewCreated,
@@ -388,7 +571,7 @@ class MainDashboardUtils {
     );
   }
 
-  static Widget qrWidget2(
+  static Widget qrWidgetInScreen(
       BuildContext context,
       Key key,
       Function(QRViewController) onQRViewCreated,
@@ -493,190 +676,6 @@ class MainDashboardUtils {
   }
 
 
-  static void scanLocationDialogue(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              insetPadding: const EdgeInsets.symmetric(horizontal: 13),
-              contentPadding: const EdgeInsets.all(10),
-              title: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10),
-                    child:
-                        SizedBox(height: 100, width: 100, child: imageList[2]),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
-                    child: Text(
-                      titleList[2],
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  )
-                ],
-              ),
-              content: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
-                            child: TextFormField(
-                              controller: partIdEditingController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 3.0),
-                                    child: Icon(Icons.search),
-                                  ),
-                                  prefixIconConstraints:
-                                      BoxConstraints(minHeight: 5, minWidth: 5),
-                                  hintText: "Part ID",
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                      borderSide: BorderSide(
-                                          color: Colors.grey, width: 2))),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                              color: MyTheme.materialColor,
-                              child: TextButton(
-                                  onPressed: () {
-                                    findStockFromID(
-                                        context, partIdEditingController.text);
-                                  },
-                                  child: Text(
-                                    "Find",
-                                    style: TextStyle(
-                                        fontSize: 18, color: MyTheme.white),
-                                  )),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                      child: Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ScanPart())).then((value) {
-                                if(value != null){
-                                  findStockFromID(context, value);
-                                }
-                              });
-                            },
-                            child: Text(
-                              "Scan Part",
-                              style:
-                                  TextStyle(fontSize: 18, color: MyTheme.white),
-                            )),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                      child: Container(
-                        color: MyTheme.materialColor,
-                        child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuickScan()));
-                            },
-                            child: Text(
-                              "Quick Scan",
-                              style:
-                                  TextStyle(fontSize: 18, color: MyTheme.white),
-                            )),
-                      ),
-                    ),
-                  ],
-                ),
-              ));
-        });
-  }
-
-  static void ScanStockReconcileFunction(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
-  }
-
-  static void ScanImagingFunction(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ScanImaging()));
-  }
-
-  static void ManagePartsFunction(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const ManagePart()));
-  }
-
-  static void WorkOrdersFunction(BuildContext context) async {
-    AuthUtils.showLoadingDialog(context);
-    Map<String, dynamic> queryParams = {
-      "clientid": AppConfig.clientId,
-      "WO_Status": "All",
-    };
-    String url = ApiConfig.baseUrl + ApiConfig.apiGetWorkOrders;
-    List? responseList =
-        await WorkOrderRepository.getWorkOrder(url, queryParams);
-
-    List<workOrder> workOrderList =
-        List.generate(responseList!.length, (index) {
-      workOrder WorkOrder = workOrder();
-      WorkOrder.fromJson(responseList[index]);
-      return WorkOrder;
-    });
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => WorkOrderScreen(workOrderList: workOrderList)));
-  }
-
-  static List<String> titleList = [
-    "Add & Manage Breaker",
-    "Add Part",
-    "Scan Location",
-    "Scan Stock Reconcile",
-    "Scan Imaging",
-    "Manage Parts",
-    "Work Orders"
-  ];
-  static List<String> subtitleList = [
-    "Add a new breaker, or customised to an existing",
-    "Easily add the part according to your specific needs",
-    "Allocate parts into a shelf location by scanning or searching the parts",
-    "Quick scan stock take of your parts, and reconcile report",
-    "Quick way to scan and take images",
-    "Search and manage existing stock",
-    "Process and manage picking, packing and dispatch orders"
-  ];
-  static List<Image> imageList = [
-    Image.asset("assets/ic_add_new.png"),
-    Image.asset("assets/ic_add_parts.png"),
-    Image.asset("assets/ic_scan.png"),
-    Image.asset("assets/ic_scan_stock_reconcile.png"),
-    Image.asset("assets/ic_scan_imaging.png"),
-    Image.asset("assets/ic_manage.png"),
-    Image.asset("assets/ic_work_order.png")
-  ];
-
   static openUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
@@ -760,7 +759,14 @@ class MainDashboardUtils {
                           child: Container(
                             color: MyTheme.materialColor,
                             child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  // Navigator.pop(context);
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => ScanPart())).then((value) {
+                                    if(value != null){
+                                      findStockFromID(context, value);
+                                    }
+                                  });
+                                },
                                 child: Text(
                                   "Scan Barcode",
                                   style:
@@ -790,7 +796,7 @@ class MainDashboardUtils {
                           child: Container(
                             color: MyTheme.materialColor,
                             child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {Navigator.pop(context);},
                                 child: Text(
                                   "New Search",
                                   style:

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:breaker_pro/screens/manage_parts2.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:flutter/foundation.dart';
 
@@ -27,19 +28,41 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
   late Part part;
   late Stock stock = Stock();
   final GlobalKey globalKey = GlobalKey();
+  TextEditingController locationController = TextEditingController();
   late QRViewController controller;
   Barcode? result;
   bool isOffline = false;
+  bool available = true;
   bool isFound = false;
+  String code = "";
   void onQRViewCreated(QRViewController controller) {
     this.controller = controller;
+
     controller.scannedDataStream.listen((event) async {
 
         print(event.code);
-        if(event.code != null){
-          controller.pauseCamera();
-          await findStockFromID(context, event.code!);
+        if(isOffline && event.code != null){
+          available = true;
+          setState(() {
+            if(event.code != code){
+              stock = Stock();
+              stock.stockID = event.code!;
+              code = event.code!;
+            }
+
+          });
+
         }
+        else{
+          if(event.code != null && event.code != code){
+            controller.pauseCamera();
+            code = event.code!;
+            await findStockFromID(context, event.code!);
+            controller.resumeCamera();
+
+          }
+        }
+
 
     });
     controller.pauseCamera();
@@ -93,7 +116,14 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
       // await file.writeAsString(
       //     "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Not Found (or not synced)\n",
       //     mode: FileMode.append);
-      Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+      // Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+
+      setState(() {
+        available = false;
+        isFound = false;
+        stock = Stock();
+        stock.stockID = partID;
+      });
       return;
     }
     // stock = Stock();
@@ -103,7 +133,8 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
     "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
     print(stock.stockID);
     setState(() {
-
+      available = true;
+      isFound = true;
     });
 
     // await file.writeAsString(
@@ -123,7 +154,7 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
             padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
             child: Text(
               title,
-              style: TextStyle(color: MyTheme.black54),
+              style: TextStyle(color: MyTheme.black54,fontWeight: FontWeight.w500),
             ),
           ),
           Expanded(
@@ -136,7 +167,8 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
                     fontWeight: FontWeight.w500),
               ),
             ),
-          )
+          ),
+          title == 'Part ID' && isFound ? TextButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (_) => ManageParts2(part: part, stock: stock)));}, child: Text('Manage Part')) : SizedBox(),
         ],
       ),
     );
@@ -150,9 +182,10 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Expanded(child : MainDashboardUtils.qrWidget2(context, globalKey, onQRViewCreated, animationController)),
+          Expanded(child : MainDashboardUtils.qrWidgetInScreen(context, globalKey, onQRViewCreated, animationController)),
 
-          isOffline?const Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):Container(),
+          isOffline ? const Center(child: Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontStyle: FontStyle.italic),)) : Container(),
+          available ? Container() : const Center(child: Text('Part Currently Not Available',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontStyle: FontStyle.italic),)),
 
           infoContainer("Part ID", stock.stockID),
           infoContainer("Part Name", stock.partName),
@@ -160,89 +193,87 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
           infoContainer("Vehicle",
               "${stock.make} ${stock.model} ${stock.year}"),
           Padding(
-            padding: const EdgeInsets.only(left: 14,right: 14),
-            child: TextField(
-              decoration: InputDecoration(
+            padding: const EdgeInsets.only(left: 14, right: 14, bottom: 5),
+            child: TextFormField(
+              controller:locationController,
+              decoration: const InputDecoration(
                   hintText: "Location",
                   hintStyle: TextStyle(color: Colors.grey),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
-                      borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 2
-                      )
-                  )
-              ),
+                      borderSide:
+                      BorderSide(color: Colors.grey, width: 2))),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  color: MyTheme.materialColor,
-                  child: TextButton(onPressed: (){},
-                      child: Text("Set Location",
-                        style: TextStyle(
-                            fontSize:18,
-                            color: MyTheme.white
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10,5,5,5),
+                  child: Container(
+                    color: MyTheme.materialColor,
+                    child: TextButton(onPressed: () async {
+                      if(isFound && !isOffline){
+                        await StockRepository.updateLocation(stock, locationController.text);
+                      }
+                    },
+                        child: Text("Set Location",
+                          style: TextStyle(
+                              fontSize:15,
+                              color: MyTheme.white
 
-                        ) ,
-                      )),
+                          ) ,
+                        )),
+                  ),
                 ),
-                SizedBox(
-                  width: 15,
+              ),
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(5,5,5,5),
+                  child: Container(
+                    color: MyTheme.materialColor,
+                    child: TextButton(onPressed: (){
+                      setState(() {
+                        isOffline = !isOffline;
+                        if(!isOffline){
+                          code = "";
+                        }
+                      });
+                    },
+                        child: Text(isOffline ? "Online Mode" : "Offline Mode",
+                          style: TextStyle(
+                              fontSize:15,
+                              color: MyTheme.white
+
+                          ) ,
+                        )),
+                  ),
                 ),
-                isOffline?Container(
-                  color: MyTheme.materialColor,
-                  child: TextButton(onPressed: (){
-                    setState(() {
-                      isOffline=!isOffline;
-                    });
-                  },
-                      child: Text("Online Mode",
-                        style: TextStyle(
-                            fontSize:18,
-                            color: MyTheme.white
+              ),
+              const Spacer(),
+              Expanded(
+                flex: 2,
+                child : Padding(
+                  padding: const EdgeInsets.fromLTRB(5,5,10,5),
+                  child: Container(
+                    color: MyTheme.materialColor,
+                    child: TextButton(onPressed: (){Navigator.pop(context);},
+                        child: Text("Exit",
+                          style: TextStyle(
+                              fontSize:15,
+                              color: MyTheme.white
 
-                        ) ,
-                      )),
-                ):Container(
-                  color: MyTheme.materialColor,
-                  child: TextButton(onPressed: (){
-                    setState(() {
-                      isOffline=!isOffline;
-                    });
-                  },
-                      child: Text("Offline Mode",
-                        style: TextStyle(
-                            fontSize:18,
-                            color: MyTheme.white
-
-                        ) ,
-                      )),
+                          ) ,
+                        )),
+                  ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
-                Container(
-                  color: MyTheme.materialColor,
-                  child: TextButton(onPressed: (){},
-                      child: Text("Exit",
-                        style: TextStyle(
-                            fontSize:18,
-                            color: MyTheme.white
-
-                        ) ,
-                      )),
-                ),
-
-
-              ],
-            ),
-          )
+              ),
+            ],
+          ),
+          SizedBox(height: 10,)
 
         ],
       ),

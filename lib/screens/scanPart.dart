@@ -72,7 +72,7 @@ class _ScanPartState extends State<ScanPart> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: MainDashboardUtils.qrWidget(
+        child: MainDashboardUtils.qrWidgetFullScreen(
             context, globalKey, onQRViewCreated, animationController),
       ),
     );

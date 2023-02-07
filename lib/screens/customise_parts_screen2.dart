@@ -78,10 +78,8 @@ class _CustomiseState extends State<Customise> {
     formattedDate = '';
     partConditionController.text = part.partCondition;
     partLocEditingController.text = part.partLocation;
-    warrantyEditingController.text =
-        part.warranty == 0 ? "" : part.warranty.toString();
-    salesPriceEditingController.text =
-        part.salesPrice == 0 ? "" : part.salesPrice.toString();
+    warrantyEditingController.text = part.warranty.toInt().toString();
+    salesPriceEditingController.text = part.salesPrice.toInt().toString();
     qtyEditingController.text = part.qty == -1 ? "1" : part.qty.toString();
     partDescEditingController.text = part.description;
     mnfPartNoEditingController.text = part.mnfPartNo;

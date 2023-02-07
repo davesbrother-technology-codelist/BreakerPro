@@ -83,9 +83,9 @@ class _ManageParts2State extends State<ManageParts2> {
     ebayTitleEditingController.text = part.ebayTitle;
     partConditionController.text = part.partCondition;
     partLocEditingController.text = part.partLocation;
-    warrantyEditingController.text = part.warranty.toString();
-    salesPriceEditingController.text = part.salesPrice.toString();
-    qtyEditingController.text = part.qty.toString();
+    warrantyEditingController.text = part.warranty.toInt().toString();
+    salesPriceEditingController.text = part.salesPrice.toInt().toString();
+    qtyEditingController.text = part.qty == -1 ? "1" : part.qty.toString();
     partDescEditingController.text = part.description;
     mnfPartNoEditingController.text = part.mnfPartNo;
     partCommentsEditingController.text = part.comments;
