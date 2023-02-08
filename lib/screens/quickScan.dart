@@ -177,7 +177,7 @@ class _QuickScanState extends State<QuickScan> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: EmptyAppBar(),
       body: Column(
         mainAxisSize: MainAxisSize.min,

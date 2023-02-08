@@ -1,12 +1,20 @@
 import 'package:breaker_pro/screens/capture_screen.dart';
+import 'package:breaker_pro/screens/quickScan.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import '../api/stock_repository.dart';
+import '../dataclass/part.dart';
+import '../dataclass/stock.dart';
 import '../my_theme.dart';
 import 'dart:io';
 import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:breaker_pro/app_config.dart';
+
+import '../utils/main_dashboard_utils.dart';
+import 'manage_parts2.dart';
 
 class ScanImaging extends StatefulWidget {
   const ScanImaging({Key? key}) : super(key: key);
@@ -16,317 +24,300 @@ class ScanImaging extends StatefulWidget {
 }
 
 class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin  {
-  late AnimationController _animationController;
-  bool _isVisible = true;
-  bool Mode=false;
-  final GlobalKey _gLobalkey = GlobalKey();
-  QRViewController? controller;
-  Barcode? result;
-  void qr(QRViewController controller) {
+  late AnimationController animationController;
+  late Part part;
+  late Stock stock = Stock();
+  final GlobalKey globalKey = GlobalKey();
+  late QRViewController controller;
+  bool isOffline = false;
+  bool available = true;
+  bool isFound = false;
+  String code = "";
+
+  void onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedDataStream.listen((event) {
-      setState(() {
-        result = event;
-        openCamera();
-      });
+
+    controller.scannedDataStream.listen((event) async {
+
+      print(event.code);
+      if(isOffline && event.code != null){
+        available = true;
+        setState(() {
+          if(event.code != code){
+            stock = Stock();
+            stock.stockID = event.code!;
+            code = event.code!;
+            isFound = false;
+          }
+
+        });
+
+      }
+      else{
+        if(event.code != null && event.code != code){
+          // controller.pauseCamera();
+          code = event.code!;
+          await findStockFromID(context, event.code!);
+          // controller.resumeCamera();
+        }
+      }
+
+
     });
     controller.pauseCamera();
     controller.resumeCamera();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: Duration(seconds: 6),
+  void initialiseRedLineAnimation() {
+    animationController = AnimationController(
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     )..addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _animationController.reverse();
+        animationController.reverse();
       } else if (status == AnimationStatus.dismissed) {
-        _animationController.forward();
+        animationController.forward();
       }
     });
-    _animationController.forward();
+    animationController.forward();
+  }
+
+  Future<void> findStockFromID(
+      BuildContext context, String partID) async {
+    Map<String, dynamic> queryParams = {
+      "clientid": AppConfig.clientId,
+      "username": AppConfig.username,
+      "stockid": partID,
+      "searchby": "part"
+    };
+    List? responseList = await StockRepository.findStock(queryParams);
+    if (responseList == null) {
+      // await file.writeAsString(
+      //     "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Not Found (or not synced)\n",
+      //     mode: FileMode.append);
+      // Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+
+      setState(() {
+        available = false;
+        isFound = false;
+        stock = Stock();
+        stock.stockID = partID;
+      });
+      return;
+    }
+    // stock = Stock();
+    stock.fromJson(responseList[0]);
+    part = Part.fromStock(stock);
+    part.partId =
+    "MNG_PRT_${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}";
+    print(stock.stockID);
+    available = true;
+    isFound = true;
+
+    await openCamera();
+
+    // await file.writeAsString(
+    //     "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Found ${part.partName}, ${stock.stockID}\n",
+    //     mode: FileMode.append);
+    // Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialiseRedLineAnimation();
   }
   @override
   void dispose() {
-    controller?.dispose();
-    _animationController.dispose();
-
+    controller.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
   @override
   void reassemble() async {
     super.reassemble();
-    if(Platform.isIOS){
-      await controller!.pauseCamera();
+    if(Platform.isIOS || Platform.isAndroid){
+      await controller.pauseCamera();
     }
-    controller!.resumeCamera();
+    controller.resumeCamera();
+  }
+
+  Widget infoContainer(String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
+            child: Text(
+              title,
+              style: TextStyle(color: MyTheme.black54,fontWeight: FontWeight.w500),
+            ),
+          ),
+          Expanded(
+            child : Padding(
+              padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+              child: Text(
+                desc ,
+                style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: EmptyAppBar(),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(child : MainDashboardUtils.qrWidgetInScreen(context, globalKey, onQRViewCreated, animationController)),
 
-      body: SingleChildScrollView(
-        child: Center(
-          child: SafeArea(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Image.asset("assets/laser.png",
-                      height: 60,
-                      width: 40,
-                    )
-                  ],
-                ),
-                Container(
-                  height: 5*MediaQuery.of(context).size.height/7,
-                  width: 400,
-
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 15,right: 15),
-                    child: Stack(
-                      children : [
-                        QRView(
-                          key: _gLobalkey,
-                          onQRViewCreated: qr,
-                          cameraFacing: CameraFacing.back,
-                          overlay: QrScannerOverlayShape(
-                            borderLength: 35,
-                            borderWidth: 4,
-                            borderColor: Colors.lightGreenAccent,
-                            cutOutHeight:MediaQuery.of(context).size.height*0.26,
-                            cutOutWidth: MediaQuery.of(context).size.width*0.7,
+          isOffline ? const Center(child: Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontStyle: FontStyle.italic),)) : Container(),
+          available ? Container() : const Center(child: Text('Part Currently Not Available',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold,fontStyle: FontStyle.italic),)),
+          ImageList.scanImagingList.isNotEmpty
+              ? Align(
+            alignment: Alignment.bottomLeft,
+            child: SizedBox(
+              height: 140,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: ImageList.scanImagingList.length,
+                  itemBuilder:
+                      (BuildContext context, int index) {
+                    return Stack(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: AspectRatio(
+                            aspectRatio: AppConfig.aspectMap[
+                            AppConfig.imageAspectRatio],
+                            child: SizedBox(
+                              child: Image.file(File(ImageList
+                                  .scanImagingList[index]),fit: BoxFit.fill,),
+                            ),
                           ),
                         ),
                         Positioned(
-                          top: 280,
-                          left: 50,
-                          right: 50,
-                          child: AnimatedBuilder(
-                            animation: _animationController,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: _animationController.value,
-                                child: Container(
-                                  width: 420,
-                                  height: 1,
-                                  color: Colors.red,
-                                ),
-                              );
+                          top: -15,
+                          right: -15,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.cancel,
+                              color:
+                              Colors.black.withOpacity(0.7),
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                ImageList.scanImagingList
+                                    .removeAt(index);
+                              });
                             },
                           ),
-                        )
-                      ]
-
-                    ),
-                  ),
-                ),
-                Mode?Text('Offline Mode',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),):SizedBox(),
-
-                ImageList.scanImagingList.isNotEmpty
-                    ? Align(
-                  alignment: Alignment.bottomLeft,
-                  child: SizedBox(
-                    height: 140,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: ImageList.scanImagingList.length,
-                        itemBuilder:
-                            (BuildContext context, int index) {
-                          return Stack(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: AspectRatio(
-                                  aspectRatio: AppConfig.aspectMap[
-                                  AppConfig.imageAspectRatio],
-                                  child: SizedBox(
-                                    width: 9,
-                                    height: 16,
-                                    child: Image.file(File(ImageList
-                                        .scanImagingList[index])),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: -15,
-                                right: -15,
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.cancel,
-                                    color:
-                                    Colors.black.withOpacity(0.7),
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      ImageList.scanImagingList
-                                          .removeAt(index);
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        }),
-                  ),
-                )
-                    : SizedBox(),
-
-                SizedBox(
-                  height: 10,
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Row(
-                    children: [
-                      Text('Part ID',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey
-                        ),),
-                      Text('')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Row(
-                    children: [
-                      Text('Part Name',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey
-                        ),),
-                      Text('')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-
-
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          color: MyTheme.materialColor,
-                          child: TextButton(onPressed: (){},
-                              child: Text("Upload & Scan New Part",
-                                style: TextStyle(
-                                    fontSize:13,
-                                    color: MyTheme.white
-
-                                ) ,
-                              )),
                         ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Mode?Expanded(
-                        child: Container(
-                          color: MyTheme.materialColor,
-                          child: TextButton(onPressed: (){
-                            setState(() {
-                              Mode=!Mode;
-                            });
-                          },
-                              child: Text("Online Mode",
-                                style: TextStyle(
-                                    fontSize:13,
-                                    color: MyTheme.white
-
-                                ) ,
-                              )),
-                        ),
-                      ):Expanded(
-                        child: Container(
-                          color: MyTheme.materialColor,
-                          child: TextButton(onPressed: (){
-                            setState(() {
-                              Mode=!Mode;
-                            });
-                          },
-                              child: Text("Offline Mode",
-                                style: TextStyle(
-                                    fontSize:13,
-                                    color: MyTheme.white
-
-                                ) ,
-                              )),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Container(
-                          color: MyTheme.materialColor,
-                          child: TextButton(onPressed: (){
-                            Navigator.pop(context);
-                          },
-                              child: Text("Exit",
-                                style: TextStyle(
-                                    fontSize:13,
-                                    color: MyTheme.white
-
-                                ) ,
-                              )),
-                        ),
-                      ),
-
-
-                    ],
-                  ),
-                )
-
-              ],
+                      ],
+                    );
+                  }),
             ),
+          )
+              : const SizedBox(),
+          infoContainer("Part ID", stock.stockID),
+          infoContainer("Part Name", stock.partName),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                flex: 5,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10,5,5,5),
+                  child: Container(
+                    color: MyTheme.materialColor,
+                    child: TextButton(onPressed: () async {
+
+                    },
+                        child: Text("Upload & Scan New Part",
+                          style: TextStyle(
+                              fontSize:13,
+                              color: MyTheme.white
+
+                          ) ,
+                        )),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(5,5,5,5),
+                  child: Container(
+                    color: MyTheme.materialColor,
+                    child: TextButton(onPressed: (){
+                      setState(() {
+                        isOffline = !isOffline;
+                        if(!isOffline){
+                          code = "";
+                        }
+                      });
+                    },
+                        child: Text(isOffline ? "Online Mode" : "Offline Mode",
+                          style: TextStyle(
+                              fontSize:13,
+                              color: MyTheme.white
+
+                          ) ,
+                        )),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child : Padding(
+                  padding: const EdgeInsets.fromLTRB(5,5,10,5),
+                  child: Container(
+                    color: MyTheme.materialColor,
+                    child: TextButton(onPressed: (){Navigator.pop(context);},
+                        child: Text("Exit",
+                          style: TextStyle(
+                              fontSize:13,
+                              color: MyTheme.white
+
+                          ) ,
+                        )),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 10,)
+
+        ],
       ),
     );
   }
   openCamera() async{
     final cameras = await availableCameras();
-    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CaptureScreen(cameras: cameras, type: 'ScanImaging')));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CaptureScreen(cameras: cameras, type: 'ScanImaging'))).then((value) async {
+      await controller.resumeCamera();
+      // controller.
+    //   setState(() {
+    //
+    //   });
+    });
 
   }
   }
-  // Future<void> scanBarcode() async{
-  //   // var status = await Permission.camera.request();
-  //   // if (status.isGranted) {
-  //     try{
-  //        scanResult = await FlutterBarcodeScanner.scanBarcode("#ff66666","Cancel",true,ScanMode.BARCODE);
-  //
-  //
-  //     }on PlatformException{
-  //       scanResult="failed";
-  //     }
-  //     if(!mounted) return;
-  //     setState((){
-  //       this.scanResult=scanResult;
-  //
-  //     });
-    // } else {
-    //   print("error");
-    // }
 
 
 

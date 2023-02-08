@@ -9,16 +9,11 @@ import 'package:breaker_pro/screens/workOrderScreen.dart';
 import 'package:breaker_pro/utils/scan_location_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 import '../api/api_config.dart';
-import '../api/stock_repository.dart';
 import '../app_config.dart';
-import '../dataclass/part.dart';
 import '../dataclass/parts_list.dart';
-import '../dataclass/stock.dart';
 import '../my_theme.dart';
 import 'package:breaker_pro/screens/scanPart.dart';
 import 'package:breaker_pro/screens/manageParts.dart';
@@ -85,11 +80,11 @@ class MainDashboardUtils {
                   padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10),
                   child: SizedBox(height: 100, width: 100, child: imageList[0]),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
+                const Padding(
+                  padding:  EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
                   child: Text(
                     'Add a Breaker',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 )
@@ -198,7 +193,7 @@ class MainDashboardUtils {
                                 .then((value) {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
-                                      builder: (_) => MainDashboard()),
+                                      builder: (_) => const MainDashboard()),
                                   (Route r) => false);
                             })
                           },
@@ -260,7 +255,7 @@ class MainDashboardUtils {
                                 .then((value) {
                               Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
-                                      builder: (_) => MainDashboard()),
+                                      builder: (_) => const MainDashboard()),
                                   (Route r) => false);
                             });
                           }
@@ -473,13 +468,16 @@ class MainDashboardUtils {
   }
 
   static void scanStockReconcileFunction(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
+    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+    // Navigator.of(context)
+    //     .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
   }
 
   static void scanImagingFunction(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ScanImaging()));
+    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+
+    // Navigator.of(context)
+    //     .push(MaterialPageRoute(builder: (context) => const ScanImaging()));
   }
 
   static void managePartsFunction(BuildContext context) {
@@ -488,6 +486,8 @@ class MainDashboardUtils {
   }
 
   static void workOrdersFunction(BuildContext context) async {
+    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+    return;
     AuthUtils.showLoadingDialog(context);
     Map<String, dynamic> queryParams = {
       "clientid": AppConfig.clientId,
