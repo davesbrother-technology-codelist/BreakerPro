@@ -142,6 +142,7 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
   void dispose() {
     controller.dispose();
     animationController.dispose();
+    f();
     super.dispose();
   }
 
@@ -354,6 +355,33 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
       });
     });
 
+  }
+
+  Future<void> f() async {
+    if(stock.stockID.isEmpty){
+      Fluttertoast.showToast(msg: "Data Not Found");
+      return;
+    }
+    if(ImageList.scanImagingList.isEmpty){
+      Fluttertoast.showToast(msg: "No images to upload.");
+      return;
+    }
+    part.imgList = List.from(ImageList.scanImagingList);
+    ImageList.scanImagingList.clear();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.getStringList('uploadManagePartQueue') == null){
+      await prefs.setStringList('uploadManagePartQueue', [part.partId]);
+    }
+    else{
+      List<String> l = prefs.getStringList('uploadManagePartQueue')!;
+      l.add(part.partId);
+      await prefs.setStringList('uploadManagePartQueue', l);
+    }
+    await prefs.setString(part.partId, jsonEncode(stock.toJson()));
+    Box<Part> box = await Hive.openBox('manageParts');
+    await box.put(part.partId, part);
+    await box.close();
+    ManagePartRepository.uploadPart(part, stock);
   }
   }
 
