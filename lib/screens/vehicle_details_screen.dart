@@ -601,7 +601,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
-        PartsList.isStockRef = true;
+        PartsList.isStockRef = false;
         prefs.setBool('uploadVehicle', true);
         await prefs.remove('vehicle');
         print("Cleared cache");
