@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:breaker_pro/screens/capture_screen.dart';
 import 'package:breaker_pro/screens/quickScan.dart';
+import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../api/manage_part_repository.dart';
 import '../api/stock_repository.dart';
 import '../dataclass/part.dart';
 import '../dataclass/stock.dart';
@@ -55,7 +62,7 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
       }
       else{
         if(event.code != null && event.code != code){
-          // controller.pauseCamera();
+          controller.pauseCamera();
           code = event.code!;
           await findStockFromID(context, event.code!);
           // controller.resumeCamera();
@@ -84,6 +91,7 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
 
   Future<void> findStockFromID(
       BuildContext context, String partID) async {
+    AuthUtils.showLoadingDialog(context);
     Map<String, dynamic> queryParams = {
       "clientid": AppConfig.clientId,
       "username": AppConfig.username,
@@ -96,6 +104,8 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
       //     "\n${DateFormat("dd/MM/yy hh:mm:ss").format(DateTime.now())}: onSearchByPartId Part Not Found (or not synced)\n",
       //     mode: FileMode.append);
       // Fluttertoast.showToast(msg: "Part Not Found (or not synced)");
+      controller.resumeCamera();
+      Navigator.pop(context);
 
       setState(() {
         available = false;
@@ -113,6 +123,7 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
     print(stock.stockID);
     available = true;
     isFound = true;
+    Navigator.pop(context);
 
     await openCamera();
 
@@ -244,7 +255,35 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
                   child: Container(
                     color: MyTheme.materialColor,
                     child: TextButton(onPressed: () async {
-
+                      if(stock.stockID.isEmpty){
+                        Fluttertoast.showToast(msg: "Data Not Found");
+                        return;
+                      }
+                      if(ImageList.scanImagingList.isEmpty){
+                        Fluttertoast.showToast(msg: "No images to upload.");
+                        return;
+                      }
+                      part.imgList = List.from(ImageList.scanImagingList);
+                      ImageList.scanImagingList.clear();
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      if(prefs.getStringList('uploadManagePartQueue') == null){
+                        await prefs.setStringList('uploadManagePartQueue', [part.partId]);
+                      }
+                      else{
+                        List<String> l = prefs.getStringList('uploadManagePartQueue')!;
+                        l.add(part.partId);
+                        await prefs.setStringList('uploadManagePartQueue', l);
+                      }
+                      await prefs.setString(part.partId, jsonEncode(stock.toJson()));
+                      Box<Part> box = await Hive.openBox('manageParts');
+                      await box.put(part.partId, part);
+                      await box.close();
+                      ManagePartRepository.uploadPart(part, stock);
+                      setState(() {
+                        stock = Stock();
+                        part = Part.fromStock(stock);
+                        code = "";
+                      });
                     },
                         child: Text("Upload & Scan New Part",
                           style: TextStyle(
@@ -311,9 +350,8 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
     Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CaptureScreen(cameras: cameras, type: 'ScanImaging'))).then((value) async {
       await controller.resumeCamera();
       // controller.
-    //   setState(() {
-    //
-    //   });
+      setState(() {
+      });
     });
 
   }

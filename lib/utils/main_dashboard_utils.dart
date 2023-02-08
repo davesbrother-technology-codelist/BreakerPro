@@ -474,10 +474,10 @@ class MainDashboardUtils {
   }
 
   static void scanImagingFunction(BuildContext context) {
-    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+    // Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
 
-    // Navigator.of(context)
-    //     .push(MaterialPageRoute(builder: (context) => const ScanImaging()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const ScanImaging()));
   }
 
   static void managePartsFunction(BuildContext context) {
