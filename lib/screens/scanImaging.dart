@@ -216,7 +216,7 @@ class _ScanImagingState extends State<ScanImaging> with TickerProviderStateMixin
                             AppConfig.imageAspectRatio],
                             child: SizedBox(
                               child: Image.file(File(ImageList
-                                  .scanImagingList[index]),fit: BoxFit.fill,),
+                                  .scanImagingList[index]),fit: BoxFit.cover,),
                             ),
                           ),
                         ),

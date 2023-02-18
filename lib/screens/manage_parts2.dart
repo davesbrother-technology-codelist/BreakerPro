@@ -409,7 +409,7 @@ class _ManageParts2State extends State<ManageParts2> {
                                                     ImageList
                                                             .managePartImageList[
                                                         index],
-                                                    fit: BoxFit.fill,
+                                                    fit: BoxFit.cover,
                                                     errorBuilder:
                                                         (BuildContext context,
                                                             Object exception,
@@ -422,7 +422,7 @@ class _ManageParts2State extends State<ManageParts2> {
                                                     File(ImageList
                                                             .managePartImageList[
                                                         index]),
-                                                    fit: BoxFit.fill,
+                                                    fit: BoxFit.cover,
                                                   ),
                                           ),
                                         ),

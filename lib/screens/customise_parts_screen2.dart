@@ -405,7 +405,7 @@ class _CustomiseState extends State<Customise> {
                                               child: Image.file(
                                                 File(ImageList
                                                     .partImageList[index]),
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                           ),

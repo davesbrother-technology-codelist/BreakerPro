@@ -504,7 +504,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                 AppConfig.imageAspectRatio],
                                             child: SizedBox(
                                               child: Image.file(File(ImageList
-                                                  .vehicleImgList[index]),fit: BoxFit.fill,),
+                                                  .vehicleImgList[index]),fit: BoxFit.cover,),
                                             ),
                                           ),
                                         ),

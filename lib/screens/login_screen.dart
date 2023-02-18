@@ -144,7 +144,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               // Forgot Password
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  showForgotDialog();
+                },
                 child: Text(
                   'Forgot Your Password?',
                   style: TextStyle(
@@ -261,17 +263,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   loginFromUser() async {
-    if (clientIdController.text.isEmpty ||
-        usernameController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      Fluttertoast.showToast(
-          msg: "Please fill all the fields",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0);
+    if (clientIdController.text.isEmpty ) {
+      Fluttertoast.showToast(msg: "Please enter Client ID");
+      return;
+    }
+    if (usernameController.text.isEmpty ) {
+      Fluttertoast.showToast(msg: "Please enter User Name");
+      return;
+    }
+    if (passwordController.text.isEmpty ) {
+      Fluttertoast.showToast(msg: "Please enter Password");
       return;
     }
     queryParams = {
@@ -334,6 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // show the dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },
@@ -363,5 +365,36 @@ class _LoginScreenState extends State<LoginScreen> {
           textColor: Colors.white,
           fontSize: 16.0);
     }
+  }
+
+  Future<void> showForgotDialog() async {
+    Widget okButton = TextButton(
+      child: const Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: const [
+          Icon(Icons.warning_rounded,size: 35,),
+          Text("Forgot Password",style: TextStyle(fontSize: 20),),
+        ],
+      ), 
+      content: const Text(
+          "Please contact BreakerPRO administrator to reset your password.",style: TextStyle(fontSize: 16),),
+      actions: [
+        okButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+
   }
 }

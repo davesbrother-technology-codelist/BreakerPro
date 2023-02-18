@@ -53,7 +53,6 @@ class _MainDashboardState extends State<MainDashboard> {
   Map responseJson = {};
   @override
   void initState() {
-    print("Helllllllo");
     partsList = PartsList();
     fetchSelectListNetwork();
     fetchPartsListNetwork();
@@ -148,37 +147,17 @@ class _MainDashboardState extends State<MainDashboard> {
                 encoder.create(
                     "${externalDirectory.parent.path}/ExportedLogs/${platform}Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
-                // if (Platform.isIOS) {
-                //   externalDirectory = await getApplicationDocumentsDirectory();
-                //   externalDirectory = Directory(
-                //       "${externalDirectory.parent.path}/Library/Application Support/Logs");
-                //   encoder.create(
-                //       "${externalDirectory.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
-                //
-                //   await encoder.addDirectory(
-                //       Directory("${externalDirectory.path}"),
-                //       includeDirName: false);
-                // } else {
-                //   externalDirectory = await getExternalStorageDirectory();
-                //   encoder.create(
-                //       "${externalDirectory!.path}/Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
-                //
-                //   await encoder.addDirectory(
-                //       Directory("${externalDirectory.path}/MyLogs/Logs"),
-                //       includeDirName: false);
-                // }
-                // print(externalDirectory.listSync(recursive: true));
                 await encoder.addDirectory(Directory(externalDirectory.path),
                     includeDirName: false);
 
                 encoder.close();
                 // var a = await Share.shareXFiles([XFile(encoder.zipPath)],text:"Send the logs for better issue tracking.",subject: "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}");
                 // print(a.raw);
-                await launchUrl(Uri.parse("mailto:smith@example.org"));
-                // await ShareExtend.share(encoder.zipPath, "file",
-                //     subject:
-                //         "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
-                //     extraText: "Send the logs for better issue tracking.");
+                // await launchUrl(Uri.parse("mailto:smith@example.org"));
+                await ShareExtend.share(encoder.zipPath, "file",
+                    subject:
+                        "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
+                    extraText: "Send the logs for better issue tracking.");
               },
               icon: Icon(
                 Icons.share,
@@ -188,11 +167,13 @@ class _MainDashboardState extends State<MainDashboard> {
               onPressed: () => {
                     // openAlreadyActiveDialogue(
                     //     context, ApiConfig.baseQueryParams)
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const NotificationScreen()))
-                  },
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (_) => const NotificationScreen()))
+              Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG)
+
+          },
               icon: Icon(
                 Icons.notifications,
                 color: MyTheme.white,
@@ -207,6 +188,10 @@ class _MainDashboardState extends State<MainDashboard> {
               )),
           IconButton(
               onPressed: () async {
+                Box<Part> box = await Hive.openBox('partListBox');
+                await box.clear();
+                await PartsList.prefs!.remove('selectList');
+
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -652,6 +637,7 @@ class _MainDashboardState extends State<MainDashboard> {
     } else {
       print(" empyt");
     }
+
     Map<String, dynamic> queryParams = ApiConfig.baseQueryParams;
 
     queryParams['index'] = "0";
@@ -661,6 +647,11 @@ class _MainDashboardState extends State<MainDashboard> {
       // if (b) {
       //   setState(() {});
       // }
+    }
+    for(Part part in PartsList.selectedPartList){
+      int i = PartsList.partList.indexWhere((element) => element.partName == part.partName);
+      print(i);
+      PartsList.partList[i].isSelected = true;
     }
   }
 

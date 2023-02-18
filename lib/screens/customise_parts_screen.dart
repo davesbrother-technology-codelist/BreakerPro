@@ -52,9 +52,9 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
   late List<Part> partsList;
   List<Part> selectedPartsList = [];
   bool selectAll = false;
-  double _headerHeight = 60.0;
-  double _bodyHeight = 180.0;
-  BottomDrawerController _controller = BottomDrawerController();
+  final double _headerHeight = 60.0;
+  final double _bodyHeight = 300.0;
+  final BottomDrawerController _controller = BottomDrawerController();
 
   @override
   void initState() {
