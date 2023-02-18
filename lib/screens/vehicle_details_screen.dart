@@ -548,7 +548,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         openBreakingSparesDialog(context);
                       },
                       child: Text(
-                        PartsList.isStockRef ? 'Update Part':'Breaking for Spares',
+                        PartsList.isStockRef ? 'Update Breaker':'Breaking for Spares',
                         style: TextStyle(color: MyTheme.white, fontSize: 15),
                       ),
                     ),
@@ -601,7 +601,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
-        PartsList.isStockRef = true;
+        PartsList.isStockRef = false;
         prefs.setBool('uploadVehicle', true);
         await prefs.remove('vehicle');
         print("Cleared cache");
