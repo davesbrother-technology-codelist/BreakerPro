@@ -65,7 +65,7 @@ class _MainDashboardState extends State<MainDashboard> {
       if (connectivityResult == ConnectivityResult.ethernet ||
           connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
-          print("Uplaod resume $connectivityResult");
+          print("Upload resume $connectivityResult");
           if(!PartsList.isUploading){
             PartsList.isUploading = true;
             try{
@@ -826,14 +826,19 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> checkLogin() async {
-    String result = await AuthRepository.login(
-        ApiConfig.baseUrl + ApiConfig.apiLogin, ApiConfig.baseQueryParams);
-    temp = result;
-    if (result == 'User Active on Another Device') {
-      print(result);
-      timer.cancel();
-      openAlreadyActiveDialogue(context, ApiConfig.baseQueryParams);
+    try{
+      String result = await AuthRepository.login(
+          ApiConfig.baseUrl + ApiConfig.apiLogin, ApiConfig.baseQueryParams);
+      temp = result;
+      if (result == 'User Active on Another Device') {
+        print(result);
+        timer.cancel();
+        openAlreadyActiveDialogue(context, ApiConfig.baseQueryParams);
+      }
+    }catch(e){
+      print(e);
     }
+
   }
 
   openAlreadyActiveDialogue(
