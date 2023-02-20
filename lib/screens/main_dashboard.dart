@@ -48,6 +48,7 @@ class _MainDashboardState extends State<MainDashboard> {
   late PartsList partsList;
   late Timer timer;
   late Timer timer2;
+  late Timer timer3;
   late String temp;
   late StreamSubscription<ConnectivityResult> _networkSubscription;
   Map responseJson = {};
@@ -59,41 +60,55 @@ class _MainDashboardState extends State<MainDashboard> {
     super.initState();
     timer =
         Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
-    _networkSubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult connectivityResult) async {
-      if (connectivityResult == ConnectivityResult.ethernet ||
-          connectivityResult == ConnectivityResult.mobile ||
-          connectivityResult == ConnectivityResult.wifi) {
-          print("Upload resume $connectivityResult");
-          if(!PartsList.isUploading){
-            PartsList.isUploading = true;
-            try{
-              await upload();
-              await uploadManagePart();
-            }
-            catch(e){
-              print(e);
-              PartsList.isUploading = false;
-            }
+    timer3 = Timer.periodic(Duration(seconds: 1), (timer) async {
+      if (!PartsList.isUploading) {
+        PartsList.isUploading = true;
+        try {
+          await upload();
+          await uploadManagePart();
+        } catch (e) {
+          print(e);
+          PartsList.isUploading = false;
+        }
 
-            PartsList.isUploading = false;
-          }
-        return;
+        PartsList.isUploading = false;
       }
     });
+    // _networkSubscription = Connectivity()
+    //     .onConnectivityChanged
+    //     .listen((ConnectivityResult connectivityResult) async {
+    //   if (connectivityResult == ConnectivityResult.ethernet ||
+    //       connectivityResult == ConnectivityResult.mobile ||
+    //       connectivityResult == ConnectivityResult.wifi) {
+    //       print("Upload resume $connectivityResult");
+    //       if(!PartsList.isUploading){
+    //         PartsList.isUploading = true;
+    //         try{
+    //           await upload();
+    //           await uploadManagePart();
+    //         }
+    //         catch(e){
+    //           print(e);
+    //           PartsList.isUploading = false;
+    //         }
+    //
+    //         PartsList.isUploading = false;
+    //       }
+    //     return;
+    //   }
+    // });
 
-    if(PartsList.newAdded){
+    if (PartsList.newAdded) {
       PartsList.newAdded = false;
       timer2 = Timer.periodic(Duration(seconds: 1), (timer) async {
-        if(!PartsList.isUploading){
-        print("Hrllo");
-        await upload();
-        timer2.cancel();
-      }});
+        if (!PartsList.isUploading) {
+          print("Hrllo");
+          await upload();
+          timer2.cancel();
+        }
+      });
     }
   }
-
 
   @override
   void dispose() {
@@ -101,10 +116,11 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
+    timer3.cancel();
     // if(timer2.isActive){
     //   timer2.cancel();
     // }
-    _networkSubscription.cancel();
+    // _networkSubscription.cancel();
     super.dispose();
   }
 
@@ -171,9 +187,11 @@ class _MainDashboardState extends State<MainDashboard> {
                     //     context,
                     //     MaterialPageRoute(
                     //         builder: (_) => const NotificationScreen()))
-              Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG)
-
-          },
+                    Fluttertoast.showToast(
+                        msg:
+                            "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",
+                        toastLength: Toast.LENGTH_LONG)
+                  },
               icon: Icon(
                 Icons.notifications,
                 color: MyTheme.white,
@@ -196,9 +214,8 @@ class _MainDashboardState extends State<MainDashboard> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) => super.widget));
-              //   SharedPreferences prefs = await SharedPreferences.getInstance();
-              // await prefs.remove('uploadQueue');
-
+                //   SharedPreferences prefs = await SharedPreferences.getInstance();
+                // await prefs.remove('uploadQueue');
               },
               icon: Icon(
                 Icons.refresh,
@@ -549,8 +566,7 @@ class _MainDashboardState extends State<MainDashboard> {
           } else {
             responseJson[a['SelectList']]?.add(a['SelectValue']);
           }
-        }
-        else {
+        } else {
           if (responseJson[a['RelatedValue']] == null) {
             responseJson[a['RelatedValue']] = [a['SelectValue']];
           } else {
@@ -558,8 +574,7 @@ class _MainDashboardState extends State<MainDashboard> {
           }
         }
 
-
-        if (a['SelectList'] == "POSTAGE"){
+        if (a['SelectList'] == "POSTAGE") {
           responseJson[a['SelectValue']] = a['RelatedValue'];
         }
       }
@@ -575,32 +590,30 @@ class _MainDashboardState extends State<MainDashboard> {
         createMenuList('POSTAGE', AppConfig.postageOptionsList, responseJson);
     AppConfig.fuelItems =
         createMenuList('FUEL', AppConfig.fuelItems, responseJson);
-    AppConfig.partConditionList =
-        createMenuList('PART CONDITION', AppConfig.partConditionList, responseJson);
-    AppConfig.postageOptionsMap = { for (var v in AppConfig.postageOptionsList) responseJson[v]:  v};
-    for(var a in AppConfig.postageOptionsMap.keys){
+    AppConfig.partConditionList = createMenuList(
+        'PART CONDITION', AppConfig.partConditionList, responseJson);
+    AppConfig.postageOptionsMap = {
+      for (var v in AppConfig.postageOptionsList) responseJson[v]: v
+    };
+    for (var a in AppConfig.postageOptionsMap.keys) {
       print(a);
     }
 
-
-    if(!PartsList.isUploading){
+    if (!PartsList.isUploading) {
       PartsList.isUploading = true;
-      try{
+      try {
         await upload();
-        if(PartsList.newAdded){
+        if (PartsList.newAdded) {
           await upload();
           PartsList.newAdded = false;
         }
-      }
-      catch(e){
+      } catch (e) {
         print(e);
         PartsList.isUploading = false;
       }
 
       PartsList.isUploading = false;
-
     }
-
 
     if (prefs.getString('vehicle') != null) {
       print("From cache ${prefs.getString('vehicle')}");
@@ -648,8 +661,9 @@ class _MainDashboardState extends State<MainDashboard> {
       //   setState(() {});
       // }
     }
-    for(Part part in PartsList.selectedPartList){
-      int i = PartsList.partList.indexWhere((element) => element.partName == part.partName);
+    for (Part part in PartsList.selectedPartList) {
+      int i = PartsList.partList
+          .indexWhere((element) => element.partName == part.partName);
       print(i);
       PartsList.partList[i].isSelected = true;
     }
@@ -679,7 +693,6 @@ class _MainDashboardState extends State<MainDashboard> {
     print("To Be Uploaded ${PartsList.uploadQueue}");
 
     await startUpload(prefs, t);
-
   }
 
   Future<void> startUpload(SharedPreferences prefs, List<dynamic> t) async {
@@ -700,26 +713,23 @@ class _MainDashboardState extends State<MainDashboard> {
         // v.imgList = List.from(ImageList.uploadVehicleImgList);
         bool isVehicleUpload = false;
 
-        if(v.uploadStatus == "0"){
+        if (v.uploadStatus == "0") {
           v.uploadStatus = "1";
-          try{
+          try {
             isVehicleUpload = await VehicleRepository.uploadVehicle(v);
-            if(isVehicleUpload){
+            if (isVehicleUpload) {
               v.imgList = ImageList.uploadVehicleImgList;
               print(jsonEncode(v.toJson()));
               await prefs.setString(vehicleString, jsonEncode(v.toJson()));
             }
-          }catch(e){
+          } catch (e) {
             v.uploadStatus = "0";
             v.imgList = ImageList.uploadVehicleImgList;
             await prefs.setString(vehicleString, jsonEncode(v.toJson()));
           }
-
-        }
-        else{
+        } else {
           isVehicleUpload = true;
         }
-
 
         bool isPartUpload = false;
         bool isPhotoUpload = false;
@@ -775,15 +785,13 @@ class _MainDashboardState extends State<MainDashboard> {
           await box2.clear();
           setState(() {});
         }
-      }
-      else{
+      } else {
         t.remove(vehicleString);
         bool b = await prefs.setString(
             'uploadQueue', jsonEncode({'uploadQueue': t}));
         print("Removed Vehicle: $b");
       }
     }
-
   }
 
   checkConnectivity() async {
@@ -826,7 +834,7 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 
   Future<void> checkLogin() async {
-    try{
+    try {
       String result = await AuthRepository.login(
           ApiConfig.baseUrl + ApiConfig.apiLogin, ApiConfig.baseQueryParams);
       temp = result;
@@ -835,10 +843,9 @@ class _MainDashboardState extends State<MainDashboard> {
         timer.cancel();
         openAlreadyActiveDialogue(context, ApiConfig.baseQueryParams);
       }
-    }catch(e){
+    } catch (e) {
       print(e);
     }
-
   }
 
   openAlreadyActiveDialogue(
@@ -917,14 +924,14 @@ class _MainDashboardState extends State<MainDashboard> {
   Future<void> uploadManagePart() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List? l = prefs.getStringList('uploadManagePartQueue');
-    if(l == null){
+    if (l == null) {
       return;
     }
     Box<Part> box = await Hive.openBox('manageParts');
     print(box.values.toList());
-    for(var partID in l){
+    for (var partID in l) {
       String? s = prefs.getString(partID);
-      if(s != null){
+      if (s != null) {
         Stock stock = Stock();
         stock.fromJson(jsonDecode(s));
         Part part = box.get(partID)!;
