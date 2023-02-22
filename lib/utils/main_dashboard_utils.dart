@@ -519,6 +519,7 @@ class MainDashboardUtils {
       WorkOrder.fromJson(responseList[index]);
       return WorkOrder;
     });
+    Navigator.pop(context);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => WorkOrderScreen(workOrderList: workOrderList)));
   }
