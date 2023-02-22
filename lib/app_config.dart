@@ -35,6 +35,7 @@ class AppConfig {
   static List<String> fuelItems = [];
   static List<String> partConditionList = [];
   static List<String> partTypeList = [];
+  static List<String> stockReconcileList = [];
   static Map postageOptionsMap = {};
 
   static getDeviceInfo() async {

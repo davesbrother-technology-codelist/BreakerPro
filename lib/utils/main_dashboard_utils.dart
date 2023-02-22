@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/api/workOrder_repository.dart';
 import 'package:breaker_pro/dataclass/workOrder.dart';
@@ -346,152 +347,163 @@ class MainDashboardUtils {
   }
 
   static void scanLocationDialogue(BuildContext context) {
-    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
-
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //           insetPadding: const EdgeInsets.symmetric(horizontal: 13),
-    //           contentPadding: const EdgeInsets.all(10),
-    //           title: Column(
-    //             children: [
-    //               Padding(
-    //                 padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10),
-    //                 child:
-    //                 SizedBox(height: 100, width: 100, child: imageList[2]),
-    //               ),
-    //               Padding(
-    //                 padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
-    //                 child: Text(
-    //                   titleList[2],
-    //                   style: const TextStyle(fontSize: 20),
-    //                 ),
-    //               )
-    //             ],
-    //           ),
-    //           content: Container(
-    //             padding: const EdgeInsets.symmetric(vertical: 20),
-    //             width: MediaQuery.of(context).size.width,
-    //             child: Column(
-    //               mainAxisSize: MainAxisSize.min,
-    //               crossAxisAlignment: CrossAxisAlignment.stretch,
-    //               children: [
-    //                 Row(
-    //                   children: [
-    //                     Expanded(
-    //                       flex: 2,
-    //                       child: Padding(
-    //                         padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
-    //                         child: TextFormField(
-    //                           controller: partIdEditingController,
-    //                           keyboardType: TextInputType.number,
-    //                           decoration: const InputDecoration(
-    //                               prefixIcon: Padding(
-    //                                 padding:
-    //                                 EdgeInsets.symmetric(horizontal: 3.0),
-    //                                 child: Icon(Icons.search),
-    //                               ),
-    //                               prefixIconConstraints:
-    //                               BoxConstraints(minHeight: 5, minWidth: 5),
-    //                               hintText: "Part ID",
-    //                               contentPadding:
-    //                               EdgeInsets.fromLTRB(5, 20, 5, 20),
-    //                               hintStyle: TextStyle(color: Colors.grey),
-    //                               border: OutlineInputBorder(
-    //                                   borderRadius:
-    //                                   BorderRadius.all(Radius.circular(5)),
-    //                                   borderSide: BorderSide(
-    //                                       color: Colors.grey, width: 2))),
-    //                         ),
-    //                       ),
-    //                     ),
-    //                     Expanded(
-    //                       flex: 1,
-    //                       child: Padding(
-    //                         padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-    //                         child: Container(
-    //                           padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-    //                           color: MyTheme.materialColor,
-    //                           child: TextButton(
-    //                               onPressed: () {
-    //                                 ScanLocationUtils.findStockFromID(
-    //                                     context, partIdEditingController.text);
-    //                               },
-    //                               child: Text(
-    //                                 "Find",
-    //                                 style: TextStyle(
-    //                                     fontSize: 18, color: MyTheme.white),
-    //                               )),
-    //                         ),
-    //                       ),
-    //                     ),
-    //                   ],
-    //                 ),
-    //                 Padding(
-    //                   padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-    //                   child: Container(
-    //                     color: MyTheme.materialColor,
-    //                     child: TextButton(
-    //                         onPressed: () {
-    //                           Navigator.of(context).push(MaterialPageRoute(builder: (_) => ScanPart())).then((value) {
-    //                             if(value != null){
-    //                               ScanLocationUtils.findStockFromID(context, value);
-    //                             }
-    //                           });
-    //                         },
-    //                         child: Text(
-    //                           "Scan Part",
-    //                           style:
-    //                           TextStyle(fontSize: 18, color: MyTheme.white),
-    //                         )),
-    //                   ),
-    //                 ),
-    //                 Padding(
-    //                   padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-    //                   child: Container(
-    //                     color: MyTheme.materialColor,
-    //                     child: TextButton(
-    //                         onPressed: () {
-    //                           Navigator.pop(context);
-    //                           Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuickScan()));
-    //                         },
-    //                         child: Text(
-    //                           "Quick Scan",
-    //                           style:
-    //                           TextStyle(fontSize: 18, color: MyTheme.white),
-    //                         )),
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //           ));
-    //     });
+    if(Platform.isIOS){
+      Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+      return;
+    }
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 13),
+              contentPadding: const EdgeInsets.all(10),
+              title: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 10),
+                    child:
+                    SizedBox(height: 100, width: 100, child: imageList[2]),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
+                    child: Text(
+                      titleList[2],
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  )
+                ],
+              ),
+              content: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 5, 5, 5),
+                            child: TextFormField(
+                              controller: partIdEditingController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  prefixIcon: Padding(
+                                    padding:
+                                    EdgeInsets.symmetric(horizontal: 3.0),
+                                    child: Icon(Icons.search),
+                                  ),
+                                  prefixIconConstraints:
+                                  BoxConstraints(minHeight: 5, minWidth: 5),
+                                  hintText: "Part ID",
+                                  contentPadding:
+                                  EdgeInsets.fromLTRB(5, 20, 5, 20),
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                      borderSide: BorderSide(
+                                          color: Colors.grey, width: 2))),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                              color: MyTheme.materialColor,
+                              child: TextButton(
+                                  onPressed: () {
+                                    ScanLocationUtils.findStockFromID(
+                                        context, partIdEditingController.text);
+                                  },
+                                  child: Text(
+                                    "Find",
+                                    style: TextStyle(
+                                        fontSize: 18, color: MyTheme.white),
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ScanPart())).then((value) {
+                                if(value != null){
+                                  ScanLocationUtils.findStockFromID(context, value);
+                                }
+                              });
+                            },
+                            child: Text(
+                              "Scan Part",
+                              style:
+                              TextStyle(fontSize: 18, color: MyTheme.white),
+                            )),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: Container(
+                        color: MyTheme.materialColor,
+                        child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_) => QuickScan()));
+                            },
+                            child: Text(
+                              "Quick Scan",
+                              style:
+                              TextStyle(fontSize: 18, color: MyTheme.white),
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+        });
   }
 
   static void scanStockReconcileFunction(BuildContext context) {
-    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
-    // Navigator.of(context)
-    //     .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
+ if(Platform.isIOS){
+   Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+    return;
+ }
+ Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => ScanStockReconcile()));
   }
 
   static void scanImagingFunction(BuildContext context) {
-    // Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
-
+    if(Platform.isIOS){
+      Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+      return;
+    }
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const ScanImaging()));
   }
 
   static void managePartsFunction(BuildContext context) {
-    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
-
-    // Navigator.of(context)
-    //     .push(MaterialPageRoute(builder: (context) => const ManagePart()));
+    if(Platform.isIOS){
+      Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+      return;
+    }
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const ManagePart()));
   }
 
   static void workOrdersFunction(BuildContext context) async {
-    Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
-    return;
+    if(Platform.isIOS){
+      Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+      return;
+    }
     AuthUtils.showLoadingDialog(context);
     Map<String, dynamic> queryParams = {
       "clientid": AppConfig.clientId,

@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -79,11 +80,13 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Breaker pro',
-        theme: ThemeData(primarySwatch: MyTheme.materialColor),
-        home: const LoginScreen(
-          noLogin: true,
-        ));
+    return OKToast(
+      child: MaterialApp(
+          title: 'Breaker pro',
+          theme: ThemeData(primarySwatch: MyTheme.materialColor),
+          home: const LoginScreen(
+            noLogin: true,
+          )),
+    );
   }
 }

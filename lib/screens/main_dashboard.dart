@@ -56,6 +56,7 @@ class _MainDashboardState extends State<MainDashboard> {
   void initState() {
     partsList = PartsList();
     fetchSelectListNetwork();
+    fetchStockReconcileList();
     fetchPartsListNetwork();
     super.initState();
     timer =
@@ -941,5 +942,10 @@ class _MainDashboardState extends State<MainDashboard> {
       }
     }
     await box.close();
+  }
+
+  Future<void> fetchStockReconcileList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    AppConfig.stockReconcileList = prefs.getStringList('stockReconcileList') ?? [];
   }
 }
