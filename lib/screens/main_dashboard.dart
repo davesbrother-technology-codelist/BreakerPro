@@ -708,7 +708,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 as Map<dynamic, dynamic>);
         v.fromJson(map);
         List a = map['Images'];
-        print("Images ss $a");
+        print("Vehicle Images $a");
         ImageList.uploadVehicleImgList =
             List<String>.generate(a.length, (index) => a[index]);
         // v.imgList = List.from(ImageList.uploadVehicleImgList);

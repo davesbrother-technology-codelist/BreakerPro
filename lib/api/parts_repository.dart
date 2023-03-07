@@ -62,6 +62,7 @@ class PartRepository {
       print(r.body);
       response = jsonDecode(r.body);
       msg += "\n${r.body}\n";
+      print(msg);
       Box<Part> box1 = await Hive.openBox('uploadPartListBox$vehicleID');
       await box1.putAt(i, part);
       box1.close();
