@@ -211,7 +211,6 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                     onTap: () async {
                       await openSelectAll(context);
                       setState(() {
-
                       });
                     },
                     child: Row(
@@ -487,7 +486,7 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
     );
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text("Click OK to Select All Parts"),
+      title: selectAll ? const Text("Click OK to UnSelect All Parts") : const Text("Click OK to Select All Parts"),
       actions: [
         cancelButton,
         okButton,
