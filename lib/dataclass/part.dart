@@ -40,16 +40,16 @@ class Part {
   late String partCondition = "";
 
   @HiveField(11)
-  double warranty = 0;
+  double warranty = -1;
 
   @HiveField(12)
   int qty = 1;
 
   @HiveField(13)
-  late double salesPrice = 0;
+  late double salesPrice = -1;
 
   @HiveField(14)
-  late double costPrice = 0;
+  late double costPrice = -1;
 
   @HiveField(15)
   late bool isDefault = false;

@@ -49,13 +49,12 @@ class PartsList {
       return true;
     }
     print("Parts from HIVE");
-    // List l = [];
     partList = box.values.toList();
-    // for(Part part in partList){
-    //   l += part.postageOptions.split(',');
-    //   print(part.postageOptions.split(','));
-    // }
-    // print(l.toSet().toList());
+    for(Part part in partList){
+      if(part.forUpload){
+        print("FrommHIVE ${part.partName}");
+      }
+    }
     return true;
   }
 }

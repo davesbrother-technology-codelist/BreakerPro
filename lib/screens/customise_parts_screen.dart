@@ -100,7 +100,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
 
   @override
   void dispose() {
-    savePart();
+    // savePart();
     super.dispose();
   }
 
@@ -239,6 +239,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                               setState(() {
                                 if (value != null) {
                                   partsList[index] = value;
+                                  savePart();
                                   print(partsList[index].imgList);
                                 }
                               });
@@ -337,6 +338,9 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
         Box<Part> box1 = await Hive.openBox('selectPartListBox');
         await box3.clear();
         await box1.clear();
+        for(Part part in PartsList.partList){
+          part.isSelected = false;
+        }
         await PartsList.loadParts(
             ApiConfig.baseUrl + ApiConfig.apiPartList, ApiConfig.baseQueryParams);
         PartsList.uploadPartList = [];

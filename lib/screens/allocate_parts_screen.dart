@@ -79,14 +79,14 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
         print(PartsList.partList[0].isSelected);
       }
 
-      // Box<Part> box1 = await Hive.openBox('selectPartListBox');
-      // Map<dynamic, Part> boxMap1 = {
-      //   for (var part in PartsList.selectedPartList) part.partName: part
-      // };
-      // if (box1.isOpen) {
-      //   box1.putAll(boxMap1);
-      //   print("saved selectdpartList");
-      // }
+      Box<Part> box1 = await Hive.openBox('selectPartListBox');
+      Map<dynamic, Part> boxMap1 = {
+        for (var part in PartsList.selectedPartList) part.partName: part
+      };
+      if (box1.isOpen) {
+        box1.putAll(boxMap1);
+        print("saved selectdpartList");
+      }
     } catch (e) {
       print(e);
     }
@@ -96,7 +96,6 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
   void dispose() {
     PartsList.partList = partsList;
     savePart();
-
     super.dispose();
   }
 
@@ -129,11 +128,6 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                 final File file = File(
                     '${AppConfig.externalDirectory!.path}/${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}.txt');
                 await file.writeAsString(msg, mode: FileMode.append);
-                // FlutterLogs.logToFile(
-                //     logFileName:
-                //         "${ApiConfig.baseQueryParams['username']}_${DateFormat("ddMMyy").format(DateTime.now())}",
-                //     overwrite: false,
-                //     logMessage: msg);
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) =>
                       CustomisePartsScreen(vehicle: widget.vehicle),
@@ -283,6 +277,7 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
                               PartsList.selectedPartList
                                   .remove(partsList[index]);
                             }
+                            savePart();
                             setState(() {});
                           },
                         ),

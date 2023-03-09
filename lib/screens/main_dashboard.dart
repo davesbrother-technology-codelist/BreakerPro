@@ -393,7 +393,7 @@ class _MainDashboardState extends State<MainDashboard> {
                                         ImageList.partImageList = [];
                                         PartsList.selectedPartList = [];
                                         PartsList.saveVehicle = false;
-
+                                        PartsList.partList = [];
                                         fetchPartsListNetwork();
                                       });
                                     },
@@ -772,8 +772,7 @@ class _MainDashboardState extends State<MainDashboard> {
         Box<Part> box1 = await Hive.openBox('uploadPartListBox${v.vehicleId}');
         if (box1.isNotEmpty) {
           PartsList.uploadPartList = [];
-          PartsList.selectedPartList = box1.values.toList();
-          for (Part part in PartsList.selectedPartList) {
+          for (Part part in box1.values.toList()) {
             if (part.forUpload) {
               PartsList.uploadPartList.add(part);
             }

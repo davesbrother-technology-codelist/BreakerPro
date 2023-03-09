@@ -1,5 +1,6 @@
 import 'package:breaker_pro/screens/postage_dropdown_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:intl/intl.dart';
 import '../api/api_config.dart';
@@ -78,8 +79,9 @@ class _CustomiseState extends State<Customise> {
     formattedDate = '';
     partConditionController.text = part.partCondition;
     partLocEditingController.text = part.partLocation;
-    warrantyEditingController.text = part.warranty.toInt().toString();
-    salesPriceEditingController.text = part.salesPrice.toInt().toString();
+    warrantyEditingController.text = part.warranty == -1 ? "": part.warranty.toString();
+    salesPriceEditingController.text = part.salesPrice == -1 ? "":part.salesPrice.toString();
+    costPriceEditingController.text = part.costPrice == -1 ? "":part.costPrice.toString();
     qtyEditingController.text = part.qty.toString();
     partDescEditingController.text = part.description;
     mnfPartNoEditingController.text = part.mnfPartNo;
@@ -151,7 +153,7 @@ class _CustomiseState extends State<Customise> {
                   custom2TextField(
                       "Warranty",
                       1 / 4,
-                      TextInputType.numberWithOptions(decimal: true),
+                      TextInputType.numberWithOptions(decimal: false),
                       warrantyEditingController)
                 ],
               ),
@@ -667,6 +669,7 @@ class _CustomiseState extends State<Customise> {
                   }
                 },
                 keyboardType: TType,
+                inputFormatters: title == "Warranty"?[FilteringTextInputFormatter.digitsOnly]:null,
                 decoration: InputDecoration(
                     enabledBorder: border,
                     focusedBorder: title == 'Ebay Title' &&
