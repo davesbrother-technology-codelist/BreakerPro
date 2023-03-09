@@ -86,7 +86,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
     try {
       Box<Part> box = await Hive.openBox('selectPartListBox');
       Map<dynamic, Part> boxMap = {
-        for (var part in partsList) part.partName: part
+        for (var part in PartsList.selectedPartList) part.partName: part
       };
       if (box.isOpen) {
         box.putAll(boxMap);
@@ -252,6 +252,7 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
                   },
                 ),
               ),
+              const SizedBox(height: 60)
             ],
           ),
         ),
@@ -319,28 +320,31 @@ class _CustomisePartsScreenState extends State<CustomisePartsScreen> {
           for (var part in PartsList.uploadPartList) part.partName: part
         };
         if (box.isOpen) {
-          box.putAll(boxMap);
+          await box.putAll(boxMap);
           print("saved uploadpartList");
         }
-        box.close();
+        await box.close();
         PartsList.uploadQueue.add(widget.vehicle.vehicleId);
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.remove('vehicle');
+        await prefs.remove('vehicle');
         MainDashboardUtils.titleList[0] = "Add & Manage Breaker";
         ImageList.vehicleImgList = [];
         PartsList.cachedVehicle = null;
         PartsList.recall = false;
         PartsList.isStockRef = false;
         PartsList.selectedPartList = [];
-        PartsList.partList = [];
+        Box<Part> box3 = await Hive.openBox('partListBox');
+        Box<Part> box1 = await Hive.openBox('selectPartListBox');
+        await box3.clear();
+        await box1.clear();
+        await PartsList.loadParts(
+            ApiConfig.baseUrl + ApiConfig.apiPartList, ApiConfig.baseQueryParams);
         PartsList.uploadPartList = [];
         await prefs.setString(
             'uploadQueue', jsonEncode({'uploadQueue': PartsList.uploadQueue}));
         await prefs.setString(
             widget.vehicle.vehicleId, jsonEncode(widget.vehicle.toJson()));
         PartsList.saveVehicle = false;
-        // prefs.setBool('uploadVehicle', true);
-        // prefs.setBool('uploadParts', true);
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (builder) => MainDashboard()),

@@ -209,7 +209,6 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   }
                                   else if(widget.type=='ScanImaging'){
                                     int count = PartsList.vehicleCount;
-
                                     String newPath = path.join(dir,
                                         'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
                                     imgFile = imgFile.renameSync(newPath);

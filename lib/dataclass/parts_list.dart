@@ -26,7 +26,7 @@ class PartsList {
   static bool newAdded = false;
   static bool newManagePartAdded = false;
 
-  Future<bool> loadParts(String url, Map<String, dynamic> queryParams) async {
+  static Future<bool> loadParts(String url, Map<String, dynamic> queryParams) async {
     Box<Part> box = await Hive.openBox('partsBox');
     if (box.isEmpty) {
       final Map<String, dynamic> responseJson =

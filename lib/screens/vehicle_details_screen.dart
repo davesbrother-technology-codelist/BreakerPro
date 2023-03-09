@@ -985,12 +985,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     String response = prefs.getString('selectList').toString();
     responseJson = jsonDecode(response);
 
-    for(var a in responseJson.keys){
-      // if(a == "EBAYSTORECAT"){
-      //   print(responseJson[a]);
-      // }
-      print(responseJson[a]);
-    }
+    // for(var a in responseJson.keys){
+    //   // if(a == "EBAYSTORECAT"){
+    //   //   print(responseJson[a]);
+    //   // }
+    //   print(responseJson[a]);
+    // }
     if (makeController.text.isNotEmpty) {
       modelMenuItems =
           createMenuList(makeController.text, modelMenuItems, responseJson);

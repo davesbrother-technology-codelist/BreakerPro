@@ -52,7 +52,7 @@ class _CustomiseState extends State<Customise> {
   TextEditingController warrantyEditingController = TextEditingController();
   TextEditingController salesPriceEditingController = TextEditingController();
   TextEditingController costPriceEditingController = TextEditingController();
-  TextEditingController qtyEditingController = TextEditingController(text: "1");
+  TextEditingController qtyEditingController = TextEditingController();
   TextEditingController partDescEditingController = TextEditingController();
   TextEditingController mnfPartNoEditingController = TextEditingController();
   TextEditingController partCommentsEditingController = TextEditingController();
@@ -80,7 +80,7 @@ class _CustomiseState extends State<Customise> {
     partLocEditingController.text = part.partLocation;
     warrantyEditingController.text = part.warranty.toInt().toString();
     salesPriceEditingController.text = part.salesPrice.toInt().toString();
-    qtyEditingController.text = part.qty == -1 ? "1" : part.qty.toString();
+    qtyEditingController.text = part.qty.toString();
     partDescEditingController.text = part.description;
     mnfPartNoEditingController.text = part.mnfPartNo;
     partCommentsEditingController.text = part.comments;
@@ -463,19 +463,31 @@ class _CustomiseState extends State<Customise> {
                         partConditionController.text.toString();
                     part.partLocation =
                         partLocEditingController.text.toString();
+
                     try {
                       part.warranty =
                           double.parse(warrantyEditingController.text);
+                    }catch (e) {
+                      print("Failed to convert warranty");
+                    }
+                    try {
                       part.salesPrice =
                           double.parse(salesPriceEditingController.text);
+                    } catch (e) {
+                      print("Failed to convert salesPrice");
+                    }
+                    try {
                       part.costPrice =
                           double.parse(costPriceEditingController.text);
+                    } catch (e) {
+                     print("Failed to convert costPrice");
+                    }
+                    try {
                       part.qty = int.parse(qtyEditingController.text);
                     } catch (e) {
-                      print("Failed to convert");
+                      print("Failed to convert Qty");
                     }
                     part.mnfPartNo = mnfPartNoEditingController.text.toString();
-                    print(part.mnfPartNo);
                     part.description =
                         partDescEditingController.text.toString();
 

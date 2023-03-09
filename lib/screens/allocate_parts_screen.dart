@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/addPart.dart';
 import 'package:breaker_pro/screens/customise_parts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_drawer/bottom_drawer.dart';
-import 'package:flutter_logs/flutter_logs.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../api/api_config.dart';
@@ -81,14 +79,14 @@ class _AllocatePartsScreenState extends State<AllocatePartsScreen> {
         print(PartsList.partList[0].isSelected);
       }
 
-      Box<Part> box1 = await Hive.openBox('selectPartListBox');
-      Map<dynamic, Part> boxMap1 = {
-        for (var part in PartsList.selectedPartList) part.partName: part
-      };
-      if (box1.isOpen) {
-        box1.putAll(boxMap1);
-        print("saved selectdpartList");
-      }
+      // Box<Part> box1 = await Hive.openBox('selectPartListBox');
+      // Map<dynamic, Part> boxMap1 = {
+      //   for (var part in PartsList.selectedPartList) part.partName: part
+      // };
+      // if (box1.isOpen) {
+      //   box1.putAll(boxMap1);
+      //   print("saved selectdpartList");
+      // }
     } catch (e) {
       print(e);
     }

@@ -8,6 +8,7 @@ import 'package:breaker_pro/screens/qr_screen.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:breaker_pro/api/api_config.dart';
 import 'package:breaker_pro/api/vehicle_repository.dart';
@@ -166,15 +167,44 @@ class _MainDashboardState extends State<MainDashboard> {
 
                 await encoder.addDirectory(Directory(externalDirectory.path),
                     includeDirName: false);
-
                 encoder.close();
-                // var a = await Share.shareXFiles([XFile(encoder.zipPath)],text:"Send the logs for better issue tracking.",subject: "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}");
-                // print(a.raw);
-                // await launchUrl(Uri.parse("mailto:smith@example.org"));
-                await ShareExtend.share(encoder.zipPath, "file",
-                    subject:
-                        "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
-                    extraText: "Send the logs for better issue tracking.");
+
+                await showModalBottomSheet(
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    builder: (BuildContext context) {
+                      return SizedBox(
+                        height: 100.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            TextButton(onPressed: () async {
+                              final Email email = Email(
+                                body: 'Send the logs for better issue tracking.',
+                                subject: 'BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}',
+                                recipients: ['sales@breakerpro.co.uk'],
+                                attachmentPaths: [encoder.zipPath],
+                                isHTML: false,
+                              );
+
+                              await FlutterEmailSender.send(email);
+                              Navigator.pop(context);
+                            }, child: const Text("Share via Email")),
+                            TextButton(onPressed: () async {
+                              await ShareExtend.share(encoder.zipPath, "file",
+                                  subject:
+                                      "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
+                                  extraText: "Send the logs for better issue tracking.");
+                              Navigator.pop(context);
+
+                            }, child: const Text("Normal Share")),
+                          ],
+                        ),
+                      );
+                    });
+
               },
               icon: Icon(
                 Icons.share,
@@ -596,9 +626,9 @@ class _MainDashboardState extends State<MainDashboard> {
     AppConfig.postageOptionsMap = {
       for (var v in AppConfig.postageOptionsList) responseJson[v]: v
     };
-    for (var a in AppConfig.postageOptionsMap.keys) {
-      print(a);
-    }
+    // for (var a in AppConfig.postageOptionsMap.keys) {
+    //   print(a);
+    // }
 
     if (!PartsList.isUploading) {
       PartsList.isUploading = true;
@@ -642,31 +672,34 @@ class _MainDashboardState extends State<MainDashboard> {
     if (box.isNotEmpty) {
       PartsList.partList = box.values.toList();
     } else {
-      print(" empyt");
+      print("Parts Empty");
     }
 
     Box<Part> box1 = await Hive.openBox('selectPartListBox');
     if (box1.isNotEmpty) {
       PartsList.selectedPartList = box1.values.toList();
     } else {
-      print(" empyt");
+      print("Select Part List empty");
     }
 
     Map<String, dynamic> queryParams = ApiConfig.baseQueryParams;
 
     queryParams['index'] = "0";
     if (PartsList.partList.isEmpty) {
-      bool b = await partsList.loadParts(
+      print("Getting Part ");
+      await PartsList.loadParts(
           ApiConfig.baseUrl + ApiConfig.apiPartList, queryParams);
-      // if (b) {
-      //   setState(() {});
-      // }
     }
     for (Part part in PartsList.selectedPartList) {
       int i = PartsList.partList
           .indexWhere((element) => element.partName == part.partName);
       print(i);
       PartsList.partList[i].isSelected = true;
+    }
+    for (Part part in PartsList.partList) {
+      if (part.isSelected) {
+        print(part.partName);
+      }
     }
   }
 
@@ -946,6 +979,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
   Future<void> fetchStockReconcileList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    AppConfig.stockReconcileList = prefs.getStringList('stockReconcileList') ?? [];
+    AppConfig.stockReconcileList =
+        prefs.getStringList('stockReconcileList') ?? [];
   }
 }
