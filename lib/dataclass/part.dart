@@ -1,7 +1,6 @@
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/dataclass/stock.dart';
 import 'package:hive/hive.dart';
-
 part 'part.g.dart';
 
 @HiveType(typeId: 0)
@@ -133,10 +132,10 @@ class Part {
       "PostageCode": postageOptionsCode,
       "Ebay_Title": ebayTitle,
       "PartCondition": partCondition,
-      "warranty": warranty.toString(),
+      "warranty": warranty == -1?"":warranty.toString(),
       "Qty": qty.toString(),
-      "PartSellPrice": salesPrice.toString(),
-      "costPrice": costPrice.toString(),
+      "PartSellPrice":  salesPrice == -1?"":salesPrice.toString(),
+      "costPrice":  costPrice == -1?"":costPrice.toString(),
       "ManPartNo": mnfPartNo,
       "PartComments": comments,
       "status": status.toString()
@@ -273,7 +272,7 @@ class Part {
 
   String addLog() {
     String m =
-        "PartID : $partId\nPartName : $partName\nPartType : $partType\nSellPrice : $salesPrice\nCostPrice : $costPrice\nQuantity : $qty\nCondition : $partCondition\nLocation : ${isDefault ? defaultLocation : partLocation}\nDescription : ${isDefault ? defaultDescription : description}\nSetDefault : $isDefault\nComment : $comments\nPostageOptions : $postageOptions\nPostageCode: $postageOptionsCode\nEbay : $isEbay\nImage Name : $imgList\nmanPartNo : $mnfPartNo\nFeatured Web : $isFeaturedWeb\nFeatured Web Date : $featuredWebDate\n";
+        "PartID : $partId\nPartName : $partName\nPartType : $partType\nSellPrice : ${salesPrice == -1?"":salesPrice}\nCostPrice : ${costPrice == -1?"":costPrice}\nQuantity : $qty\nCondition : $partCondition\nLocation : ${isDefault ? defaultLocation : partLocation}\nDescription : ${isDefault ? defaultDescription : description}\nSetDefault : $isDefault\nComment : $comments\nPostageOptions : $postageOptions\nPostageCode: $postageOptionsCode\nEbay : $isEbay\nImage Name : $imgList\nmanPartNo : $mnfPartNo\nFeatured Web : $isFeaturedWeb\nFeatured Web Date : $featuredWebDate\n";
 
     return m;
   }

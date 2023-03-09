@@ -62,43 +62,43 @@ class _MainDashboardState extends State<MainDashboard> {
     super.initState();
     timer =
         Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
-    timer3 = Timer.periodic(Duration(seconds: 1), (timer) async {
-      if (!PartsList.isUploading) {
-        PartsList.isUploading = true;
-        try {
-          await upload();
-          await uploadManagePart();
-        } catch (e) {
-          print(e);
-          PartsList.isUploading = false;
-        }
-
-        PartsList.isUploading = false;
-      }
-    });
-    // _networkSubscription = Connectivity()
-    //     .onConnectivityChanged
-    //     .listen((ConnectivityResult connectivityResult) async {
-    //   if (connectivityResult == ConnectivityResult.ethernet ||
-    //       connectivityResult == ConnectivityResult.mobile ||
-    //       connectivityResult == ConnectivityResult.wifi) {
-    //       print("Upload resume $connectivityResult");
-    //       if(!PartsList.isUploading){
-    //         PartsList.isUploading = true;
-    //         try{
-    //           await upload();
-    //           await uploadManagePart();
-    //         }
-    //         catch(e){
-    //           print(e);
-    //           PartsList.isUploading = false;
-    //         }
-    //
-    //         PartsList.isUploading = false;
-    //       }
-    //     return;
+    // timer3 = Timer.periodic(Duration(seconds: 1), (timer) async {
+    //   if (!PartsList.isUploading) {
+    //     PartsList.isUploading = true;
+    //     try {
+    //       await upload();
+    //       await uploadManagePart();
+    //     } catch (e) {
+    //       print("FAILED TO UPLOAD $e");
+    //       PartsList.isUploading = false;
+    //     }
+    //     PartsList.isUploading = false;
     //   }
     // });
+    _networkSubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult connectivityResult) async {
+      if (connectivityResult == ConnectivityResult.ethernet ||
+          connectivityResult == ConnectivityResult.mobile ||
+          connectivityResult == ConnectivityResult.wifi) {
+          print("Upload resume $connectivityResult");
+          if(!PartsList.isUploading){
+            PartsList.isUploading = true;
+            try{
+              await upload();
+              await uploadManagePart();
+            }
+            catch(e){
+              print("FAILED TO UPLOAD $e");
+              PartsList.isUploading = false;
+            }
+            finally{
+              PartsList.isUploading = false;
+            }
+          }
+        return;
+      }
+    });
 
     if (PartsList.newAdded) {
       PartsList.newAdded = false;
@@ -118,11 +118,11 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
     timer.cancel();
-    timer3.cancel();
+    // timer3.cancel();
     // if(timer2.isActive){
     //   timer2.cancel();
     // }
-    // _networkSubscription.cancel();
+    _networkSubscription.cancel();
     super.dispose();
   }
 
@@ -760,6 +760,7 @@ class _MainDashboardState extends State<MainDashboard> {
             v.uploadStatus = "0";
             v.imgList = ImageList.uploadVehicleImgList;
             await prefs.setString(vehicleString, jsonEncode(v.toJson()));
+            print("Vehicle upload error $e");
           }
         } else {
           isVehicleUpload = true;
@@ -768,7 +769,11 @@ class _MainDashboardState extends State<MainDashboard> {
         bool isPartUpload = false;
         bool isPhotoUpload = false;
 
-        await VehicleRepository.fileUpload(v);
+        try {
+          await VehicleRepository.fileUpload(v);
+        } catch (e) {
+          print("File upload error $e");
+        }
         Box<Part> box1 = await Hive.openBox('uploadPartListBox${v.vehicleId}');
         if (box1.isNotEmpty) {
           PartsList.uploadPartList = [];
@@ -784,10 +789,18 @@ class _MainDashboardState extends State<MainDashboard> {
         print("Upload Part List ${PartsList.uploadPartList}");
 
         if (PartsList.uploadPartList.isNotEmpty) {
-          isPartUpload = await PartRepository.uploadParts(
-              PartsList.uploadPartList, v.vehicleId, v.model);
-          isPhotoUpload = await PartRepository.fileUpload(
-              PartsList.uploadPartList, v.vehicleId, v.model);
+          try {
+            isPartUpload = await PartRepository.uploadParts(
+                PartsList.uploadPartList, v.vehicleId, v.model);
+          } catch (e) {
+            print("Part Upload Error $e");
+          }
+          try {
+            isPhotoUpload = await PartRepository.fileUpload(
+                PartsList.uploadPartList, v.vehicleId, v.model);
+          }  catch (e) {
+            print("Part File Error $e");
+          }
         } else {
           isPartUpload = true;
           isPhotoUpload = true;
@@ -877,7 +890,7 @@ class _MainDashboardState extends State<MainDashboard> {
         openAlreadyActiveDialogue(context, ApiConfig.baseQueryParams);
       }
     } catch (e) {
-      print(e);
+      print("login error $e");
     }
   }
 
