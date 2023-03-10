@@ -84,6 +84,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
           color: Colors.red,
         ),
       ),
+      backgroundColor: Colors.black,
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: Center(
         child: FutureBuilder<void>(
