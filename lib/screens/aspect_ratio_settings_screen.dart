@@ -11,7 +11,7 @@ class AspectRatioScreen extends StatefulWidget {
 
 class _AspectRatioScreenState extends State<AspectRatioScreen> {
   String selected = "Default";
-  List<String> aspectRatios = ["Default", "1:1", "4:3", "6:9"];
+  List<String> aspectRatios = ["Default", "1:1", "4:3", "16:9"];
 
   @override
   void initState() {

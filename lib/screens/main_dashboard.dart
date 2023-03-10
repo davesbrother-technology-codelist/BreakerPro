@@ -81,21 +81,19 @@ class _MainDashboardState extends State<MainDashboard> {
       if (connectivityResult == ConnectivityResult.ethernet ||
           connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
-          print("Upload resume $connectivityResult");
-          if(!PartsList.isUploading){
-            PartsList.isUploading = true;
-            try{
-              await upload();
-              await uploadManagePart();
-            }
-            catch(e){
-              print("FAILED TO UPLOAD $e");
-              PartsList.isUploading = false;
-            }
-            finally{
-              PartsList.isUploading = false;
-            }
+        print("Upload resume $connectivityResult");
+        if (!PartsList.isUploading) {
+          PartsList.isUploading = true;
+          try {
+            await upload();
+            await uploadManagePart();
+          } catch (e) {
+            print("FAILED TO UPLOAD $e");
+            PartsList.isUploading = false;
+          } finally {
+            PartsList.isUploading = false;
           }
+        }
         return;
       }
     });
@@ -180,31 +178,37 @@ class _MainDashboardState extends State<MainDashboard> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            TextButton(onPressed: () async {
-                              final Email email = Email(
-                                body: 'Send the logs for better issue tracking.',
-                                subject: 'BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}',
-                                recipients: ['sales@breakerpro.co.uk'],
-                                attachmentPaths: [encoder.zipPath],
-                                isHTML: false,
-                              );
+                            TextButton(
+                                onPressed: () async {
+                                  final Email email = Email(
+                                    body:
+                                        'Send the logs for better issue tracking.',
+                                    subject:
+                                        'BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}',
+                                    recipients: ['sales@breakerpro.co.uk'],
+                                    attachmentPaths: [encoder.zipPath],
+                                    isHTML: false,
+                                  );
 
-                              await FlutterEmailSender.send(email);
-                              Navigator.pop(context);
-                            }, child: const Text("Share via Email")),
-                            TextButton(onPressed: () async {
-                              await ShareExtend.share(encoder.zipPath, "file",
-                                  subject:
-                                      "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
-                                  extraText: "Send the logs for better issue tracking.");
-                              Navigator.pop(context);
-
-                            }, child: const Text("Normal Share")),
+                                  await FlutterEmailSender.send(email);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Share via Email")),
+                            TextButton(
+                                onPressed: () async {
+                                  await ShareExtend.share(
+                                      encoder.zipPath, "file",
+                                      subject:
+                                          "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
+                                      extraText:
+                                          "Send the logs for better issue tracking.");
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Normal Share")),
                           ],
                         ),
                       );
                     });
-
               },
               icon: Icon(
                 Icons.share,
@@ -639,7 +643,7 @@ class _MainDashboardState extends State<MainDashboard> {
           PartsList.newAdded = false;
         }
       } catch (e) {
-        print(e);
+        print("FAILED TO UPLOAD $e");
         PartsList.isUploading = false;
       }
 
@@ -769,11 +773,7 @@ class _MainDashboardState extends State<MainDashboard> {
         bool isPartUpload = false;
         bool isPhotoUpload = false;
 
-        try {
-          await VehicleRepository.fileUpload(v);
-        } catch (e) {
-          print("File upload error $e");
-        }
+        await VehicleRepository.fileUpload(v);
         Box<Part> box1 = await Hive.openBox('uploadPartListBox${v.vehicleId}');
         if (box1.isNotEmpty) {
           PartsList.uploadPartList = [];
@@ -789,18 +789,11 @@ class _MainDashboardState extends State<MainDashboard> {
         print("Upload Part List ${PartsList.uploadPartList}");
 
         if (PartsList.uploadPartList.isNotEmpty) {
-          try {
-            isPartUpload = await PartRepository.uploadParts(
-                PartsList.uploadPartList, v.vehicleId, v.model);
-          } catch (e) {
-            print("Part Upload Error $e");
-          }
-          try {
-            isPhotoUpload = await PartRepository.fileUpload(
-                PartsList.uploadPartList, v.vehicleId, v.model);
-          }  catch (e) {
-            print("Part File Error $e");
-          }
+          isPartUpload = await PartRepository.uploadParts(
+              PartsList.uploadPartList, v.vehicleId, v.model);
+
+          isPhotoUpload = await PartRepository.fileUpload(
+              PartsList.uploadPartList, v.vehicleId, v.model);
         } else {
           isPartUpload = true;
           isPhotoUpload = true;

@@ -2,13 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/image_list.dart';
-import 'package:breaker_pro/utils/auth_utils.dart';
-import 'package:flutter_logs/flutter_logs.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../dataclass/parts_list.dart';
 import '../dataclass/vehicle.dart';
@@ -16,7 +13,6 @@ import '../notification_service.dart';
 import '../utils/main_dashboard_utils.dart';
 import 'api_call.dart';
 import 'api_config.dart';
-import 'package:async/async.dart';
 
 class VehicleRepository {
   static Future<bool> uploadVehicle(Vehicle vehicle) async {
@@ -65,7 +61,6 @@ class VehicleRepository {
     Uri uri = Uri.parse(ApiConfig.baseUrl + ApiConfig.apiSubmitImage);
 
     for (int i = 0; i < ImageList.uploadVehicleImgList.length; i++) {
-      print(i);
       if(ImageList.uploadVehicleImgList[i].isEmpty){
         continue;
       }
@@ -81,16 +76,6 @@ class VehicleRepository {
       print(image.path);
       String filename = image.path.split("/").last.toString();
       print(filename);
-      String msg =
-          "\n\n--Uploading Vehicle Image--\n\n\nURL:${uri.toString()}\n\nFilename:$filename\n\n";
-
-      msg += "\nClientID: ${ApiConfig.baseQueryParams['clientid']}";
-      msg += "\nVehicleID: ${vehicle.vehicleId}";
-      msg += "\nPartID: ";
-      msg += "\nappversion: ${ApiConfig.baseQueryParams['appversion']}";
-      msg += "\ndeviceid: ${ApiConfig.baseQueryParams['deviceid']}";
-      msg += "\nosversion: ${ApiConfig.baseQueryParams['osversion']}";
-      msg += "\nfile: $filename";
       Map<String, dynamic>? queryParams = {
         "ClientID": ApiConfig.baseQueryParams['clientid'],
         "VehicleID": vehicle.vehicleId,
@@ -101,6 +86,18 @@ class VehicleRepository {
         "file": filename,
       };
       uri = uri.replace(queryParameters: queryParams);
+
+      String msg =
+          "\n\n--Uploading Vehicle Image--\n\n\nURL:${uri.toString()}\n\nFilename:$filename\n\n";
+
+      msg += "\nClientID: ${ApiConfig.baseQueryParams['clientid']}";
+      msg += "\nVehicleID: ${vehicle.vehicleId}";
+      msg += "\nPartID: ";
+      msg += "\nappversion: ${ApiConfig.baseQueryParams['appversion']}";
+      msg += "\ndeviceid: ${ApiConfig.baseQueryParams['deviceid']}";
+      msg += "\nosversion: ${ApiConfig.baseQueryParams['osversion']}";
+      msg += "\nfile: $filename";
+
       print(uri);
       var request = http.MultipartRequest("POST", uri)
         ..fields['ClientID'] = ApiConfig.baseQueryParams['clientid'];
