@@ -168,9 +168,8 @@ class PartRepository {
         if(part.imgList[i].isEmpty){
           continue;
         }
-        String msg =
-            "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
-        msg += "URL: $uri";
+
+
         NotificationService().instantNofitication(
             "4/5 - Uploading Part Images $j/$t $model ${part.partName}");
         File initialImage = File(part.imgList[i]);
@@ -182,15 +181,6 @@ class PartRepository {
         print(image.path);
         String filename = image.path.split("/").last.toString();
         print(filename);
-        msg += "\nFilename: $filename\n\nParams:\n";
-        msg += "\nClientID: ${ApiConfig.baseQueryParams['clientid']}";
-        msg += "\nVehicleID: $vehicleID";
-        msg += "\nPartID: ${part.partId}";
-        msg += "\nfile: $filename";
-        msg += "\nappversion: ${ApiConfig.baseQueryParams['appversion']}";
-        msg += "\ndeviceid: ${ApiConfig.baseQueryParams['deviceid']}";
-        msg += "\nosversion: ${ApiConfig.baseQueryParams['osversion']}";
-
         Map<String, dynamic>? queryParams = {
           "ClientID": ApiConfig.baseQueryParams['clientid'],
           "VehicleID": vehicleID,
@@ -201,6 +191,19 @@ class PartRepository {
           "file": filename,
         };
         uri = uri.replace(queryParameters: queryParams);
+        String msg =
+            "\n\n\n--Uploading Parts Image--\n\n\nImage Uploading PartID ${part.partId}\n";
+        msg += "URL: $uri";
+        msg += "\nFilename: $filename\n\nParams:\n";
+        msg += "\nClientID: ${ApiConfig.baseQueryParams['clientid']}";
+        msg += "\nVehicleID: $vehicleID";
+        msg += "\nPartID: ${part.partId}";
+        msg += "\nfile: $filename";
+        msg += "\nappversion: ${ApiConfig.baseQueryParams['appversion']}";
+        msg += "\ndeviceid: ${ApiConfig.baseQueryParams['deviceid']}";
+        msg += "\nosversion: ${ApiConfig.baseQueryParams['osversion']}";
+
+
         print(uri);
         var request = http.MultipartRequest("POST", uri)
           ..fields['ClientID'] = ApiConfig.baseQueryParams['clientid'];

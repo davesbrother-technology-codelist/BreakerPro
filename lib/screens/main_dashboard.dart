@@ -191,6 +191,15 @@ class _MainDashboardState extends State<MainDashboard> {
                                   );
 
                                   await FlutterEmailSender.send(email);
+                                  // String email = Uri.encodeComponent("sales@breakerpro.co.uk");
+                                  // String subject = Uri.encodeComponent("BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}");
+                                  // String body = Uri.encodeComponent("Send the logs for better issue tracking.");
+                                  // Uri mail = Uri.parse("mailto:$email?subject=$subject&body=$body");
+                                  // if (await launchUrl(mail)) {
+                                  //   //email app opened
+                                  // }else{
+                                  //   //email app is not opened
+                                  // }
                                   Navigator.pop(context);
                                 },
                                 child: const Text("Share via Email")),
