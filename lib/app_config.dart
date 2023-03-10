@@ -10,7 +10,7 @@ class AppConfig {
   static String password = "";
   static String appName = "Breaker Pro";
   static String appVersion = "version 0.1.0";
-  static String updateDate = "Updated on 9 March 2023";
+  static String updateDate = "Updated on 10 March 2023";
   static String rightsInfo = "${DateTime.now().year.toString()} All Rights Reserved by Lyons Systems Ltd.";
 
   static String deviceId = "";
