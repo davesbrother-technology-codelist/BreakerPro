@@ -82,6 +82,7 @@ class _MainDashboardState extends State<MainDashboard> {
           connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
         print("Upload resume $connectivityResult");
+        await Future.delayed(Duration(seconds: 2));
         if (!PartsList.isUploading) {
           PartsList.isUploading = true;
           try {
@@ -95,6 +96,10 @@ class _MainDashboardState extends State<MainDashboard> {
           }
         }
         return;
+      }
+      else{
+        print(connectivityResult);
+        PartsList.isUploading = false;
       }
     });
 
