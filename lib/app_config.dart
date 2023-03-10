@@ -9,7 +9,7 @@ class AppConfig {
   static String username = "";
   static String password = "";
   static String appName = "Breaker Pro";
-  static String appVersion = "version 0.1.0";
+  static String appVersion = "version 0.3.0";
   static String updateDate = "Updated on 10 March 2023";
   static String rightsInfo = "${DateTime.now().year.toString()} All Rights Reserved by Lyons Systems Ltd.";
 
@@ -28,7 +28,7 @@ class AppConfig {
     'Default': 9 / 16,
     '1:1': 1 / 1,
     '4:3': 3 / 4,
-    '6:9': 9 / 16,
+    '16:9': 9 / 16,
   };
 
   static List<String> postageOptionsList = [];
