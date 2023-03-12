@@ -491,10 +491,10 @@ class MainDashboardUtils {
   }
 
   static void managePartsFunction(BuildContext context) {
-    if(Platform.isIOS){
-      Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
-      return;
-    }
+    // if(Platform.isIOS){
+    //   Fluttertoast.showToast(msg: "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",toastLength: Toast.LENGTH_LONG);
+    //   return;
+    // }
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const ManagePart()));
   }
