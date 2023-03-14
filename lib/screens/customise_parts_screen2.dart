@@ -213,7 +213,7 @@ class _CustomiseState extends State<Customise> {
               ),
               custom2TextField("Part Description", 1, TextInputType.text,
                   partDescEditingController),
-              custom2TextField("Manufacturer Part no", 1, TextInputType.text,
+              custom2TextField("Manufacturer Part No", 1, TextInputType.text,
                   mnfPartNoEditingController),
               custom2TextField("Part Comments", 1, TextInputType.text,
                   partCommentsEditingController),
@@ -661,7 +661,7 @@ class _CustomiseState extends State<Customise> {
                   }
                 },
                 onSubmitted: (String? s) {
-                  if (title == 'Manufacturer Part no' && s != null) {
+                  if (title == 'Manufacturer Part No' && s != null) {
                     setState(() {
                       // mnfPartNoEditingController.text = "";
                       ebayTitleEditingController.text += s;
