@@ -450,7 +450,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               XFile image = imageFileList[i];
                               File imgFile = File(image.path);
                               imgFile = await FlutterExifRotation.rotateAndSaveImage(path: imgFile.path);
-                              imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
+                              // imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
                               imageFileList[i] = XFile(imgFile.path);
                             }
                             setState(() {
