@@ -4,6 +4,7 @@ import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/drop_down_screen.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
@@ -448,6 +449,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             for (int i = 0; i < imageFileList.length; i++){
                               XFile image = imageFileList[i];
                               File imgFile = File(image.path);
+                              imgFile = await FlutterExifRotation.rotateAndSaveImage(path: imgFile.path);
                               imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
                               imageFileList[i] = XFile(imgFile.path);
                             }

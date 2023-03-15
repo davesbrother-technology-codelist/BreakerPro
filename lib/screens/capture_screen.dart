@@ -3,7 +3,7 @@ import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
-import 'package:image/image.dart' as img;
+import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 
@@ -51,9 +51,14 @@ class _CaptureScreenState extends State<CaptureScreen> {
     );
 
     // Next, initialize the controller. This returns a Future.
-    _initializeControllerFuture = _controller.initialize();
-    _controller.setFlashMode(FlashMode.off);
+      initialiseCamera();
     // _getAvailableCameras();
+  }
+
+  Future<void> initialiseCamera() async {
+     _initializeControllerFuture = _controller.initialize().then((value) => {_controller.setFlashMode(FlashMode.off)
+     });
+
   }
 
   Future<void> _initCamera(CameraDescription description) async {
@@ -117,19 +122,17 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   onPressed: () async {
                                     try {
                                       if (imgList.isEmpty) return;
-                                      File? img = File(image.path);
                                       print('image first');
                                       CroppedFile? croppedImage =
                                           await ImageCropper().cropImage(
                                               sourcePath:
-                                                  File(image.path).path);
+                                                  imgList.last);
                                       print('image after');
                                       if (croppedImage == null) return;
                                       // img=croppedImage.path as File?;
                                       print('image after');
                                       setState(() {
-                                        imgList.add(croppedImage.path);
-                                        imgList.remove(image.path);
+                                        imgList.last = croppedImage.path;
                                         if (widget.type == 'Vehicle') {
                                           ImageList.vehicleImgList
                                               .remove(image.path);
@@ -170,15 +173,10 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   try {
                                     image = await _controller.takePicture();
                                     File imgFile = File(image.path);
+                                    imgFile = await FlutterExifRotation.rotateAndSaveImage(path: imgFile.path);
                                     imgFile = imgFile.renameSync(
                                         image.path.replaceAll('.jpg', '.png'));
-                                    // img.Image imagee = img.decodeImage(imgFile.readAsBytesSync())!;
-                                    //
-                                    // // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
-                                    // img.Image thumbnail = img.copyResize(imagee);
-                                    //
-                                    // // Save the thumbnail as a PNG.
-                                    // imgFile = imgFile..writeAsBytesSync(img.encodePng(thumbnail),mode: FileMode.writeOnly);
+
                                     if (!mounted) return;
                                     setState(() {
                                       if (widget.type == 'Vehicle') {
