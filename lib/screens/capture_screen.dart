@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
+import 'package:exif/exif.dart';
+
 
 class CaptureScreen extends StatefulWidget {
   const CaptureScreen({Key? key, required this.cameras, required this.type})
@@ -173,9 +175,13 @@ class _CaptureScreenState extends State<CaptureScreen> {
                                   try {
                                     image = await _controller.takePicture();
                                     File imgFile = File(image.path);
+
                                     imgFile = await FlutterExifRotation.rotateAndSaveImage(path: imgFile.path);
+                                    Map<String, IfdTag> data = await readExifFromBytes(await imgFile.readAsBytes());
+                                    print(data);
                                     // imgFile = imgFile.renameSync(
                                     //     image.path.replaceAll('.jpg', '.png'));
+
 
                                     if (!mounted) return;
                                     setState(() {

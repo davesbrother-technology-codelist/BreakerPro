@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:breaker_pro/api/vehicle_repository.dart';
+import 'package:exif/exif.dart';
 import 'package:breaker_pro/dataclass/parts_list.dart';
 import 'package:breaker_pro/screens/drop_down_screen.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
@@ -450,6 +450,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                               XFile image = imageFileList[i];
                               File imgFile = File(image.path);
                               imgFile = await FlutterExifRotation.rotateAndSaveImage(path: imgFile.path);
+                              Map<String, IfdTag> data = await readExifFromBytes(await imgFile.readAsBytes());
+                              print(data);
                               // imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
                               imageFileList[i] = XFile(imgFile.path);
                             }

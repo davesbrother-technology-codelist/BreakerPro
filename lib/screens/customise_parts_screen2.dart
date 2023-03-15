@@ -1,4 +1,5 @@
 import 'package:breaker_pro/screens/postage_dropdown_screen.dart';
+import 'package:exif/exif.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
@@ -353,6 +354,8 @@ class _CustomiseState extends State<Customise> {
                               XFile image = imageFileList[i];
                               File imgFile = File(image.path);
                               imgFile = await FlutterExifRotation.rotateAndSaveImage(path: imgFile.path);
+                              Map<String, IfdTag> data = await readExifFromBytes(await imgFile.readAsBytes());
+                              print(data);
                               // imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
                               imageFileList[i] = XFile(imgFile.path);
                             }
