@@ -3,6 +3,7 @@ import 'package:breaker_pro/dataclass/image_list.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
 
@@ -55,8 +56,6 @@ class _CaptureScreenState extends State<CaptureScreen> {
     // _getAvailableCameras();
   }
 
-
-
   Future<void> _initCamera(CameraDescription description) async {
     _controller =
         CameraController(description, ResolutionPreset.max, enableAudio: true);
@@ -87,200 +86,219 @@ class _CaptureScreenState extends State<CaptureScreen> {
       backgroundColor: Colors.black,
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: Center(
-        child: FutureBuilder<void>(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return AspectRatio(
-                aspectRatio: AppConfig.aspectMap[AppConfig.imageAspectRatio],
-                child: CameraPreview(
-                  _controller,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15,right: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: imgList.isNotEmpty
-                              ? Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.file(File(imgList.last)),
-                              )
-                              : const SizedBox(),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: ElevatedButton(
-                              onPressed: () async {
-                                try {
-                                  if (imgList.isEmpty) return;
-                                  File? img = File(image.path);
-                                  print('image first');
-                                  CroppedFile? croppedImage =
-                                      await ImageCropper().cropImage(
-                                          sourcePath: File(image.path).path);
-                                  print('image after');
-                                  if (croppedImage == null) return;
-                                  // img=croppedImage.path as File?;
-                                  print('image after');
-                                  setState(() {
-                                    imgList.add(croppedImage.path);
-                                    imgList.remove(image.path);
-                                    if (widget.type == 'Vehicle') {
-                                      ImageList.vehicleImgList
-                                          .remove(image.path);
-                                      ImageList.vehicleImgList
-                                          .add(croppedImage.path);
-                                    }else if(widget.type=='ScanImaging') {
-                                      ImageList.scanImagingList.remove(image.path);
-                                      ImageList.scanImagingList.add(croppedImage.path);
-                                    }
-                                      else {
-                                      ImageList.partImageList
-                                          .remove(image.path);
-                                      ImageList.partImageList
-                                          .add(croppedImage.path);
-                                    }
+        child: OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            return FutureBuilder<void>(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return AspectRatio(
+                    aspectRatio: orientation == Orientation.portrait ? AppConfig.aspectMap[AppConfig.imageAspectRatio] : 1/AppConfig.aspectMap[AppConfig.imageAspectRatio],
+                    child: CameraPreview(
+                      _controller,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 15, right: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Expanded(
+                              flex: 2,
+                              child: imgList.isNotEmpty
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.file(File(imgList.last)),
+                                    )
+                                  : const SizedBox(),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: ElevatedButton(
+                                  onPressed: () async {
+                                    try {
+                                      if (imgList.isEmpty) return;
+                                      File? img = File(image.path);
+                                      print('image first');
+                                      CroppedFile? croppedImage =
+                                          await ImageCropper().cropImage(
+                                              sourcePath:
+                                                  File(image.path).path);
+                                      print('image after');
+                                      if (croppedImage == null) return;
+                                      // img=croppedImage.path as File?;
+                                      print('image after');
+                                      setState(() {
+                                        imgList.add(croppedImage.path);
+                                        imgList.remove(image.path);
+                                        if (widget.type == 'Vehicle') {
+                                          ImageList.vehicleImgList
+                                              .remove(image.path);
+                                          ImageList.vehicleImgList
+                                              .add(croppedImage.path);
+                                        } else if (widget.type ==
+                                            'ScanImaging') {
+                                          ImageList.scanImagingList
+                                              .remove(image.path);
+                                          ImageList.scanImagingList
+                                              .add(croppedImage.path);
+                                        } else {
+                                          ImageList.partImageList
+                                              .remove(image.path);
+                                          ImageList.partImageList
+                                              .add(croppedImage.path);
+                                        }
 
-                                    Navigator.of(context).pop();
-                                  });
-                                } on PlatformException catch (e) {
-                                  print(e);
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.grey),
+                                        Navigator.of(context).pop();
+                                      });
+                                    } on PlatformException catch (e) {
+                                      print(e);
+                                      Navigator.of(context).pop();
+                                    }
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all(Colors.grey),
+                                  ),
+                                  child: Text(
+                                    "Adjust",
+                                  )),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: IconButton(
+                                onPressed: () async {
+                                  try {
+                                    image = await _controller.takePicture();
+                                    File imgFile = File(image.path);
+                                    imgFile = imgFile.renameSync(
+                                        image.path.replaceAll('.jpg', '.png'));
+                                    // img.Image imagee = img.decodeImage(imgFile.readAsBytesSync())!;
+                                    //
+                                    // // Resize the image to a 120x? thumbnail (maintaining the aspect ratio).
+                                    // img.Image thumbnail = img.copyResize(imagee);
+                                    //
+                                    // // Save the thumbnail as a PNG.
+                                    // imgFile = imgFile..writeAsBytesSync(img.encodePng(thumbnail),mode: FileMode.writeOnly);
+                                    if (!mounted) return;
+                                    setState(() {
+                                      if (widget.type == 'Vehicle') {
+                                        // int count = PartsList.vehicleCount;
+                                        // String newPath = path.join(dir,
+                                        //     'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                        // imgFile = imgFile.renameSync(newPath);
+                                        imgList.add(imgFile.path);
+                                        ImageList.vehicleImgList
+                                            .add(imgFile.path);
+                                        print(imgFile.path);
+                                      } else if (widget.type == 'ScanImaging') {
+                                        // int count = PartsList.vehicleCount;
+                                        // String newPath = path.join(dir,
+                                        //     'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                        // imgFile = imgFile.renameSync(newPath);
+                                        imgList.add(imgFile.path);
+                                        ImageList.scanImagingList
+                                            .add(imgFile.path);
+                                        print(imgFile.path);
+                                      } else if (widget.type == 'ManagePart') {
+                                        // String newPath = path.join(dir,
+                                        //     'IMG${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                        // imgFile = imgFile.renameSync(newPath);
+                                        imgList.add(imgFile.path);
+                                        ImageList.managePartImageList
+                                            .add(imgFile.path);
+                                        print(imgFile.path);
+                                      } else {
+                                        // int count = PartsList.partCount;
+                                        // String newPath = path.join(dir,
+                                        //     'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
+                                        // imgFile = imgFile.renameSync(newPath);
+                                        imgList.add(imgFile.path);
+                                        ImageList.partImageList
+                                            .add(imgFile.path);
+                                        print(imgFile.path);
+                                      }
+                                      image = XFile(imgFile.path);
+                                    });
+                                  } catch (e) {
+                                    // If an error occurs, log the error to the console.
+                                    print("Error capturing $e");
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.camera,
+                                  size: 40,
+                                  color: Colors.white,
+                                ),
                               ),
-                              child: Text(
-                                "Adjust",
-                              )),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: IconButton(
-                            onPressed: () async {
-                              try {
-                                image = await _controller.takePicture();
-                                File imgFile = File(image.path);
-                                if (!mounted) return;
-                                setState(() {
-                                  if (widget.type == 'Vehicle') {
-                                    // int count = PartsList.vehicleCount;
-                                    // String newPath = path.join(dir,
-                                    //     'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                    // imgFile = imgFile.renameSync(newPath);
-                                    imgList.add(imgFile.path);
-                                    ImageList.vehicleImgList.add(imgFile.path);
-                                    print(imgFile.path);
-                                  }
-                                  else if(widget.type=='ScanImaging'){
-                                    // int count = PartsList.vehicleCount;
-                                    // String newPath = path.join(dir,
-                                    //     'IMGVHC${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                    // imgFile = imgFile.renameSync(newPath);
-                                    imgList.add(imgFile.path);
-                                    ImageList.scanImagingList.add(imgFile.path);
-                                    print(imgFile.path);
-                                  }
-                                  else if(widget.type=='ManagePart'){
-                                    // String newPath = path.join(dir,
-                                    //     'IMG${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                    // imgFile = imgFile.renameSync(newPath);
-                                    imgList.add(imgFile.path);
-                                    ImageList.managePartImageList.add(imgFile.path);
-                                    print(imgFile.path);
-                                  }
-                                  else {
-                                    // int count = PartsList.partCount;
-                                    // String newPath = path.join(dir,
-                                    //     'IMGPRT${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${count.toString().padLeft(4, '0')}$count${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}${DateFormat('yyyyMMddHHmmss').format(DateTime.now())}.jpg');
-                                    // imgFile = imgFile.renameSync(newPath);
-                                    imgList.add(imgFile.path);
-                                    ImageList.partImageList.add(imgFile.path);
-                                    print(imgFile.path);
-                                  }
-                                  image = XFile(imgFile.path);
-                                });
-                              } catch (e) {
-                                // If an error occurs, log the error to the console.
-                                print(e);
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.camera,
-                              size: 40,
-                              color: Colors.white,
                             ),
-                          ),
-                        ),
-                        Expanded(
-                          child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (isFlashed == 'off') {
-                                    isFlashed = 'on';
-                                    _controller.setFlashMode(FlashMode.torch);
-                                  } else if (isFlashed == 'on') {
-                                    isFlashed = 'auto';
-                                    _controller.setFlashMode(FlashMode.auto);
+                            Expanded(
+                              child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isFlashed == 'off') {
+                                        isFlashed = 'on';
+                                        _controller
+                                            .setFlashMode(FlashMode.torch);
+                                      } else if (isFlashed == 'on') {
+                                        isFlashed = 'auto';
+                                        _controller
+                                            .setFlashMode(FlashMode.auto);
+                                      } else {
+                                        isFlashed = 'off';
+                                        _controller.setFlashMode(FlashMode.off);
+                                      }
+                                    });
+                                  },
+                                  icon: Icon(
+                                    flashMap[isFlashed],
+                                    size: 35,
+                                    color: Colors.white,
+                                  )),
+                            ),
+                            Expanded(
+                              child: IconButton(
+                                onPressed: () {
+                                  print('object');
+                                  if (_currentFlashMode == FlashMode.off) {
+                                    _currentFlashMode = FlashMode.torch;
+                                    isFlashed = "on";
                                   } else {
-                                    isFlashed = 'off';
-                                    _controller.setFlashMode(FlashMode.off);
+                                    _currentFlashMode = FlashMode.off;
+                                    isFlashed = "off";
                                   }
-                                });
-                              },
-                              icon: Icon(
-                                flashMap[isFlashed],
-                                size: 35,
-                                color: Colors.white,
-                              )),
-                        ),
-                        Expanded(
-                          child: IconButton(
-                            onPressed: () {
-                              print('object');
-                              if (_currentFlashMode == FlashMode.off) {
-                                _currentFlashMode = FlashMode.torch;
-                                isFlashed = "on";
-                              } else {
-                                _currentFlashMode = FlashMode.off;
-                                isFlashed = "off";
-                              }
-                              setState(() {
-                                _controller.setFlashMode(_currentFlashMode!);
-
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.flashlight_on,
-                              size: 30,
-                              color: Colors.white,
+                                  setState(() {
+                                    _controller
+                                        .setFlashMode(_currentFlashMode!);
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.flashlight_on,
+                                  size: 30,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Expanded(
-                          child: IconButton(
-                            onPressed: _toggleCameraLens,
-                            icon: const Icon(
-                              Icons.flip_camera_android,
-                              size: 40,
-                              color: Colors.white,
+                            Expanded(
+                              child: IconButton(
+                                onPressed: _toggleCameraLens,
+                                icon: const Icon(
+                                  Icons.flip_camera_android,
+                                  size: 40,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              );
-            } else {
-              // Otherwise, display a loading indicator.
-              return const Center(child: CircularProgressIndicator());
-            }
+                  );
+                } else {
+                  // Otherwise, display a loading indicator.
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            );
           },
         ),
       ),

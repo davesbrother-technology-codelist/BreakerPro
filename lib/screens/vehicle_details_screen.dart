@@ -445,6 +445,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                             if(selectedImages.isNotEmpty){
                               imageFileList.addAll(selectedImages);
                             }
+                            for (int i = 0; i < imageFileList.length; i++){
+                              XFile image = imageFileList[i];
+                              File imgFile = File(image.path);
+                              imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
+                              imageFileList[i] = XFile(imgFile.path);
+                            }
                             setState(() {
                               List<String> l = List.generate(imageFileList.length, (index) => imageFileList[index].path);
                               // int i = 1;

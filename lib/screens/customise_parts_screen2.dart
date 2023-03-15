@@ -348,6 +348,12 @@ class _CustomiseState extends State<Customise> {
                             if (selectedImages.isNotEmpty) {
                               imageFileList.addAll(selectedImages);
                             }
+                            for (int i = 0; i < imageFileList.length; i++){
+                              XFile image = imageFileList[i];
+                              File imgFile = File(image.path);
+                              imgFile = imgFile.renameSync(image.path.replaceAll('.jpg', '.png'));
+                              imageFileList[i] = XFile(imgFile.path);
+                            }
                             setState(() {
                               List<String> l = List.generate(
                                   imageFileList.length,
@@ -643,39 +649,50 @@ class _CustomiseState extends State<Customise> {
                 style: textStyle,
               ),
             ),
-            TextField(
-                minLines: title == 'Part Description' ||
-                        title == 'Part Comments' ||
-                        title == 'Ebay Title'
-                    ? 3
-                    : 1,
-                maxLines: title == 'Part Description' ||
-                        title == 'Part Comments' ||
-                        title == 'Ebay Title'
-                    ? 5
-                    : 1,
-                controller: controller,
-                onChanged: (String s) {
-                  if (title == 'Ebay Title') {
-                    setState(() {});
-                  }
-                },
-                onSubmitted: (String? s) {
-                  if (title == 'Manufacturer Part No' && s != null) {
-                    setState(() {
-                      // mnfPartNoEditingController.text = "";
-                      ebayTitleEditingController.text += s;
-                    });
-                  }
-                },
-                keyboardType: TType,
-                inputFormatters: title == "Warranty"?[FilteringTextInputFormatter.digitsOnly]:null,
-                decoration: InputDecoration(
-                    enabledBorder: border,
-                    focusedBorder: title == 'Ebay Title' &&
-                            ebayTitleEditingController.text.length >= 80
-                        ? redBorder
-                        : focusedBorder))
+            Focus(
+              child: TextField(
+                  minLines: title == 'Part Description' ||
+                          title == 'Part Comments' ||
+                          title == 'Ebay Title'
+                      ? 3
+                      : 1,
+                  maxLines: title == 'Part Description' ||
+                          title == 'Part Comments' ||
+                          title == 'Ebay Title'
+                      ? 5
+                      : 1,
+                  controller: controller,
+                  onChanged: (String s) {
+                    if (title == 'Ebay Title') {
+                      setState(() {});
+                    }
+                  },
+                  onSubmitted: (String? s) {
+                    if (title == 'Manufacturer Part No' && s != null) {
+                      setState(() {
+                        // mnfPartNoEditingController.text = "";
+                        ebayTitleEditingController.text += s;
+                      });
+                    }
+                  },
+                  keyboardType: TType,
+                  inputFormatters: title == "Warranty"?[FilteringTextInputFormatter.digitsOnly]:null,
+                  decoration: InputDecoration(
+                      enabledBorder: border,
+                      focusedBorder: title == 'Ebay Title' &&
+                              ebayTitleEditingController.text.length >= 80
+                          ? redBorder
+                          : focusedBorder)),
+              onFocusChange: (isFocus){
+                if(!isFocus && title == "Manufacturer Part No"){
+                  setState(() {
+                    if(!ebayTitleEditingController.text.contains(mnfPartNoEditingController.text)){
+                      ebayTitleEditingController.text += mnfPartNoEditingController.text;
+                    }
+                  });
+                }
+              },
+            )
           ]),
     );
   }

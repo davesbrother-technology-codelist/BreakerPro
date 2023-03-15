@@ -2,19 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive_io.dart';
-import 'package:breaker_pro/dataclass/notification_utils.dart';
 import 'package:breaker_pro/notification_service.dart';
-import 'package:breaker_pro/screens/qr_screen.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:flutter_logs/flutter_logs.dart';
 import 'package:breaker_pro/api/api_config.dart';
 import 'package:breaker_pro/api/vehicle_repository.dart';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/screens/login_screen.dart';
-import 'package:breaker_pro/screens/notification_screen.dart';
 import 'package:breaker_pro/screens/settings_screen.dart';
 import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
@@ -23,11 +19,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../api/api_call.dart';
 import '../api/login_repository.dart';
 import '../api/manage_part_repository.dart';
@@ -81,8 +74,10 @@ class _MainDashboardState extends State<MainDashboard> {
       if (connectivityResult == ConnectivityResult.ethernet ||
           connectivityResult == ConnectivityResult.mobile ||
           connectivityResult == ConnectivityResult.wifi) {
-        print("Upload resume $connectivityResult");
-        await Future.delayed(Duration(seconds: 2));
+        if (kDebugMode) {
+          print("Upload resume $connectivityResult");
+        }
+        await Future.delayed(const Duration(seconds: 2));
         if (!PartsList.isUploading) {
           PartsList.isUploading = true;
           try {
@@ -105,7 +100,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
     if (PartsList.newAdded) {
       PartsList.newAdded = false;
-      timer2 = Timer.periodic(Duration(seconds: 1), (timer) async {
+      timer2 = Timer.periodic(const Duration(seconds: 1), (timer) async {
         if (!PartsList.isUploading) {
           print("Hrllo");
           await upload();
