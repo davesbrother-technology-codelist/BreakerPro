@@ -16,6 +16,7 @@ import 'package:breaker_pro/utils/auth_utils.dart';
 import 'package:breaker_pro/utils/main_dashboard_utils.dart';
 import 'package:breaker_pro/my_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fgbg/flutter_fgbg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -38,14 +39,17 @@ class MainDashboard extends StatefulWidget {
   State<MainDashboard> createState() => _MainDashboardState();
 }
 
-class _MainDashboardState extends State<MainDashboard> {
+class _MainDashboardState extends State<MainDashboard>{
   late PartsList partsList;
   late Timer timer;
   late Timer timer2;
   late Timer timer3;
   late String temp;
+  late StreamSubscription<FGBGType> subscription;
   late StreamSubscription<ConnectivityResult> _networkSubscription;
   Map responseJson = {};
+
+
   @override
   void initState() {
     partsList = PartsList();
@@ -53,6 +57,20 @@ class _MainDashboardState extends State<MainDashboard> {
     fetchStockReconcileList();
     fetchPartsListNetwork();
     super.initState();
+    subscription = FGBGEvents.stream.listen((event) async {
+      if (!PartsList.isUploading) {
+        PartsList.isUploading = true;
+        try {
+          await upload();
+          await uploadManagePart();
+        } catch (e) {
+          print("FAILED TO UPLOAD $e");
+          PartsList.isUploading = false;
+        } finally {
+          PartsList.isUploading = false;
+        }
+      }
+    });
     timer =
         Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
     // timer3 = Timer.periodic(Duration(seconds: 1), (timer) async {
@@ -115,6 +133,7 @@ class _MainDashboardState extends State<MainDashboard> {
     PartsList.prefs!.setInt('partCount', PartsList.partCount);
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
+    subscription.cancel();
     timer.cancel();
     // timer3.cancel();
     // if(timer2.isActive){
@@ -124,309 +143,315 @@ class _MainDashboardState extends State<MainDashboard> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: Container(
-          padding: const EdgeInsets.all(5),
-          child: Image.asset('assets/logo_breaker_pro.png'),
-        ),
-        actions: [
-          IconButton(
-              onPressed: () => {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (builder) => const SettingsScreen()))
-                  },
-              icon: Icon(
-                Icons.settings,
-                color: MyTheme.white,
-              )),
-          IconButton(
-              onPressed: () => {openLogoutDialog(context)},
-              icon: Icon(
-                Icons.logout,
-                color: MyTheme.white,
-              )),
-          IconButton(
-              onPressed: () async {
-                Fluttertoast.showToast(
-                    msg: "Please wait while creating zip...");
-                Directory externalDirectory = AppConfig.externalDirectory!;
-                String platform = "";
-                if (Platform.isAndroid) {
-                  platform = "Android";
-                } else {
-                  platform = "iOS";
-                }
-                var encoder = ZipFileEncoder();
-                encoder.create(
-                    "${externalDirectory.parent.path}/ExportedLogs/${platform}Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
+    return WillPopScope(
+      onWillPop: () {
+        upload();
+        return Future.value(true);},
+      child : Scaffold(
+        appBar: AppBar(
+          leading: Container(
+            padding: const EdgeInsets.all(5),
+            child: Image.asset('assets/logo_breaker_pro.png'),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () => {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (builder) => const SettingsScreen()))
+                    },
+                icon: Icon(
+                  Icons.settings,
+                  color: MyTheme.white,
+                )),
+            IconButton(
+                onPressed: () => {openLogoutDialog(context)},
+                icon: Icon(
+                  Icons.logout,
+                  color: MyTheme.white,
+                )),
+            IconButton(
+                onPressed: () async {
+                  Fluttertoast.showToast(
+                      msg: "Please wait while creating zip...");
+                  Directory externalDirectory = AppConfig.externalDirectory!;
+                  String platform = "";
+                  if (Platform.isAndroid) {
+                    platform = "Android";
+                  } else {
+                    platform = "iOS";
+                  }
+                  var encoder = ZipFileEncoder();
+                  encoder.create(
+                      "${externalDirectory.parent.path}/ExportedLogs/${platform}Logger${DateFormat('dd_MM_yyyy').format(DateTime.now())}.zip");
 
-                await encoder.addDirectory(Directory(externalDirectory.path),
-                    includeDirName: false);
-                encoder.close();
+                  await encoder.addDirectory(Directory(externalDirectory.path),
+                      includeDirName: false);
+                  encoder.close();
 
-                await showModalBottomSheet(
-                    context: context,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    builder: (BuildContext context) {
-                      return SizedBox(
-                        height: 100.0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            TextButton(
-                                onPressed: () async {
-                                  final Email email = Email(
-                                    body:
-                                        'Send the logs for better issue tracking.',
-                                    subject:
-                                        'BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}',
-                                    recipients: ['sales@breakerpro.co.uk'],
-                                    attachmentPaths: [encoder.zipPath],
-                                    isHTML: false,
-                                  );
-
-                                  await FlutterEmailSender.send(email);
-                                  // String email = Uri.encodeComponent("sales@breakerpro.co.uk");
-                                  // String subject = Uri.encodeComponent("BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}");
-                                  // String body = Uri.encodeComponent("Send the logs for better issue tracking.");
-                                  // Uri mail = Uri.parse("mailto:$email?subject=$subject&body=$body");
-                                  // if (await launchUrl(mail)) {
-                                  //   //email app opened
-                                  // }else{
-                                  //   //email app is not opened
-                                  // }
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Share via Email")),
-                            TextButton(
-                                onPressed: () async {
-                                  await ShareExtend.share(
-                                      encoder.zipPath, "file",
+                  await showModalBottomSheet(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      builder: (BuildContext context) {
+                        return SizedBox(
+                          height: 100.0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              TextButton(
+                                  onPressed: () async {
+                                    final Email email = Email(
+                                      body:
+                                          'Send the logs for better issue tracking.',
                                       subject:
-                                          "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
-                                      extraText:
-                                          "Send the logs for better issue tracking.");
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Normal Share")),
-                          ],
-                        ),
-                      );
-                    });
-              },
-              icon: Icon(
-                Icons.share,
-                color: MyTheme.white,
-              )),
-          IconButton(
-              onPressed: () => {
-                    // openAlreadyActiveDialogue(
-                    //     context, ApiConfig.baseQueryParams)
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (_) => const NotificationScreen()))
-                    Fluttertoast.showToast(
-                        msg:
-                            "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",
-                        toastLength: Toast.LENGTH_LONG)
-                  },
-              icon: Icon(
-                Icons.notifications,
-                color: MyTheme.white,
-              )),
-          IconButton(
-              onPressed: () {
-                MainDashboardUtils.openUrl("https://breakerpro.co.uk/livechat");
-              },
-              icon: Icon(
-                Icons.chat,
-                color: MyTheme.white,
-              )),
-          IconButton(
-              onPressed: () async {
-                Box<Part> box = await Hive.openBox('partListBox');
-                await box.clear();
-                await PartsList.prefs!.remove('selectList');
+                                          'BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}',
+                                      recipients: ['sales@breakerpro.co.uk'],
+                                      attachmentPaths: [encoder.zipPath],
+                                      isHTML: false,
+                                    );
 
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => super.widget));
-                //   SharedPreferences prefs = await SharedPreferences.getInstance();
-                // await prefs.remove('uploadQueue');
-              },
-              icon: Icon(
-                Icons.refresh,
-                color: MyTheme.white,
-              )),
-        ],
-      ),
-      body: ListView.builder(
-          itemCount: MainDashboardUtils.titleList.length + 1,
-          itemBuilder: (context, index) {
-            if (index == MainDashboardUtils.titleList.length) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Live Chat
-                        Expanded(
-                          child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.all(5),
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                MainDashboardUtils.openUrl(
-                                    "https://breakerpro.co.uk/livechat");
-                              },
-                              icon: const Icon(
-                                Icons.chat,
-                                color: Colors.white,
-                              ),
-                              label: const Text(
-                                "LIVE CHAT",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: MyTheme.redLiveChat,
-                                textStyle: const TextStyle(fontSize: 15),
-                              ),
-                            ),
+                                    await FlutterEmailSender.send(email);
+                                    // String email = Uri.encodeComponent("sales@breakerpro.co.uk");
+                                    // String subject = Uri.encodeComponent("BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}");
+                                    // String body = Uri.encodeComponent("Send the logs for better issue tracking.");
+                                    // Uri mail = Uri.parse("mailto:$email?subject=$subject&body=$body");
+                                    // if (await launchUrl(mail)) {
+                                    //   //email app opened
+                                    // }else{
+                                    //   //email app is not opened
+                                    // }
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("Share via Email")),
+                              TextButton(
+                                  onPressed: () async {
+                                    await ShareExtend.share(
+                                        encoder.zipPath, "file",
+                                        subject:
+                                            "BreakerPRO - $platform App Debug Logs \nClient Id: ${AppConfig.clientId} \nUserName: ${AppConfig.username}",
+                                        extraText:
+                                            "Send the logs for better issue tracking.");
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("Normal Share")),
+                            ],
                           ),
-                        ),
-                        // Whatsapp
-                        Expanded(
-                          child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.all(5),
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                MainDashboardUtils.openUrl(
-                                    "https://breakerpro.co.uk/whatsapp");
-                              },
-                              icon: const Icon(
-                                Icons.whatsapp,
-                                color: Colors.white,
-                              ),
-                              label: const Text(
-                                "WhatsApp Chat",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: MyTheme.greenWhatsapp,
-                                textStyle: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        );
+                      });
+                },
+                icon: Icon(
+                  Icons.share,
+                  color: MyTheme.white,
+                )),
+            IconButton(
+                onPressed: () => {
+                      // openAlreadyActiveDialogue(
+                      //     context, ApiConfig.baseQueryParams)
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (_) => const NotificationScreen()))
+                      Fluttertoast.showToast(
+                          msg:
+                              "This feature is not yet currently available in the iOS Mobile App. Please use the Android Mobile App to use this feature instead",
+                          toastLength: Toast.LENGTH_LONG)
+                    },
+                icon: Icon(
+                  Icons.notifications,
+                  color: MyTheme.white,
+                )),
+            IconButton(
+                onPressed: () {
+                  MainDashboardUtils.openUrl("https://breakerpro.co.uk/livechat");
+                },
+                icon: Icon(
+                  Icons.chat,
+                  color: MyTheme.white,
+                )),
+            IconButton(
+                onPressed: () async {
+                  Box<Part> box = await Hive.openBox('partListBox');
+                  await box.clear();
+                  await PartsList.prefs!.remove('selectList');
+
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => super.widget));
+                  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+                  // await prefs.remove('uploadQueue');
+                },
+                icon: Icon(
+                  Icons.refresh,
+                  color: MyTheme.white,
+                )),
+          ],
+        ),
+        body: ListView.builder(
+            itemCount: MainDashboardUtils.titleList.length + 1,
+            itemBuilder: (context, index) {
+              if (index == MainDashboardUtils.titleList.length) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(AppConfig.rightsInfo),
-                          Text(
-                            AppConfig.appVersion,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          // Live Chat
+                          Expanded(
+                            child: Container(
+                              height: 50,
+                              padding: const EdgeInsets.all(5),
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  MainDashboardUtils.openUrl(
+                                      "https://breakerpro.co.uk/livechat");
+                                },
+                                icon: const Icon(
+                                  Icons.chat,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  "LIVE CHAT",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: MyTheme.redLiveChat,
+                                  textStyle: const TextStyle(fontSize: 15),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Whatsapp
+                          Expanded(
+                            child: Container(
+                              height: 50,
+                              padding: const EdgeInsets.all(5),
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  MainDashboardUtils.openUrl(
+                                      "https://breakerpro.co.uk/whatsapp");
+                                },
+                                icon: const Icon(
+                                  Icons.whatsapp,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  "WhatsApp Chat",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: MyTheme.greenWhatsapp,
+                                  textStyle: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    )
-                  ],
-                ),
-              );
-            }
-            return Padding(
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: GestureDetector(
-                    onTap: () {
-                      print(index);
-                      if (index == 0 || index == 1) {
-                        if (PartsList.cachedVehicle != null) {
-                          print("Hello ${PartsList.cachedVehicle}");
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const VehicleDetailsScreen(),
-                          ))
-                              //     .then((value) {
-                              //   Navigator.of(context).pushAndRemoveUntil(
-                              //       MaterialPageRoute(
-                              //           builder: (_) => MainDashboard()),
-                              //       (Route r) => false);
-                              // })
-                              ;
-                        } else {
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(AppConfig.rightsInfo),
+                            Text(
+                              AppConfig.appVersion,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              }
+              return Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  child: GestureDetector(
+                      onTap: () {
+                        print(index);
+                        if (index == 0 || index == 1) {
+                          if (PartsList.cachedVehicle != null) {
+                            print("Hello ${PartsList.cachedVehicle}");
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const VehicleDetailsScreen(),
+                            ))
+                                //     .then((value) {
+                                //   Navigator.of(context).pushAndRemoveUntil(
+                                //       MaterialPageRoute(
+                                //           builder: (_) => MainDashboard()),
+                                //       (Route r) => false);
+                                // })
+                                ;
+                          } else {
+                            MainDashboardUtils.functionList[index]!(
+                                context, partsList);
+                          }
+                        } else if (index == 1) {
                           MainDashboardUtils.functionList[index]!(
                               context, partsList);
+                        } else {
+                          MainDashboardUtils.functionList[index]!(context);
                         }
-                      } else if (index == 1) {
-                        MainDashboardUtils.functionList[index]!(
-                            context, partsList);
-                      } else {
-                        MainDashboardUtils.functionList[index]!(context);
-                      }
-                    },
-                    child: PartsList.cachedVehicle != null && index == 0
-                        ? Column(
-                            children: [
-                              cardView(index),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ElevatedButton(
-                                    onPressed: () async {
-                                      Box<Part> box =
-                                          await Hive.openBox('partListBox');
-                                      Box<Part> box1 = await Hive.openBox(
-                                          'selectPartListBox');
-                                      await box.clear();
-                                      await box1.clear();
-                                      setState(() {
-                                        MainDashboardUtils.titleList[0] =
-                                            "Add & Manage Breaker";
-                                        PartsList.cachedVehicle = null;
-                                        PartsList.prefs!.remove('vehicle');
-                                        PartsList.prefs!.remove('partList');
-                                        PartsList.prefs!.remove('selectedList');
-                                        PartsList.recall = false;
-                                        ImageList.vehicleImgList = [];
-                                        ImageList.partImageList = [];
-                                        PartsList.selectedPartList = [];
-                                        PartsList.saveVehicle = false;
-                                        PartsList.partList = [];
-                                        fetchPartsListNetwork();
-                                      });
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      elevation: 0,
-                                      backgroundColor: Colors.black26,
-                                      minimumSize:
-                                          const Size.fromHeight(50), // NEW
-                                    ),
-                                    child: Text(
-                                      "RESET",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.normal),
-                                    )),
-                              )
-                            ],
-                          )
-                        : cardView(index)));
-          }),
+                      },
+                      child: PartsList.cachedVehicle != null && index == 0
+                          ? Column(
+                              children: [
+                                cardView(index),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                      onPressed: () async {
+                                        Box<Part> box =
+                                            await Hive.openBox('partListBox');
+                                        Box<Part> box1 = await Hive.openBox(
+                                            'selectPartListBox');
+                                        await box.clear();
+                                        await box1.clear();
+                                        setState(() {
+                                          MainDashboardUtils.titleList[0] =
+                                              "Add & Manage Breaker";
+                                          PartsList.cachedVehicle = null;
+                                          PartsList.prefs!.remove('vehicle');
+                                          PartsList.prefs!.remove('partList');
+                                          PartsList.prefs!.remove('selectedList');
+                                          PartsList.recall = false;
+                                          ImageList.vehicleImgList = [];
+                                          ImageList.partImageList = [];
+                                          PartsList.selectedPartList = [];
+                                          PartsList.saveVehicle = false;
+                                          PartsList.partList = [];
+                                          fetchPartsListNetwork();
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: Colors.black26,
+                                        minimumSize:
+                                            const Size.fromHeight(50), // NEW
+                                      ),
+                                      child: Text(
+                                        "RESET",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.normal),
+                                      )),
+                                )
+                              ],
+                            )
+                          : cardView(index)));
+            }),
+      ),
     );
   }
 
