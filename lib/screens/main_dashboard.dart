@@ -58,6 +58,7 @@ class _MainDashboardState extends State<MainDashboard>{
     fetchPartsListNetwork();
     super.initState();
     subscription = FGBGEvents.stream.listen((event) async {
+      print(event)
       if (!PartsList.isUploading) {
         PartsList.isUploading = true;
         try {
