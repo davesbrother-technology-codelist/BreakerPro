@@ -192,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               "https://breakerpro.co.uk/whatsapp")
                         },
                         icon: Icon(
-                          Icons.whatsapp,
+                          Icons.message,
                           color: MyTheme.white,
                         ),
                         label: Text(
