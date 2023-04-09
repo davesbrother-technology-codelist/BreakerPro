@@ -12,18 +12,18 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:workmanager/workmanager.dart';
+// import 'package:workmanager/workmanager.dart';
 
 Future<void> main() async {
   await initialiseHive();
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  Workmanager().initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
-      isInDebugMode:
-          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-      );
+  // Workmanager().initialize(
+  //     callbackDispatcher, // The top level function, aka callbackDispatcher
+  //     isInDebugMode:
+  //         true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+  //     );
 
   NotificationService().initialize();
 
@@ -62,17 +62,17 @@ Future<void> initialiseHive() async {
   }
 }
 
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) {
-    switch (task) {
-      case "1":
-        NotificationService().instantNofitication("Hello");
-        break;
-    }
-
-    return Future.value(true);
-  });
-}
+// void callbackDispatcher() {
+//   Workmanager().executeTask((task, inputData) {
+//     switch (task) {
+//       case "1":
+//         NotificationService().instantNofitication("Hello");
+//         break;
+//     }
+//
+//     return Future.value(true);
+//   });
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
