@@ -69,7 +69,7 @@ class _MainDashboardState extends State<MainDashboard>{
           // Use a switch statement to route task-handling.
           switch (taskId) {
             case 'com.transistorsoft.customtask':
-              upload();
+              await upload();
               break;
             default:
               print("Default fetch task");
@@ -90,6 +90,7 @@ class _MainDashboardState extends State<MainDashboard>{
     fetchSelectListNetwork();
     fetchStockReconcileList();
     fetchPartsListNetwork();
+    initBackgroundFetch();
     super.initState();
     // subscription = FGBGEvents.stream.listen((event) async {
     //   print(event);
@@ -121,46 +122,46 @@ class _MainDashboardState extends State<MainDashboard>{
     //     PartsList.isUploading = false;
     //   }
     // });
-    _networkSubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult connectivityResult) async {
-      if (connectivityResult == ConnectivityResult.ethernet ||
-          connectivityResult == ConnectivityResult.mobile ||
-          connectivityResult == ConnectivityResult.wifi) {
-        if (kDebugMode) {
-          print("Upload resume $connectivityResult");
-        }
-        await Future.delayed(const Duration(seconds: 2));
-        if (!PartsList.isUploading) {
-          PartsList.isUploading = true;
-          try {
-            await upload();
-            await uploadManagePart();
-          } catch (e) {
-            print("FAILED TO UPLOAD $e");
-            PartsList.isUploading = false;
-          } finally {
-            PartsList.isUploading = false;
-          }
-        }
-        return;
-      }
-      else{
-        print(connectivityResult);
-        PartsList.isUploading = false;
-      }
-    });
+    // _networkSubscription = Connectivity()
+    //     .onConnectivityChanged
+    //     .listen((ConnectivityResult connectivityResult) async {
+    //   if (connectivityResult == ConnectivityResult.ethernet ||
+    //       connectivityResult == ConnectivityResult.mobile ||
+    //       connectivityResult == ConnectivityResult.wifi) {
+    //     if (kDebugMode) {
+    //       print("Upload resume $connectivityResult");
+    //     }
+    //     await Future.delayed(const Duration(seconds: 2));
+    //     if (!PartsList.isUploading) {
+    //       PartsList.isUploading = true;
+    //       try {
+    //         await upload();
+    //         await uploadManagePart();
+    //       } catch (e) {
+    //         print("FAILED TO UPLOAD $e");
+    //         PartsList.isUploading = false;
+    //       } finally {
+    //         PartsList.isUploading = false;
+    //       }
+    //     }
+    //     return;
+    //   }
+    //   else{
+    //     print(connectivityResult);
+    //     PartsList.isUploading = false;
+    //   }
+    // });
 
-    if (PartsList.newAdded) {
-      PartsList.newAdded = false;
-      timer2 = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        if (!PartsList.isUploading) {
-          print("Hrllo");
-          await upload();
-          timer2.cancel();
-        }
-      });
-    }
+    // if (PartsList.newAdded) {
+    //   PartsList.newAdded = false;
+    //   timer2 = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    //     if (!PartsList.isUploading) {
+    //       print("Hrllo");
+    //       await upload();
+    //       timer2.cancel();
+    //     }
+    //   });
+    // }
     BackgroundFetch.scheduleTask(TaskConfig(
         taskId: "com.transistorsoft.customtask",
         delay: 1000  // <-- milliseconds
@@ -178,7 +179,7 @@ class _MainDashboardState extends State<MainDashboard>{
     // if(timer2.isActive){
     //   timer2.cancel();
     // }
-    _networkSubscription.cancel();
+    // _networkSubscription.cancel();
     super.dispose();
   }
 
@@ -187,7 +188,7 @@ class _MainDashboardState extends State<MainDashboard>{
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        upload();
+        // upload();
         return Future.value(true);},
       child : Scaffold(
         appBar: AppBar(
@@ -707,21 +708,21 @@ class _MainDashboardState extends State<MainDashboard>{
     //   print(a);
     // }
 
-    if (!PartsList.isUploading) {
-      PartsList.isUploading = true;
-      try {
-        await upload();
-        if (PartsList.newAdded) {
-          await upload();
-          PartsList.newAdded = false;
-        }
-      } catch (e) {
-        print("FAILED TO UPLOAD $e");
-        PartsList.isUploading = false;
-      }
-
-      PartsList.isUploading = false;
-    }
+    // if (!PartsList.isUploading) {
+    //   PartsList.isUploading = true;
+    //   try {
+    //     await upload();
+    //     if (PartsList.newAdded) {
+    //       await upload();
+    //       PartsList.newAdded = false;
+    //     }
+    //   } catch (e) {
+    //     print("FAILED TO UPLOAD $e");
+    //     PartsList.isUploading = false;
+    //   }
+    //
+    //   PartsList.isUploading = false;
+    // }
 
     if (prefs.getString('vehicle') != null) {
       print("From cache ${prefs.getString('vehicle')}");
