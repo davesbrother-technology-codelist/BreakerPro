@@ -84,29 +84,35 @@ class _MainDashboardState extends State<MainDashboard>{
     );
   }
 
+  f() async {
+    await Future.delayed(Duration(seconds: 5));
+    print("Running");
+  }
   @override
   void initState() {
     partsList = PartsList();
     fetchSelectListNetwork();
     fetchStockReconcileList();
     fetchPartsListNetwork();
-    initBackgroundFetch();
+    // initBackgroundFetch();
     super.initState();
-    // subscription = FGBGEvents.stream.listen((event) async {
-    //   print(event);
-    //   if (!PartsList.isUploading) {
-    //     PartsList.isUploading = true;
-    //     try {
-    //       await upload();
-    //       await uploadManagePart();
-    //     } catch (e) {
-    //       print("FAILED TO UPLOAD $e");
-    //       PartsList.isUploading = false;
-    //     } finally {
-    //       PartsList.isUploading = false;
-    //     }
-    //   }
-    // });
+    subscription = FGBGEvents.stream.listen((event) async {
+      print(event);
+      f();
+
+      // if (!PartsList.isUploading) {
+      //   PartsList.isUploading = true;
+      //   try {
+      //     await upload();
+      //     await uploadManagePart();
+      //   } catch (e) {
+      //     print("FAILED TO UPLOAD $e");
+      //     PartsList.isUploading = false;
+      //   } finally {
+      //     PartsList.isUploading = false;
+      //   }
+      // }
+    });
     timer =
         Timer.periodic(const Duration(seconds: 10), (Timer t) => checkLogin());
     // timer3 = Timer.periodic(Duration(seconds: 1), (timer) async {
@@ -162,10 +168,11 @@ class _MainDashboardState extends State<MainDashboard>{
     //     }
     //   });
     // }
-    BackgroundFetch.scheduleTask(TaskConfig(
-        taskId: "com.transistorsoft.customtask",
-        delay: 1000  // <-- milliseconds
-    ));
+    // BackgroundFetch.scheduleTask(TaskConfig(
+    //     taskId: "com.transistorsoft.customtask",
+    //     delay: 1000  // <-- milliseconds
+    // ));
+
   }
 
   @override
@@ -173,7 +180,7 @@ class _MainDashboardState extends State<MainDashboard>{
     PartsList.prefs!.setInt('partCount', PartsList.partCount);
     PartsList.prefs!.setInt('vehicleCount', PartsList.vehicleCount);
     Hive.close();
-    // subscription.cancel();
+    subscription.cancel();
     timer.cancel();
     // timer3.cancel();
     // if(timer2.isActive){
