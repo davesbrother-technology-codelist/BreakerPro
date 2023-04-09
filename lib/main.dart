@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:breaker_pro/app_config.dart';
 import 'package:breaker_pro/dataclass/part.dart';
 import 'package:breaker_pro/my_theme.dart';
@@ -13,6 +14,22 @@ import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 // import 'package:workmanager/workmanager.dart';
+
+@pragma('vm:entry-point')
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  if (isTimeout) {
+    // This task has exceeded its allowed running-time.
+    // You must stop what you're doing and immediately .finish(taskId)
+    print("[BackgroundFetch] Headless task timed-out: $taskId");
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  print('[BackgroundFetch] Headless event received.');
+  print("Start Upload");
+  BackgroundFetch.finish(taskId);
+}
 
 Future<void> main() async {
   await initialiseHive();
@@ -30,6 +47,8 @@ Future<void> main() async {
   await AppConfig.getDeviceInfo();
 
   await getExternalDirectory();
+
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   runApp(const MyApp());
 }
 

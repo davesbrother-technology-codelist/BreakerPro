@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive_io.dart';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:breaker_pro/notification_service.dart';
 import 'package:breaker_pro/screens/vehicle_details_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -49,6 +50,39 @@ class _MainDashboardState extends State<MainDashboard>{
   late StreamSubscription<ConnectivityResult> _networkSubscription;
   Map responseJson = {};
 
+  Future<void> initBackgroundFetch() async {
+    await BackgroundFetch.configure(
+        BackgroundFetchConfig(
+          minimumFetchInterval: 15,
+          stopOnTerminate: false,
+          enableHeadless: true,
+          requiresBatteryNotLow: false,
+          requiresCharging: false,
+          requiresStorageNotLow: false,
+          requiresDeviceIdle: false,
+          startOnBoot: true,
+        ),
+            (String taskId) async {  // <-- Event callback.
+          // This is the fetch-event callback.
+          print("[BackgroundFetch] taskId: $taskId");
+
+          // Use a switch statement to route task-handling.
+          switch (taskId) {
+            case 'com.transistorsoft.customtask':
+              upload();
+              break;
+            default:
+              print("Default fetch task");
+          }
+          // Finish, providing received taskId.
+          BackgroundFetch.finish(taskId);
+        }, (String taskId) async {  // <-- Event timeout callback
+      // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
+      print("[BackgroundFetch] TIMEOUT taskId: $taskId");
+      BackgroundFetch.finish(taskId);
+    }
+    );
+  }
 
   @override
   void initState() {
@@ -127,6 +161,10 @@ class _MainDashboardState extends State<MainDashboard>{
         }
       });
     }
+    BackgroundFetch.scheduleTask(TaskConfig(
+        taskId: "com.transistorsoft.customtask",
+        delay: 1000  // <-- milliseconds
+    ));
   }
 
   @override
